@@ -1,6 +1,10 @@
 import os
 
 def rename_files(directory):
+    if not os.path.exists(directory):
+        print(f"Directory {directory} does not exist.")
+        return
+    
     for filename in os.listdir(directory):
         if filename.endswith('.jsx'):
             old_file = os.path.join(directory, filename)
@@ -12,4 +16,6 @@ def rename_files(directory):
             except Exception as e:
                 print(f'Error renaming {old_file}: {e}')
 
-rename_files('client')
+if __name__ == '__main__':
+    client_directory = 'client'
+    rename_files(client_directory)
