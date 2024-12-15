@@ -8,6 +8,6 @@ def rename_files(directory):
             os.rename(old_file, new_file)
             print(f'Renamed: {old_file} -> {new_file}')
 
-if __name__ == '__main__':
-    client_directory = 'client'
-    rename_files(client_directory)
+
+client_directory = 'client'
+rename_files(client_directory)
