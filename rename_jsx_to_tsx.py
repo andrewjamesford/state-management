@@ -12,6 +12,4 @@ def rename_files(directory):
             except Exception as e:
                 print(f'Error renaming {old_file}: {e}')
 
-if __name__ == '__main__':
-    client_directory = 'client'
-    rename_files(client_directory)
+rename_files('client')
