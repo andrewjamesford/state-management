@@ -5,7 +5,7 @@ This project is to be used in conjunction with the video tutorial of the same na
 ## Dependencies
 
 - Docker
-- Nodejs 20+
+- Nodejs 22+
 
 
 ## Getting started
