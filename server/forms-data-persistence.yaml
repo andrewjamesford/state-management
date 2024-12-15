@@ -1,0 +1,88 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "state-management",
+    "description": "",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Andrew Ford",
+      "email": "andrew@andrewford.co.nz"
+      "github": "andrewjamesford"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5002/",
+      "description": ""
+    }
+  ],
+  "paths": {
+    "/api/categories/": {
+      "get": {
+        "summary": "Request",
+        "description": "",
+        "operationId": "741677f8-99ec-438d-bcf7-863f89953143",
+        "parameters": [
+          {
+            "name": "parentId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "0",
+              "description": ""
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "text/plain": {}
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "categories": {
+                      "type": "object",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "parent_id": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "",
+                "schema": {
+                  "type": "string",
+                  "example": "application/json; charset=utf-8"
+                }
+              },
+            }
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "components": {}
+}

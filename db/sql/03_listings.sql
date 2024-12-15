@@ -1,0 +1,45 @@
+INSERT INTO listings (
+		title,
+		category_id,
+		sub_title,
+		end_date,
+		listing_description,
+		condition_new,
+		listing_price,
+		reserve_price,
+		credit_card_payment,
+		bank_transfer_payment,
+		bitcoin_payment,
+		pick_up,
+		shipping_option
+	)
+VALUES (
+		'Antique clock',
+		24,
+		'Beautiful antique clock',
+		'2024-12-31 23:59:59',
+		'This clock is a beautiful antique piece that will look great in any home.',
+		false,
+		99.99,
+		149.99,
+		true,
+		true,
+		false,
+		true,
+		'courier'
+	),
+	(
+		'Vintage computer',
+		57,
+		'Fully functional vintage Acer computer XT 8086',
+		'2024-12-31 23:59:59',
+		'This computer is a fully functional vintage piece that will look great in any home.',
+		false,
+		200.00,
+		201.00,
+		false,
+		false,
+		true,
+		false,
+		'post'
+	)
