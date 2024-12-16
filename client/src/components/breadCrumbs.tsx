@@ -1,4 +1,4 @@
-import { usePath } from "crossroad";
+// import { usePath } from "crossroad";
 
 /**
  * NavItem component renders a navigation item with a link or a span based on its active state.

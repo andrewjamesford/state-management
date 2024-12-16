@@ -1,7 +1,7 @@
 import Loader from "@/components/loader";
 import { getPageAndPath } from "@/utils/getPageAndPath";
 import { getLocalStorageItem, setLocalStorageItem } from "@/utils/localStorage";
-import { usePath } from "crossroad";
+// import { usePath } from "crossroad";
 import React, { lazy, Suspense, useState } from "react";
 const MenuLoggedIn = lazy(() => import("@/components/menuLoggedIn"));
 const MenuLoggedOut = lazy(() => import("@/components/menuLoggedOut"));
