@@ -1,7 +1,7 @@
 import api from "@/api";
 import ErrorMessage from "@/components/errorMessage";
 import { getLocalStorageItem } from "@/utils/localStorage";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, JSX } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
 import BreadCrumbs from "@/components/breadCrumbs";
@@ -18,6 +18,45 @@ import PageFive from "@/components/multi-page-form/page5";
 
 import { listingSchema } from "@/models/listingSchema";
 
+interface TitleCategory {
+  userId: string;
+  title: string;
+  category?: string;
+  subTitle?: string;
+  categoryId?: string;
+  subCategoryId?: string;
+  endDate?: string;
+}
+
+interface ItemDetails {
+  description?: string;
+  condition?: string;
+  // Add other item details properties as needed
+}
+
+interface PricePayment {
+  price?: number;
+  paymentMethod?: string;
+  // Add other price/payment properties as needed
+}
+
+interface Shipping {
+  method?: string;
+  cost?: number;
+  // Add other shipping properties as needed
+}
+
+interface FormState {
+  titleCategory: TitleCategory;
+  itemDetails: ItemDetails;
+  pricePayment: PricePayment;
+  shipping: Shipping;
+}
+
+interface MultiPageFormProps {
+  step: string;
+}
+
 /**
  * MultiPageForm component handles the multi-step form for adding a listing.
  * It manages the form state, draft saving/loading, and form submission.
@@ -31,20 +70,21 @@ import { listingSchema } from "@/models/listingSchema";
  * @example
  * <MultiPageForm step="1" />
  */
-export default function MultiPageForm({ step }) {
-	const userID = getLocalStorageItem("userId");
+export default function MultiPageForm({ step }: MultiPageFormProps): JSX.Element {
+	const userID: string = getLocalStorageItem("userId") || "";
 	// Add userId to formState
-	const [formState, setFormState] = useState({
+	const [formState, setFormState] = useState<FormState>({
 		...listingSchema,
 		titleCategory: {
 			...listingSchema.titleCategory,
 			userId: userID,
+			title: listingSchema.titleCategory.title || "",
 		},
 	});
 
-	const [draftAvailable, setDraftAvailable] = useState(false);
+	const [draftAvailable, setDraftAvailable] = useState<boolean>(false);
 
-	const handleAddListing = async () => {
+	const handleAddListing = async (): Promise<void> => {
 		const listing = {
 			listing: formState,
 		};
@@ -62,7 +102,7 @@ export default function MultiPageForm({ step }) {
 		alert(`${JSON.stringify(result)} listing added`);
 	};
 
-	const handleLoadDraft = async (userId) => {
+	const handleLoadDraft = async (userId: string): Promise<void> => {
 		try {
 			const response = await api.getDraftListing(userId);
 			if (!response.ok) {
@@ -86,11 +126,15 @@ export default function MultiPageForm({ step }) {
 			});
 			console.log("Draft loaded successfully:", draftValues);
 		} catch (error) {
-			console.error("Error loading draft:", error.message);
+			if (error instanceof Error) {
+				console.error("Error loading draft:", error.message);
+			} else {
+				console.error("Error loading draft:", error);
+			}
 		}
 	};
 
-	const saveDraft = async () => {
+	const saveDraft = async (): Promise<void> => {
 		const listing = {
 			listing: formState,
 		};
@@ -108,7 +152,7 @@ export default function MultiPageForm({ step }) {
 		console.log("Draft saved successfully");
 	};
 
-	const checkForDraft = async (userId) => {
+	const checkForDraft = async (userId: string): Promise<void> => {
 		// Check if there is already a draft record for this users id
 		try {
 			if (userId.length === 0) {
@@ -124,7 +168,11 @@ export default function MultiPageForm({ step }) {
 			}
 		} catch (error) {
 			setDraftAvailable(false);
-			setError(error);
+			if (error instanceof Error) {
+				setError(error);
+			} else {
+				setError(new Error(String(error)));
+			}
 		}
 	};
 
@@ -138,7 +186,7 @@ export default function MultiPageForm({ step }) {
 		<>
 			<ErrorBoundary
 				fallback={
-					<ErrorMessage message="An error occured trying to load the form." />
+					<ErrorMessage message="An error occurred trying to load the form." />
 				}
 				onError={(error) => console.error(error)}
 			>
@@ -146,7 +194,7 @@ export default function MultiPageForm({ step }) {
 				{step === "1" && (
 					<PageOne
 						values={formState.titleCategory}
-						setFormState={(newTitleCategory) => {
+						setFormState={(newTitleCategory: TitleCategory) => {
 							setFormState({
 								...formState,
 								titleCategory: newTitleCategory,
@@ -160,7 +208,7 @@ export default function MultiPageForm({ step }) {
 				{step === "2" && (
 					<PageTwo
 						values={formState.itemDetails}
-						setFormState={(newItemDetails) => {
+						setFormState={(newItemDetails: ItemDetails) => {
 							setFormState({
 								...formState,
 								itemDetails: newItemDetails,
@@ -174,19 +222,21 @@ export default function MultiPageForm({ step }) {
 				{step === "3" && (
 					<PageThree
 						values={formState.pricePayment}
-						setFormState={(newPricePayment) => {
+						setFormState={(newPricePayment: PricePayment) => {
 							setFormState({
 								...formState,
 								pricePayment: newPricePayment,
 							});
 							saveDraft();
 						}}
+						draftAvailable={draftAvailable}
+						handleLoadDraft={handleLoadDraft}
 					/>
 				)}
 				{step === "4" && (
 					<PageFour
 						values={formState.shipping}
-						setFormState={(newShipping) => {
+						setFormState={(newShipping: Shipping) => {
 							setFormState({ ...formState, shipping: newShipping });
 							saveDraft();
 						}}
@@ -201,3 +251,11 @@ export default function MultiPageForm({ step }) {
 		</>
 	);
 }
+const [error, setError] = useState<Error | null>(null);
+
+useEffect(() => {
+	if (error) {
+		console.error("An error occurred:", error.message);
+	}
+}, [error]);
+

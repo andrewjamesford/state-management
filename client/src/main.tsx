@@ -1,18 +1,22 @@
 import App from "@/app.jsx";
 import ErrorPage from "@/components/errorPage";
-import React, { StrictMode } from "react";
+import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { ErrorBoundary } from "react-error-boundary";
 
-import "@/index.css";
 
-ReactDOM.createRoot(document.getElementById("root")).render(
-	<StrictMode>
-		<ErrorBoundary
-			fallback={<ErrorPage message="Something went wrong" />}
-			onError={(error) => console.error(error)}
-		>
-			<App />
-		</ErrorBoundary>
-	</StrictMode>,
-);
+const rootElement = document.getElementById("root");
+if (rootElement) {
+	ReactDOM.createRoot(rootElement).render(
+		<StrictMode>
+			<ErrorBoundary
+				fallback={<ErrorPage message="Something went wrong" />}
+				onError={(error) => console.error(error)}
+			>
+				<App />
+			</ErrorBoundary>
+		</StrictMode>,
+	);
+} else {
+	console.error("Root element not found");
+}
