@@ -13,7 +13,7 @@
 		"report": "biome check --reporter=summary --log-level=warn ./src"
 	},
 	"dependencies": {
-		"@tanstack/react-router": "^1.90.0",
+		"@tanstack/react-router": "^1.91.2",
 		"date-fns": "^4.1",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
@@ -22,8 +22,8 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
-		"@tanstack/router-devtools": "^1.90.0",
-		"@tanstack/router-plugin": "^1.87.13",
+		"@tanstack/router-devtools": "^1.91",
+		"@tanstack/router-plugin": "^1.91",
 		"@types/node": "^22.10.2",
 		"@types/react": "^19.0.1",
 		"@types/react-dom": "^19.0.2",
