@@ -2,9 +2,9 @@ import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 
-import categoriesRouter from "./categories/categories.router.mjs";
-import listingRouter from "./listing/listing.router.mjs";
-import errorHandlerMiddleware from "./middleware/errorHandlerMiddleware.mjs";
+import categoriesRouter from "./categories/categories.router";
+import listingRouter from "./listing/listing.router";
+import errorHandlerMiddleware from "./middleware/errorHandlerMiddleware";
 
 dotenv.config();
 const app = express();

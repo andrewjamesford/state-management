@@ -1,4 +1,4 @@
-import { query } from "../db.cjs";
+import { query } from "../db";
 
 /**
  * Retrieves categories from the database based on the provided parent ID and active status.
@@ -16,6 +16,6 @@ export async function getCategories(parentId = 0, active = true) {
 		);
 		return result.rows;
 	} catch (error) {
-		throw new Error(error);
+		throw new Error(String(error));
 	}
 }

@@ -1,4 +1,4 @@
-import { query } from "../db.cjs";
+import { query } from "../db";
 
 /**
  * getListings - gets all listings from the database
@@ -12,7 +12,7 @@ export const getListings = async () => {
 		);
 		return result.rows ?? [];
 	} catch (error) {
-		throw new Error(error);
+		throw new Error(error instanceof Error ? error.message : String(error));
 	}
 };
 
@@ -21,10 +21,41 @@ export const getListings = async () => {
  * @param {object} listingDetails
  * @returns {object} listing
  */
-export const addListing = async (listingDetails) => {
+interface TitleCategory {
+	title: string;
+	categoryId: number;
+	subTitle: string;
+	endDate: string;
+}
+
+interface ItemDetails {
+	condition: boolean;
+	description: string;
+}
+
+interface PricePayment {
+	listingPrice: number;
+	reservePrice: number;
+	creditCardPayment: boolean;
+	bankTransferPayment: boolean;
+	bitcoinPayment: boolean;
+}
+
+interface Shipping {
+	pickUp: boolean;
+	shippingOption: string;
+}
+
+interface ListingDetails {
+	titleCategory: TitleCategory;
+	itemDetails: ItemDetails;
+	pricePayment: PricePayment;
+	shipping: Shipping;
+}
+
+export const addListing = async (listingDetails: ListingDetails): Promise<number> => {
 	try {
-		const { titleCategory, itemDetails, pricePayment, shipping } =
-			listingDetails;
+		const { titleCategory, itemDetails, pricePayment, shipping } = listingDetails;
 
 		const { title, categoryId, subTitle, endDate } = titleCategory;
 
@@ -56,7 +87,7 @@ export const addListing = async (listingDetails) => {
 			pick_up, 
 			shipping_option)
 			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);
-      `,
+		`,
 			[
 				title,
 				categoryId,
@@ -75,7 +106,12 @@ export const addListing = async (listingDetails) => {
 		);
 		return result.rowCount ?? 0;
 	} catch (error) {
-		throw new Error(`Error adding listing: ${error.message}`);
+		if (error instanceof Error) {
+			throw new Error(`Error adding listing: ${error?.message}`);
+			
+		} 
+			throw new Error('Error adding listing: Unknown error');
+		
 	}
 };
 
@@ -85,7 +121,12 @@ export const addListing = async (listingDetails) => {
  * @param {string} userId
  * @returns rowcount
  */
-export const addDraftListing = async (draft, userId) => {
+interface Draft {
+	// Define the structure of the draft object here
+	[key: string]: any;
+}
+
+export const addDraftListing = async (draft: Draft, userId: string): Promise<number> => {
 	try {
 		const result = await query(
 			`INSERT INTO listings_draft (
@@ -96,7 +137,10 @@ export const addDraftListing = async (draft, userId) => {
 		);
 		return result.rowCount ?? 0;
 	} catch (error) {
-		throw new Error(`Error adding listing: ${error.message}`);
+		if (error instanceof Error) {
+			throw new Error(`Error updating draft: ${error.message}`);
+		}
+		throw new Error('Error updating draft: Unknown error');
 	}
 };
 
@@ -106,7 +150,11 @@ export const addDraftListing = async (draft, userId) => {
  * @param {string} userId
  * @returns rowcount
  */
-export const updateDraftListing = async (draft, userId) => {
+interface UpdateDraft {
+	[key: string]: any;
+}
+
+export const updateDraftListing = async (draft: UpdateDraft, userId: string): Promise<number> => {
 	try {
 		const result = await query(
 			`UPDATE listings_draft SET 
@@ -115,7 +163,10 @@ export const updateDraftListing = async (draft, userId) => {
 		);
 		return result.rowCount ?? 0;
 	} catch (error) {
-		throw new Error(`Error updating draft: ${error.message}`);
+		if (error instanceof Error) {
+			throw new Error(`Error updating draft: ${error.message}`);
+		}
+		throw new Error('Error updating draft: Unknown error');
 	}
 };
 
@@ -124,7 +175,12 @@ export const updateDraftListing = async (draft, userId) => {
  * @param {string} userId
  * @returns draft listing
  */
-export const getDraftListing = async (userId) => {
+interface DraftListing {
+	user_id: string;
+	draft: any;
+}
+
+export const getDraftListing = async (userId: string): Promise<DraftListing[]> => {
 	try {
 		const result = await query(
 			`SELECT user_id, draft 
@@ -132,8 +188,12 @@ export const getDraftListing = async (userId) => {
 			WHERE user_id=$1`,
 			[userId],
 		);
-		return result.rows;
+		return result.rows as DraftListing[];
 	} catch (error) {
-		throw new Error(`Error getting draft: ${error.message}`);
+		if (error instanceof Error) {
+			throw new Error(`Error getting draft: ${error.message}`);
+		} else {
+			throw new Error('Error getting draft: Unknown error');
+		}
 	}
 };

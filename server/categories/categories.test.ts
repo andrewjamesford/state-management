@@ -1,8 +1,8 @@
 import request from "supertest";
 import { describe, expect, it, vi } from "vitest";
-import { app } from "../app";
-import * as db from "../db.cjs";
-import { getCategories } from "./categories.repository.mjs";
+import  app  from "../app";
+import * as db from "../db";
+import { getCategories } from "./categories.repository";
 
 const mockCategories = {
 	categories: [
@@ -33,7 +33,7 @@ describe("getCategories", () => {
 
 	// Test case to verify that getCategories returns an empty array if no categories match the query
 	it("should return an empty array if no categories match the query", async () => {
-		const mockResult = { rows: [] };
+		const mockResult = { rows: [], command: '', rowCount: 0, oid: 0, fields: [] };
 
 		vi.spyOn(db, "query").mockResolvedValue(mockResult);
 

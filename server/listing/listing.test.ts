@@ -1,8 +1,8 @@
 import request from "supertest";
 import { describe, expect, it, vi } from "vitest";
-import { app } from "../app";
-import * as db from "../db.cjs";
-import { addListing, getListings } from "./listing.repository.mjs";
+import app from "../app";
+import * as db from "../db";
+import { addListing, getListings } from "./listing.repository";
 
 /**
  * Test suite for the getListings function.
@@ -38,7 +38,7 @@ describe("getListings", () => {
 	 * Test case to verify that getListings returns an empty array when there are no listings.
 	 */
 	it("should return empty array", async () => {
-		const mockResult = { rows: [] };
+		const mockResult = { rows: [], command: '', rowCount: 0, oid: 0, fields: [] };
 
 		vi.spyOn(db, "query").mockResolvedValue(mockResult);
 

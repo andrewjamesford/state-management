@@ -1,14 +1,14 @@
 import express from "express";
 const router = express.Router();
 import Joi from "joi";
-import bodyValidationMiddleware from "../middleware/bodyValidationMiddleware.mjs";
+import bodyValidationMiddleware from "../middleware/bodyValidationMiddleware";
 import {
 	addDraftListing,
 	addListing,
 	getDraftListing,
 	getListings,
 	updateDraftListing,
-} from "./listing.repository.mjs";
+} from "./listing.repository";
 
 router.use(express.json());
 
