@@ -1,4 +1,4 @@
-import { getPageAndPath } from "@/utils/getPageAndPath";
+import { getPageAndPath } from "~/utils/getPageAndPath";
 // import { usePath, useUrl } from "crossroad";
 import React, { useState } from "react";
 /**

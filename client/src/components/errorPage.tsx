@@ -1,5 +1,5 @@
-import ErrorMessage from "@/components/errorMessage";
-import Footer from "@/components/footer";
+import ErrorMessage from "~/components/errorMessage";
+import Footer from "~/components/footer";
 
 /**
  * ErrorPage component renders a full-page error message with a header and footer.

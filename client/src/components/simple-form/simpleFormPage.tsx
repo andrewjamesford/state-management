@@ -1,5 +1,5 @@
-import ErrorMessage from "@/components/errorMessage";
-import { listingSchema } from "@/models/listingSchema";
+import ErrorMessage from "~/components/errorMessage";
+import { listingSchema } from "~/models/listingSchema";
 import { addDays, format } from "date-fns";
 import { useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -8,9 +8,9 @@ import {
 	getSessionStorageItem,
 	removeSessionStorageItem,
 	setSessionStorageItem,
-} from "@/utils/sessionStorage";
+} from "~/utils/sessionStorage";
 
-import api from "@/api";
+import api from "~/api";
 
 /**
  * Simple form page

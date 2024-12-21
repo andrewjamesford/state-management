@@ -1,6 +1,6 @@
-import api from "@/api";
-import Loader from "@/components/loader";
-import { getPageAndPath } from "@/utils/getPageAndPath";
+import api from "~/api";
+import Loader from "~/components/loader";
+import { getPageAndPath } from "~/utils/getPageAndPath";
 // import { usePath, useUrl } from "crossroad";
 import { addDays, format } from "date-fns";
 import { useEffect, useState, FormEvent, ChangeEvent } from "react";

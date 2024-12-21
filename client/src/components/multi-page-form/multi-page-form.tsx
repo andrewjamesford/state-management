@@ -1,22 +1,22 @@
-import api from "@/api";
-import ErrorMessage from "@/components/errorMessage";
-import { getLocalStorageItem } from "@/utils/localStorage";
+import api from "~/api";
+import ErrorMessage from "~/components/errorMessage";
+import { getLocalStorageItem } from "~/utils/localStorage";
 import { useState, useEffect, JSX } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
-import BreadCrumbs from "@/components/breadCrumbs";
+import BreadCrumbs from "~/components/breadCrumbs";
 // titleCategory
-import PageOne from "@/components/multi-page-form/page1";
+import PageOne from "~/components/multi-page-form/page1";
 // itemDetails
-import PageTwo from "@/components/multi-page-form/page2";
+import PageTwo from "~/components/multi-page-form/page2";
 // pricePayment
-import PageThree from "@/components/multi-page-form/page3";
+import PageThree from "~/components/multi-page-form/page3";
 // shipping
-import PageFour from "@/components/multi-page-form/page4";
+import PageFour from "~/components/multi-page-form/page4";
 // review
-import PageFive from "@/components/multi-page-form/page5";
+import PageFive from "~/components/multi-page-form/page5";
 
-import { listingSchema } from "@/models/listingSchema";
+import { listingSchema } from "~/models/listingSchema";
 
 interface TitleCategory {
   userId: string;

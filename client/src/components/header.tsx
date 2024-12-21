@@ -1,10 +1,10 @@
-import Loader from "@/components/loader";
-import { getPageAndPath } from "@/utils/getPageAndPath";
-import { getLocalStorageItem, setLocalStorageItem } from "@/utils/localStorage";
+import Loader from "~/components/loader";
+import { getPageAndPath } from "~/utils/getPageAndPath";
+import { getLocalStorageItem, setLocalStorageItem } from "~/utils/localStorage";
 // import { usePath } from "crossroad";
 import React, { lazy, Suspense, useState } from "react";
-const MenuLoggedIn = lazy(() => import("@/components/menuLoggedIn"));
-const MenuLoggedOut = lazy(() => import("@/components/menuLoggedOut"));
+const MenuLoggedIn = lazy(() => import("~/components/menuLoggedIn"));
+const MenuLoggedOut = lazy(() => import("~/components/menuLoggedOut"));
 
 /**
  * Header component that displays a navigation header with login/logout functionality.
@@ -20,8 +20,9 @@ const MenuLoggedOut = lazy(() => import("@/components/menuLoggedOut"));
  * @returns {JSX.Element} The rendered header component.
  */
 export default function Header() {
-	const path = usePath();
-	const { page } = getPageAndPath(path);
+	// const path = usePath();
+	// const { page } = getPageAndPath(path);
+	const page = "single";
 	const storageKey = "isLoggedIn";
 	const storageIsLoggedIn = getLocalStorageItem(storageKey) || false;
 	const [isLoggedIn, setIsLoggedIn] = useState(storageIsLoggedIn);

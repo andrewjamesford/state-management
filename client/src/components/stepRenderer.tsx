@@ -14,11 +14,11 @@ interface StepRendererProps {
   handleAddListing: () => void;
 }
 
-const PageOne = lazy(() => import("@/components/multi-page-form/page1"));
-const PageTwo = lazy(() => import("@/components/multi-page-form/page2"));
-const PageThree = lazy(() => import("@/components/multi-page-form/page3"));
-const PageFour = lazy(() => import("@/components/multi-page-form/page3"));
-const PageFive = lazy(() => import("@/components/multi-page-form/page4"));
+const PageOne = lazy(() => import("~/components/multi-page-form/page1"));
+const PageTwo = lazy(() => import("~/components/multi-page-form/page2"));
+const PageThree = lazy(() => import("~/components/multi-page-form/page3"));
+const PageFour = lazy(() => import("~/components/multi-page-form/page3"));
+const PageFive = lazy(() => import("~/components/multi-page-form/page4"));
 
 /**
  * StepRenderer component renders different pages of a multi-step form based on the current step.
