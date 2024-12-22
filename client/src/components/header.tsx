@@ -42,11 +42,11 @@ export default function Header() {
 	const multi = page === "multi" ? "font-bold" : "";
 	return (
 		<>
-			<header className="flex flex-col md:flex-row justify-between px-4 py-2 bg-white border-b">
-				<div className="text-center mb-4 md:space-x-4">
+			<header className="flex flex-col justify-between border-b bg-white px-4 py-2 md:flex-row">
+				<div className="mb-4 text-center md:space-x-4">
 					<a
 						href="/"
-						className="text-sm text-black text-center inline-flex items-center mt-2"
+						className="mt-2 inline-flex items-center text-center text-sm text-black"
 					>
 						<img
 							src="/gavel.svg"
@@ -58,7 +58,7 @@ export default function Header() {
 						<span className="text-3xl md:text-lg">SOLD!</span>
 					</a>
 				</div>
-				<div className="flex flex-col text-center md:flex-row md:text-left gap-4 py-2 md:py-4">
+				<div className="flex flex-col gap-4 py-2 text-center md:flex-row md:py-4 md:text-left">
 					<Suspense fallback={<Loader />}>
 						{isLoggedIn ? (
 							<MenuLoggedIn

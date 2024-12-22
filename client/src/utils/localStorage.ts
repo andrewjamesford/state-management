@@ -6,12 +6,12 @@
  * @returns {boolean} True if the save was successful, false otherwise.
  */
 function setLocalStorageItem<T>(key: string, value: T): boolean {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-    return true;
-  } catch {
-    return false;
-  }
+	try {
+		localStorage.setItem(key, JSON.stringify(value));
+		return true;
+	} catch {
+		return false;
+	}
 }
 
 /**
@@ -21,15 +21,15 @@ function setLocalStorageItem<T>(key: string, value: T): boolean {
  * @returns {T | undefined} The item stored under the given key or undefined if it does not exist.
  */
 function getLocalStorageItem<T>(key: string): T | undefined {
-  const item = localStorage.getItem(key);
+	const item = localStorage.getItem(key);
 
-  if (item === null) return undefined;
+	if (item === null) return undefined;
 
-  try {
-    return JSON.parse(item) as T;
-  } catch {
-    return undefined;
-  }
+	try {
+		return JSON.parse(item) as T;
+	} catch {
+		return undefined;
+	}
 }
 
 /**
@@ -39,8 +39,8 @@ function getLocalStorageItem<T>(key: string): T | undefined {
  * @returns {boolean} True if the item was successfully removed.
  */
 function removeLocalStorageItem(key: string): boolean {
-  localStorage.removeItem(key);
-  return true;
+	localStorage.removeItem(key);
+	return true;
 }
 
 export { setLocalStorageItem, getLocalStorageItem, removeLocalStorageItem };

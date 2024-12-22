@@ -1,5 +1,5 @@
-import { createRootRoute, Link, Outlet } from '@tanstack/react-router';
-import { lazy, Suspense } from 'react';
+import { createRootRoute, Outlet } from "@tanstack/react-router";
+import { lazy, Suspense } from "react";
 
 import Footer from "~/components/footer";
 import Header from "~/components/header";
@@ -9,18 +9,17 @@ import NotFoundPage from "~/components/notFoundPage";
 import { generateUUID } from "~/utils/generateUUID";
 import { getLocalStorageItem, setLocalStorageItem } from "~/utils/localStorage";
 
-
 const TanStackRouterDevtools =
-  process.env.NODE_ENV === 'production'
-    ? () => null // Render nothing in production
-    : lazy(() =>
-        // Lazy load in development
-        import('@tanstack/router-devtools').then((res) => ({
-          default: res.TanStackRouterDevtools,
-          // For Embedded Mode
-          // default: res.TanStackRouterDevtoolsPanel
-        })),
-      )
+	process.env.NODE_ENV === "production"
+		? () => null // Render nothing in production
+		: lazy(() =>
+				// Lazy load in development
+				import("@tanstack/router-devtools").then((res) => ({
+					default: res.TanStackRouterDevtools,
+					// For Embedded Mode
+					// default: res.TanStackRouterDevtoolsPanel
+				})),
+			);
 
 // On secure log in get and set user ID
 const getUserID = () => {
@@ -36,26 +35,26 @@ getUserID();
 
 export const Route = createRootRoute({
 	loader: () => <Skeleton />,
-  component: () => (
-    <>
-		<div className="w-full flex flex-row place-content-center bg-gray-100">
-					<div className="w-11/12 max-w-7xl min-h-screen flex flex-col ">
-						<div className="bg-gray-100 h-full">
-							<Header />
-							<main className="px-4 py-8 bg-white">
-								<Outlet />
-							</main>
-						</div>
-						<Footer />
+	component: () => (
+		<>
+			<div className="w-full flex flex-row place-content-center bg-gray-100">
+				<div className="w-11/12 max-w-7xl min-h-screen flex flex-col ">
+					<div className="bg-gray-100 h-full">
+						<Header />
+						<main className="px-4 py-8 bg-white">
+							<Outlet />
+						</main>
 					</div>
+					<Footer />
 				</div>
+			</div>
 
-				<Suspense>
-					<TanStackRouterDevtools />  
-				</Suspense>
-    </>
-  )
-	,notFoundComponent: () => {
-    return <NotFoundPage />
-  }})
-	
+			<Suspense>
+				<TanStackRouterDevtools />
+			</Suspense>
+		</>
+	),
+	notFoundComponent: () => {
+		return <NotFoundPage />;
+	},
+});

@@ -1,4 +1,4 @@
-// import { usePath } from "crossroad";
+import type { ReactNode } from "react";
 
 /**
  * NavItem component renders a navigation item with a link or a span based on its active state.
@@ -9,7 +9,14 @@
  * @param {React.ReactNode} props.children - The content to be displayed inside the navigation item.
  * @returns {JSX.Element} The rendered navigation item.
  */
-function NavItem({ href, isActive, children }) {
+
+interface NavItemProps {
+	href: string;
+	isActive: boolean;
+	children: ReactNode;
+}
+
+function NavItem({ href, isActive, children }: NavItemProps) {
 	return (
 		<div>
 			{isActive ? (

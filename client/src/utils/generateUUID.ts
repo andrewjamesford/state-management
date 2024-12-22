@@ -5,5 +5,5 @@
  * @returns {string} A randomly generated UUID in the format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
  */
 export function generateUUID(): string {
-    return crypto.randomUUID();
+	return crypto.randomUUID();
 }

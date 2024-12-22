@@ -3,7 +3,6 @@ const headers = {
 	"Content-Type": "application/json",
 };
 
-
 /**
  * Fetches categories from the API.
  * @param {number} [parentId=0] - The ID of the parent category.
@@ -37,7 +36,6 @@ interface Listing {
 	[key: string]: any;
 }
 
-
 /**
  * Fetches a draft listing for a specific user from the API.
  * @param {string} userId - The ID of the user.
@@ -68,7 +66,10 @@ async function addListing(listing: Listing): Promise<Response> {
  * @param {Listing} listing - The listing data to be saved as a draft.
  * @returns {Promise<Response>} The fetch response promise.
  */
-async function saveDraftListing(userId: string, listing: Listing): Promise<Response> {
+async function saveDraftListing(
+	userId: string,
+	listing: Listing,
+): Promise<Response> {
 	console.log("saveDraftListing", userId, listing);
 	return await fetch(`${import.meta.env.VITE_API_URL}/listings/${userId}`, {
 		method: "POST",
@@ -76,7 +77,6 @@ async function saveDraftListing(userId: string, listing: Listing): Promise<Respo
 		body: JSON.stringify(listing),
 	});
 }
-
 
 export default {
 	getCategories,

@@ -13,7 +13,7 @@ export default function MenuLoggedIn({ menuProps, onChange }) {
 	const { single, simple, multi } = menuProps;
 
 	return (
-		<ul className="list-none gap-2 md:gap-4 flex flex-col items-center md:flex-row">
+		<ul className="flex list-none flex-col items-center gap-2 md:flex-row md:gap-4">
 			<li>
 				<a
 					href="/single/"

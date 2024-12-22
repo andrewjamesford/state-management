@@ -5,8 +5,8 @@
  * @returns The stored value
  */
 function setSessionStorageItem<T>(key: string, value: T): T {
-    sessionStorage.setItem(key, JSON.stringify(value));
-    return value;
+	sessionStorage.setItem(key, JSON.stringify(value));
+	return value;
 }
 
 /**
@@ -15,11 +15,11 @@ function setSessionStorageItem<T>(key: string, value: T): T {
  * @returns Value or undefined if not found in session storage
  */
 function getSessionStorageItem<T>(key: string): T | undefined {
-    const item = sessionStorage.getItem(key);
+	const item = sessionStorage.getItem(key);
 
-    if (item === null) return undefined;
+	if (item === null) return undefined;
 
-    return JSON.parse(item) as T;
+	return JSON.parse(item) as T;
 }
 
 /**
@@ -28,12 +28,12 @@ function getSessionStorageItem<T>(key: string): T | undefined {
  * @returns True if removed from session storage
  */
 function removeSessionStorageItem(key: string): boolean {
-    sessionStorage.removeItem(key);
-    return true;
+	sessionStorage.removeItem(key);
+	return true;
 }
 
 export {
-    setSessionStorageItem,
-    getSessionStorageItem,
-    removeSessionStorageItem,
+	setSessionStorageItem,
+	getSessionStorageItem,
+	removeSessionStorageItem,
 };

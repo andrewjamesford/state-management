@@ -1,6 +1,6 @@
 interface PageAndPath {
-  page: string;
-  step: number;
+	page: string;
+	step: number;
 }
 
 /**
@@ -10,8 +10,8 @@ interface PageAndPath {
  * @returns {PageAndPath} An object containing the parsed "page" and "step" values.
  */
 export function getPageAndPath(path: string): PageAndPath {
-  const stepArray: string[] = path.split("/") || [];
-  const page: string = stepArray[1] ?? "state";
-  const step: number = Number.parseInt(stepArray[2] ?? "1") || 1;
-  return { page, step };
+	const stepArray: string[] = path.split("/") || [];
+	const page: string = stepArray[1] ?? "state";
+	const step: number = Number.parseInt(stepArray[2] ?? "1") || 1;
+	return { page, step };
 }

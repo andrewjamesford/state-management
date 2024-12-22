@@ -8,7 +8,7 @@ import Footer from "~/components/footer";
  * @param {string} [props.message="An error occurred"] - The error message to display.
  * @returns {JSX.Element} The rendered ErrorPage component.
  */
-export default function ErrorPage({ message = "An error occured" }) {
+export default function ErrorPage({ message = "An error occurred" }) {
 	return (
 		<div className="w-full flex flex-row place-content-center bg-gray-100">
 			<div className="w-11/12 max-w-7xl min-h-screen flex flex-col ">

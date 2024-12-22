@@ -12,7 +12,6 @@ export default function Loader({ width = 10, height = 10 }) {
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 512 512"
-				title="Loading Animation"
 				aria-label="Loading Animation"
 				className=" animate-spin text-primary flex-1 "
 				width={width}
