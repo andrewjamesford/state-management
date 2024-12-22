@@ -9,11 +9,11 @@ import errorHandlerMiddleware from "./middleware/errorHandlerMiddleware";
 dotenv.config();
 const app = express();
 
-// middleware
+// Middle ware
 app.use(cors());
 app.use(express.json());
 
-// routes
+// Routes
 app.use("/api/categories", categoriesRouter);
 app.use("/api/listings", listingRouter);
 // Health check API route
@@ -21,7 +21,7 @@ app.get("/health", (req, res) => {
 	res.status(200).json({ message: "OK" });
 });
 
-// error handling middleware
+// Error handling middleware
 app.use(errorHandlerMiddleware);
 
 export default app;

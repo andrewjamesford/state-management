@@ -4,8 +4,8 @@
 	"description": "",
 	"main": "index.ts",
 	"scripts": {
-		"dev": "nodemon index.ts",
-		"start": "ts-node index.ts",
+		"dev": "nodemon",
+		"start": "npm run build && node dist/index.js",
 		"build": "tsc",
 		"test": "vitest",
 		"check": "biome check --write ./**/*.ts",
