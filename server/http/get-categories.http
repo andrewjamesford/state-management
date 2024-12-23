@@ -2,4 +2,11 @@ GET {{ HOST }}/api/categories?parentId=0 HTTP/1.1
 
 ?? status == 200
 
-
+HTTP/1.1 500  - Internal Server Error
+x-powered-by: Express
+access-control-allow-origin: *
+content-type: application/json; charset=utf-8
+content-length: 45
+etag: W/"2d-J1Zvq8Tg/9iB4MLaNtph8//lt8c"
+date: Mon, 23 Dec 2024 08:50:04 GMT
+connection: close
