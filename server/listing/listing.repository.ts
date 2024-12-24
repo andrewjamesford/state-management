@@ -1,12 +1,12 @@
-import { query } from "../db";
+import { pool } from "../db";
 
 /**
  * getListings - gets all listings from the database
  * @returns array of listings
  */
-export const getListings = async () => {
+export async function getListings() {
 	try {
-		const result = await query(
+		const result = await pool.query(
 			`SELECT l.id, l.title, l.sub_title, l.listing_description, l.listing_price, l.condition_new, c.category_name AS category FROM listings l INNER JOIN categories c ON c.id = l.category_id
       `,
 		);
@@ -14,7 +14,7 @@ export const getListings = async () => {
 	} catch (error) {
 		throw new Error(error instanceof Error ? error.message : String(error));
 	}
-};
+}
 
 /**
  * addListing - adds a new listing to the database
@@ -53,9 +53,12 @@ interface ListingDetails {
 	shipping: Shipping;
 }
 
-export const addListing = async (listingDetails: ListingDetails): Promise<number> => {
+export const addListing = async (
+	listingDetails: ListingDetails,
+): Promise<number> => {
 	try {
-		const { titleCategory, itemDetails, pricePayment, shipping } = listingDetails;
+		const { titleCategory, itemDetails, pricePayment, shipping } =
+			listingDetails;
 
 		const { title, categoryId, subTitle, endDate } = titleCategory;
 
@@ -71,7 +74,7 @@ export const addListing = async (listingDetails: ListingDetails): Promise<number
 
 		const { pickUp, shippingOption } = shipping;
 
-		const result = await query(
+		const result = await pool.query(
 			`INSERT INTO listings (
 			title, 
 			category_id, 
@@ -108,10 +111,8 @@ export const addListing = async (listingDetails: ListingDetails): Promise<number
 	} catch (error) {
 		if (error instanceof Error) {
 			throw new Error(`Error adding listing: ${error?.message}`);
-			
-		} 
-			throw new Error('Error adding listing: Unknown error');
-		
+		}
+		throw new Error("Error adding listing: Unknown error");
 	}
 };
 
@@ -123,12 +124,15 @@ export const addListing = async (listingDetails: ListingDetails): Promise<number
  */
 interface Draft {
 	// Define the structure of the draft object here
-	[key: string]: any;
+	[key: string]: string | number | boolean | object;
 }
 
-export const addDraftListing = async (draft: Draft, userId: string): Promise<number> => {
+export const addDraftListing = async (
+	draft: Draft,
+	userId: string,
+): Promise<number> => {
 	try {
-		const result = await query(
+		const result = await pool.query(
 			`INSERT INTO listings_draft (
 		draft, 
 		user_id) 
@@ -140,7 +144,7 @@ export const addDraftListing = async (draft: Draft, userId: string): Promise<num
 		if (error instanceof Error) {
 			throw new Error(`Error updating draft: ${error.message}`);
 		}
-		throw new Error('Error updating draft: Unknown error');
+		throw new Error("Error updating draft: Unknown error");
 	}
 };
 
@@ -151,12 +155,15 @@ export const addDraftListing = async (draft: Draft, userId: string): Promise<num
  * @returns rowcount
  */
 interface UpdateDraft {
-	[key: string]: any;
+	[key: string]: string | number | boolean | object;
 }
 
-export const updateDraftListing = async (draft: UpdateDraft, userId: string): Promise<number> => {
+export const updateDraftListing = async (
+	draft: UpdateDraft,
+	userId: string,
+): Promise<number> => {
 	try {
-		const result = await query(
+		const result = await pool.query(
 			`UPDATE listings_draft SET 
 		draft=$1 WHERE user_id=$2;`,
 			[draft, userId],
@@ -166,7 +173,7 @@ export const updateDraftListing = async (draft: UpdateDraft, userId: string): Pr
 		if (error instanceof Error) {
 			throw new Error(`Error updating draft: ${error.message}`);
 		}
-		throw new Error('Error updating draft: Unknown error');
+		throw new Error("Error updating draft: Unknown error");
 	}
 };
 
@@ -177,12 +184,14 @@ export const updateDraftListing = async (draft: UpdateDraft, userId: string): Pr
  */
 interface DraftListing {
 	user_id: string;
-	draft: any;
+	draft: Record<string, unknown>;
 }
 
-export const getDraftListing = async (userId: string): Promise<DraftListing[]> => {
+export const getDraftListing = async (
+	userId: string,
+): Promise<DraftListing[]> => {
 	try {
-		const result = await query(
+		const result = await pool.query(
 			`SELECT user_id, draft 
 			FROM listings_draft 
 			WHERE user_id=$1`,
@@ -192,8 +201,7 @@ export const getDraftListing = async (userId: string): Promise<DraftListing[]> =
 	} catch (error) {
 		if (error instanceof Error) {
 			throw new Error(`Error getting draft: ${error.message}`);
-		} else {
-			throw new Error('Error getting draft: Unknown error');
 		}
+		throw new Error("Error getting draft: Unknown error");
 	}
 };

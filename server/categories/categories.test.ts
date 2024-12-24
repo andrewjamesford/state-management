@@ -1,6 +1,6 @@
 import request from "supertest";
 import { describe, expect, it, vi } from "vitest";
-import  app  from "../app";
+import app from "../app";
 import * as db from "../db";
 import { getCategories } from "./categories.repository";
 
@@ -19,6 +19,14 @@ const mockCategories = {
 	],
 };
 
+interface mockResult {
+	rows: never[];
+	command: string;
+	rowCount: number;
+	oid: number;
+	fields: never[];
+}
+
 // getCategories test suite
 describe("getCategories", () => {
 	// Test case to verify that getCategories returns the categories
@@ -33,9 +41,15 @@ describe("getCategories", () => {
 
 	// Test case to verify that getCategories returns an empty array if no categories match the query
 	it("should return an empty array if no categories match the query", async () => {
-		const mockResult = { rows: [], command: '', rowCount: 0, oid: 0, fields: [] };
+		const mockResult: mockResult = {
+			rows: [],
+			command: "",
+			rowCount: 0,
+			oid: 0,
+			fields: [],
+		};
 
-		vi.spyOn(db, "query").mockResolvedValue(mockResult);
+		vi.spyOn(db, "query", "get").mockResolvedValue(mockResult);
 
 		const categories = await getCategories();
 
@@ -46,7 +60,7 @@ describe("getCategories", () => {
 	it("should throw an error if the database query fails", async () => {
 		const mockError = new Error("Database query failed");
 
-		vi.spyOn(db, "query").mockRejectedValue(mockError);
+		vi.spyOn(db, "query", "get").mockRejectedValue(mockError);
 
 		await expect(getCategories()).rejects.toThrow("Database query failed");
 	});

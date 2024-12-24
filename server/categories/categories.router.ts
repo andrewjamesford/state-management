@@ -1,18 +1,18 @@
-import express from "express";
+import express, {
+	type Request,
+	type Response,
+	type NextFunction,
+} from "express";
 const router = express.Router();
 import { getCategories } from "./categories.repository";
+import type { QueryResult } from "pg";
 
 // Get all categories
-router.get("/", async (req, res, next) => {
+router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const parentId = 0;
-		const categories = await getCategories(parentId, true);
+		const categories = await getCategories(0, true);
 
-		const responseResults = {
-			categories,
-		};
-
-		return res.json(responseResults);
+		return res.status(200).json(categories.rows);
 	} catch (err) {
 		next(err);
 	}

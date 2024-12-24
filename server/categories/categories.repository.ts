@@ -1,4 +1,4 @@
-import { query } from "../db";
+import { pool } from "../db";
 
 /**
  * Retrieves categories from the database based on the provided parent ID and active status.
@@ -8,14 +8,18 @@ import { query } from "../db";
  * @returns {Promise<Array>} A promise that resolves to an array of category objects.
  * @throws {Error} If there is an error executing the query.
  */
-export async function getCategories(parentId = 0, active = true) {
+export async function getCategories(parentId: number, active: boolean) {
 	try {
-		const result = await query(
-			"SELECT c.id, c.category_name, c.parent_id FROM categories c WHERE c.parent_id = $1 AND c.active = $2 ORDER BY c.category_name",
-			[parentId, active],
-		);
-		return result.rows;
+		const text =
+			"SELECT * FROM categories WHERE parent_id = $0 AND active = $1 ORDER BY category_name";
+		const values = [parentId, active];
+		const result = await pool.query(text, values);
+		return result;
 	} catch (error) {
+		if (error instanceof Error) {
+			console.error(error.message);
+		}
+		console.error(String(error));
 		throw new Error(String(error));
 	}
 }

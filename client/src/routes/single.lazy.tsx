@@ -38,10 +38,17 @@ function RouteComponent() {
 		}
 	};
 
-	const handleSubmit = async (e) => {
+	interface Listing {
+		titleCategory: typeof listingSchema.titleCategory;
+		itemDetails: typeof listingSchema.itemDetails;
+		pricePayment: typeof listingSchema.pricePayment;
+		shipping: typeof listingSchema.shipping;
+	}
+
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		const listing = {
+		const listing: Listing = {
 			titleCategory: titleCategory,
 			itemDetails: itemDetails,
 			pricePayment: pricePayment,

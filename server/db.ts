@@ -1,28 +1,19 @@
-import { Pool, QueryResult, QueryResultRow } from 'pg';
-import { types } from 'pg';
+import { Pool } from "pg";
+import { config } from "dotenv";
 
 // Database connection pool
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.DATABASE_URL
-        ? {
-              rejectUnauthorized: false,
-          }
-        : false,
+export const pool = new Pool({
+	user: process.env.PGUSER,
+	host: process.env.PGHOST,
+	password: process.env.PGPASSWORD,
+	database: process.env.PGDATABASE,
+	port: process.env.PGPORT ? Number.parseInt(process.env.PGPORT) : 5432,
 });
 
-function query<T extends QueryResultRow>(
-    text: string,
-    params: any[] = []
-): Promise<QueryResult<T>> {
-    return pool.query(text, params);
-}
-
-function end(): Promise<void> {
-    return pool.end();
-}
-
-export {
-    query,
-    end
-};
+// export const pool = new Pool({
+// 	user: "postgres",
+// 	host: "localhost",
+// 	password: "password",
+// 	database: "postgres",
+// 	port: 5432,
+// });
