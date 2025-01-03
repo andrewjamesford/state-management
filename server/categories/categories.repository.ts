@@ -10,11 +10,12 @@ import { pool } from "../db";
  */
 export async function getCategories(parentId: number, active: boolean) {
 	try {
-		const text =
-			"SELECT * FROM categories WHERE parent_id = $0 AND active = $1 ORDER BY category_name";
-		const values = [parentId, active];
-		const result = await pool.query(text, values);
-		return result;
+		const result = await pool.query(
+			"SELECT * FROM categories WHERE parent_id = $1 AND active = $2 ORDER BY category_name",
+			[parentId, active],
+		);
+		console.log("categories 3", result.rows[0]);
+		return result.rows ?? [];
 	} catch (error) {
 		if (error instanceof Error) {
 			console.error(error.message);

@@ -6,13 +6,18 @@
 	"configurations": [
 		{
 			"type": "node",
-			"port": 9229,
 			"request": "attach",
 			"name": "Docker: Attach to Node",
-			"remoteRoot": "/app",
-			"skipFiles": [
-				"<node_internals>/**"
-			],
+			"remoteRoot": "/usr/src/app"
+		},
+		{
+			"type": "node",
+			"request": "attach",
+			"name": "Attach to Remote",
+			"port": 9229,
+			"address": "localhost",
+			"localRoot": "${workspaceFolder}",
+			"remoteRoot": "/app"
 		}
 	]
 }

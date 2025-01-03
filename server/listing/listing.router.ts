@@ -1,4 +1,5 @@
 import express from "express";
+import type { Request, Response, NextFunction } from "express";
 const router = express.Router();
 import Joi from "joi";
 import bodyValidationMiddleware from "../middleware/bodyValidationMiddleware";
@@ -21,7 +22,7 @@ router.use(express.json());
  * @param {Object} res - The response object
  * @param {Function} next - The next middleware function
  */
-router.get("/", async (req, res, next) => {
+router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		// Call getListings() to retrieve all listings from the database
 		const getListingsResponse = await getListings();
