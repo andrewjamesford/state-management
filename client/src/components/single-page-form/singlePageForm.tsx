@@ -208,7 +208,6 @@ export function SinglePageFormContent({ boundaryTest }) {
 					{!loadingCategory && (
 						<select
 							id="category"
-							placeholder="Select a category"
 							className={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background  peer ${titleCategory.categoryId === 0 ? " italic text-gray-400" : ""}`}
 							onChange={(e) => {
 								const value = Number.parseInt(e.target.value) || 0;

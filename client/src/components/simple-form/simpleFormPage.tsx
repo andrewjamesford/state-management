@@ -20,7 +20,7 @@ export default function SimpleFormPage() {
 	return (
 		<ErrorBoundary
 			fallback={
-				<ErrorMessage message="An error occured trying to load the form." />
+				<ErrorMessage message="An error occurred trying to load the form." />
 			}
 			onError={(error) => console.error(error)}
 		>

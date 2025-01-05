@@ -1,48 +1,30 @@
-/**
- * MenuLoggedIn component renders a navigation menu for logged-in users.
- *
- * @param {Object} props - The component props.
- * @param {Object} props.menuProps - The properties for menu items.
- * @param {string} props.menuProps.single - The CSS class for the single page form link.
- * @param {string} props.menuProps.simple - The CSS class for the simple form link.
- * @param {string} props.menuProps.multi - The CSS class for the multi-page form link.
- * @param {Function} props.onChange - The callback function to handle the log out button click.
- * @returns {JSX.Element} The rendered component.
- */
-export default function MenuLoggedIn({ menuProps, onChange }) {
-	const { single, simple, multi } = menuProps;
+import type { JSX } from "react";
+import { LinkComponent } from "./linkComponent";
 
+/**
+ * Navigation menu component for authenticated users.
+ * Displays links to various forms and a logout button.
+ *
+ * @param {Object} props
+ * @param {() => void} props.onChange - Callback function triggered on logout
+ * @returns {JSX.Element} Navigation menu
+ */
+export default function MenuLoggedIn({
+	onChange,
+}: { onChange: () => void }): JSX.Element {
 	return (
 		<ul className="flex list-none flex-col items-center gap-2 md:flex-row md:gap-4">
 			<li>
-				<a
-					href="/single/"
-					className={`${single} text-sm text-gray-600 underline`}
-				>
-					Single Page Form
-				</a>
+				<LinkComponent to="/single" title="Single Page Form" />
 			</li>
 			<li>
-				<a
-					href="/simple/"
-					className={`${simple} text-sm text-gray-600 underline`}
-				>
-					Simple Form
-				</a>
-			</li>
-
-			<li>
-				<a
-					href="/multi/1"
-					className={`${multi} text-sm text-gray-600 underline`}
-				>
-					Multi Page Form
-				</a>
+				<LinkComponent to="/simple" title="Simple Form" />
 			</li>
 			<li>
-				<a href="/" className="text-sm text-gray-600 underline">
-					My Sold!
-				</a>
+				<LinkComponent to="/multi/1" title="Multi Page Form" />
+			</li>
+			<li>
+				<LinkComponent to="/" title="My Sold!" />
 			</li>
 			<li>
 				<button

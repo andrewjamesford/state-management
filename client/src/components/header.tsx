@@ -1,8 +1,6 @@
 import Loader from "~/components/loader";
-import { getPageAndPath } from "~/utils/getPageAndPath";
 import { getLocalStorageItem, setLocalStorageItem } from "~/utils/localStorage";
-// import { usePath } from "crossroad";
-import React, { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useState } from "react";
 const MenuLoggedIn = lazy(() => import("~/components/menuLoggedIn"));
 const MenuLoggedOut = lazy(() => import("~/components/menuLoggedOut"));
 
@@ -20,9 +18,6 @@ const MenuLoggedOut = lazy(() => import("~/components/menuLoggedOut"));
  * @returns {JSX.Element} The rendered header component.
  */
 export default function Header() {
-	// const path = usePath();
-	// const { page } = getPageAndPath(path);
-	const page = "single";
 	const storageKey = "isLoggedIn";
 	const storageIsLoggedIn = getLocalStorageItem(storageKey) || false;
 	const [isLoggedIn, setIsLoggedIn] = useState(storageIsLoggedIn);
@@ -37,9 +32,6 @@ export default function Header() {
 		setLocalStorageItem(storageKey, true);
 	};
 
-	const single = page === "single" ? "font-bold" : "";
-	const simple = page === "simple" ? "font-bold" : "";
-	const multi = page === "multi" ? "font-bold" : "";
 	return (
 		<>
 			<header className="flex flex-col justify-between border-b bg-white px-4 py-2 md:flex-row">
@@ -61,10 +53,7 @@ export default function Header() {
 				<div className="flex flex-col gap-4 py-2 text-center md:flex-row md:py-4 md:text-left">
 					<Suspense fallback={<Loader />}>
 						{isLoggedIn ? (
-							<MenuLoggedIn
-								menuProps={{ single, multi, simple }}
-								onChange={handleLogout}
-							/>
+							<MenuLoggedIn onChange={handleLogout} />
 						) : (
 							<MenuLoggedOut onChange={handleLogin} />
 						)}
