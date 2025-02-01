@@ -1,4 +1,4 @@
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { addDays, format } from "date-fns";
 import { useEffect, useState } from "react";
@@ -6,7 +6,7 @@ import { listingSchema } from "~/models/listingSchema";
 import Loader from "~/components/loader";
 import api from "~/api";
 
-export const Route = createLazyFileRoute("/single")({
+export const Route = createFileRoute("/tsquery/$listingId")({
 	component: RouteComponent,
 });
 

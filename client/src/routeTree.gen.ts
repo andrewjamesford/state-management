@@ -13,46 +13,60 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as ZustandIndexImport } from './routes/zustand/index'
+import { Route as TsqueryIndexImport } from './routes/tsquery/index'
+import { Route as ReduxIndexImport } from './routes/redux/index'
+import { Route as ZustandListingIdImport } from './routes/zustand/$listingId'
+import { Route as TsqueryListingIdImport } from './routes/tsquery/$listingId'
+import { Route as ReduxListingIdImport } from './routes/redux/$listingId'
 
 // Create Virtual Routes
 
-const SingleLazyImport = createFileRoute('/single')()
-const SimpleLazyImport = createFileRoute('/simple')()
-const MultiLazyImport = createFileRoute('/multi')()
-const AboutLazyImport = createFileRoute('/about')()
 const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
-
-const SingleLazyRoute = SingleLazyImport.update({
-  id: '/single',
-  path: '/single',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/single.lazy').then((d) => d.Route))
-
-const SimpleLazyRoute = SimpleLazyImport.update({
-  id: '/simple',
-  path: '/simple',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/simple.lazy').then((d) => d.Route))
-
-const MultiLazyRoute = MultiLazyImport.update({
-  id: '/multi',
-  path: '/multi',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/multi.lazy').then((d) => d.Route))
-
-const AboutLazyRoute = AboutLazyImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
 
 const IndexLazyRoute = IndexLazyImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+
+const ZustandIndexRoute = ZustandIndexImport.update({
+  id: '/zustand/',
+  path: '/zustand/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const TsqueryIndexRoute = TsqueryIndexImport.update({
+  id: '/tsquery/',
+  path: '/tsquery/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ReduxIndexRoute = ReduxIndexImport.update({
+  id: '/redux/',
+  path: '/redux/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ZustandListingIdRoute = ZustandListingIdImport.update({
+  id: '/zustand/$listingId',
+  path: '/zustand/$listingId',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const TsqueryListingIdRoute = TsqueryListingIdImport.update({
+  id: '/tsquery/$listingId',
+  path: '/tsquery/$listingId',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ReduxListingIdRoute = ReduxListingIdImport.update({
+  id: '/redux/$listingId',
+  path: '/redux/$listingId',
+  getParentRoute: () => rootRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -65,32 +79,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexLazyImport
       parentRoute: typeof rootRoute
     }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutLazyImport
+    '/redux/$listingId': {
+      id: '/redux/$listingId'
+      path: '/redux/$listingId'
+      fullPath: '/redux/$listingId'
+      preLoaderRoute: typeof ReduxListingIdImport
       parentRoute: typeof rootRoute
     }
-    '/multi': {
-      id: '/multi'
-      path: '/multi'
-      fullPath: '/multi'
-      preLoaderRoute: typeof MultiLazyImport
+    '/tsquery/$listingId': {
+      id: '/tsquery/$listingId'
+      path: '/tsquery/$listingId'
+      fullPath: '/tsquery/$listingId'
+      preLoaderRoute: typeof TsqueryListingIdImport
       parentRoute: typeof rootRoute
     }
-    '/simple': {
-      id: '/simple'
-      path: '/simple'
-      fullPath: '/simple'
-      preLoaderRoute: typeof SimpleLazyImport
+    '/zustand/$listingId': {
+      id: '/zustand/$listingId'
+      path: '/zustand/$listingId'
+      fullPath: '/zustand/$listingId'
+      preLoaderRoute: typeof ZustandListingIdImport
       parentRoute: typeof rootRoute
     }
-    '/single': {
-      id: '/single'
-      path: '/single'
-      fullPath: '/single'
-      preLoaderRoute: typeof SingleLazyImport
+    '/redux/': {
+      id: '/redux/'
+      path: '/redux'
+      fullPath: '/redux'
+      preLoaderRoute: typeof ReduxIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/tsquery/': {
+      id: '/tsquery/'
+      path: '/tsquery'
+      fullPath: '/tsquery'
+      preLoaderRoute: typeof TsqueryIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/zustand/': {
+      id: '/zustand/'
+      path: '/zustand'
+      fullPath: '/zustand'
+      preLoaderRoute: typeof ZustandIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -100,52 +128,84 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
-  '/about': typeof AboutLazyRoute
-  '/multi': typeof MultiLazyRoute
-  '/simple': typeof SimpleLazyRoute
-  '/single': typeof SingleLazyRoute
+  '/redux/$listingId': typeof ReduxListingIdRoute
+  '/tsquery/$listingId': typeof TsqueryListingIdRoute
+  '/zustand/$listingId': typeof ZustandListingIdRoute
+  '/redux': typeof ReduxIndexRoute
+  '/tsquery': typeof TsqueryIndexRoute
+  '/zustand': typeof ZustandIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
-  '/about': typeof AboutLazyRoute
-  '/multi': typeof MultiLazyRoute
-  '/simple': typeof SimpleLazyRoute
-  '/single': typeof SingleLazyRoute
+  '/redux/$listingId': typeof ReduxListingIdRoute
+  '/tsquery/$listingId': typeof TsqueryListingIdRoute
+  '/zustand/$listingId': typeof ZustandListingIdRoute
+  '/redux': typeof ReduxIndexRoute
+  '/tsquery': typeof TsqueryIndexRoute
+  '/zustand': typeof ZustandIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
-  '/about': typeof AboutLazyRoute
-  '/multi': typeof MultiLazyRoute
-  '/simple': typeof SimpleLazyRoute
-  '/single': typeof SingleLazyRoute
+  '/redux/$listingId': typeof ReduxListingIdRoute
+  '/tsquery/$listingId': typeof TsqueryListingIdRoute
+  '/zustand/$listingId': typeof ZustandListingIdRoute
+  '/redux/': typeof ReduxIndexRoute
+  '/tsquery/': typeof TsqueryIndexRoute
+  '/zustand/': typeof ZustandIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/multi' | '/simple' | '/single'
+  fullPaths:
+    | '/'
+    | '/redux/$listingId'
+    | '/tsquery/$listingId'
+    | '/zustand/$listingId'
+    | '/redux'
+    | '/tsquery'
+    | '/zustand'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/multi' | '/simple' | '/single'
-  id: '__root__' | '/' | '/about' | '/multi' | '/simple' | '/single'
+  to:
+    | '/'
+    | '/redux/$listingId'
+    | '/tsquery/$listingId'
+    | '/zustand/$listingId'
+    | '/redux'
+    | '/tsquery'
+    | '/zustand'
+  id:
+    | '__root__'
+    | '/'
+    | '/redux/$listingId'
+    | '/tsquery/$listingId'
+    | '/zustand/$listingId'
+    | '/redux/'
+    | '/tsquery/'
+    | '/zustand/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
-  AboutLazyRoute: typeof AboutLazyRoute
-  MultiLazyRoute: typeof MultiLazyRoute
-  SimpleLazyRoute: typeof SimpleLazyRoute
-  SingleLazyRoute: typeof SingleLazyRoute
+  ReduxListingIdRoute: typeof ReduxListingIdRoute
+  TsqueryListingIdRoute: typeof TsqueryListingIdRoute
+  ZustandListingIdRoute: typeof ZustandListingIdRoute
+  ReduxIndexRoute: typeof ReduxIndexRoute
+  TsqueryIndexRoute: typeof TsqueryIndexRoute
+  ZustandIndexRoute: typeof ZustandIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
-  AboutLazyRoute: AboutLazyRoute,
-  MultiLazyRoute: MultiLazyRoute,
-  SimpleLazyRoute: SimpleLazyRoute,
-  SingleLazyRoute: SingleLazyRoute,
+  ReduxListingIdRoute: ReduxListingIdRoute,
+  TsqueryListingIdRoute: TsqueryListingIdRoute,
+  ZustandListingIdRoute: ZustandListingIdRoute,
+  ReduxIndexRoute: ReduxIndexRoute,
+  TsqueryIndexRoute: TsqueryIndexRoute,
+  ZustandIndexRoute: ZustandIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -159,26 +219,34 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/about",
-        "/multi",
-        "/simple",
-        "/single"
+        "/redux/$listingId",
+        "/tsquery/$listingId",
+        "/zustand/$listingId",
+        "/redux/",
+        "/tsquery/",
+        "/zustand/"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
     },
-    "/about": {
-      "filePath": "about.lazy.tsx"
+    "/redux/$listingId": {
+      "filePath": "redux/$listingId.tsx"
     },
-    "/multi": {
-      "filePath": "multi.lazy.tsx"
+    "/tsquery/$listingId": {
+      "filePath": "tsquery/$listingId.tsx"
     },
-    "/simple": {
-      "filePath": "simple.lazy.tsx"
+    "/zustand/$listingId": {
+      "filePath": "zustand/$listingId.tsx"
     },
-    "/single": {
-      "filePath": "single.lazy.tsx"
+    "/redux/": {
+      "filePath": "redux/index.tsx"
+    },
+    "/tsquery/": {
+      "filePath": "tsquery/index.tsx"
+    },
+    "/zustand/": {
+      "filePath": "zustand/index.tsx"
     }
   }
 }

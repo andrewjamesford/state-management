@@ -15,13 +15,13 @@ export default function MenuLoggedIn({
 	return (
 		<ul className="flex list-none flex-col items-center gap-2 md:flex-row md:gap-4">
 			<li>
-				<LinkComponent to="/single" title="Single Page Form" />
+				<LinkComponent to="/tsquery" title="Tanstack Query" />
 			</li>
 			<li>
-				<LinkComponent to="/simple" title="Simple Form" />
+				<LinkComponent to="/redux" title="Redux" />
 			</li>
 			<li>
-				<LinkComponent to="/multi/1" title="Multi Page Form" />
+				<LinkComponent to="/zustand" title="Zustand" />
 			</li>
 			<li>
 				<LinkComponent to="/" title="My Sold!" />
