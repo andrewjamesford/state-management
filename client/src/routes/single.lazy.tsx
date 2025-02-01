@@ -1,4 +1,5 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { addDays, format } from "date-fns";
 import { useEffect, useState } from "react";
 import { listingSchema } from "~/models/listingSchema";
@@ -9,18 +10,22 @@ export const Route = createLazyFileRoute("/single")({
 	component: RouteComponent,
 });
 
+interface Listing {
+	titleCategory: typeof listingSchema.titleCategory;
+	itemDetails: typeof listingSchema.itemDetails;
+	pricePayment: typeof listingSchema.pricePayment;
+	shipping: typeof listingSchema.shipping;
+}
+
+interface Category {
+	id: number;
+	category_name: string;
+}
+
 function RouteComponent() {
 	const today = format(new Date(), "yyyy-MM-dd");
 	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
 	const fortnight = format(addDays(today, 14), "yyyy-MM-dd");
-
-	const [categories, setCategories] = useState([]);
-	const [subCategories, setSubCategories] = useState([]);
-
-	const [loadingCategory, setLoadingCategory] = useState(true);
-	const [loadingSubCategory, setLoadingSubCategory] = useState(true);
-
-	const [error, setError] = useState<Error | null>(null);
 
 	const [titleCategory, setTitleCategory] = useState(
 		listingSchema.titleCategory,
@@ -37,13 +42,6 @@ function RouteComponent() {
 			throw new Error("Price must be less than $10");
 		}
 	};
-
-	interface Listing {
-		titleCategory: typeof listingSchema.titleCategory;
-		itemDetails: typeof listingSchema.itemDetails;
-		pricePayment: typeof listingSchema.pricePayment;
-		shipping: typeof listingSchema.shipping;
-	}
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -68,52 +66,43 @@ function RouteComponent() {
 		alert(`${JSON.stringify(result)} listing added`);
 	};
 
-	useEffect(() => {
-		const fetchData = async () => {
-			setLoadingCategory(true);
-			try {
-				const response = await api.getCategories();
-				if (!response.ok) {
-					throw new Error("Error retrieving categories");
-				}
-				const result = await response.json();
-				setCategories(result.categories);
-			} catch (error) {
-				setError(error as Error);
-			} finally {
-				setLoadingCategory(false);
-			}
-		};
+	const {
+		data: parentCatData,
+		isLoading: loadingCategory,
+		error: parentError,
+	} = useQuery({
+		queryKey: ["parentCategories"],
+		queryFn: async () => {
+			const response = await api.getCategories();
+			console.log("response", response);
+			if (!response.ok) throw new Error("Error retrieving categories");
+			const result = await response.json();
+			console.log("result", result);
+			return result ?? [];
+		},
+	});
 
-		fetchData();
-	}, []);
+	const {
+		data: subCatData,
+		isLoading: loadingSubCategory,
+		error: subCatError,
+	} = useQuery({
+		queryKey: ["subCategories", titleCategory.categoryId],
+		queryFn: async () => {
+			console.log("subCatData titleCategory", titleCategory.categoryId);
+			if (!titleCategory.categoryId) return [];
+			const response = await api.getCategories(titleCategory.categoryId);
+			console.log("sub response", response);
+			if (!response.ok) throw new Error("Error retrieving sub-categories");
+			return await response.json();
+		},
+	});
 
-	useEffect(() => {
-		const fetchData = async () => {
-			setLoadingSubCategory(true);
-			try {
-				const parentId = titleCategory.categoryId || 0;
-				if (Number.parseInt(parentId.toString()) === 0) {
-					setSubCategories([]);
-					return;
-				}
-				const response = await api.getCategories(parentId);
-				if (!response.ok) {
-					throw new Error("Error retrieving sub-categories");
-				}
-				const result = await response.json();
-				setSubCategories(result?.categories);
-			} catch (error) {
-				setError(error);
-			} finally {
-				setLoadingSubCategory(false);
-			}
-		};
+	if (parentError) return <p>Error: {parentError.message}</p>;
+	if (subCatError) return <p>Error: {subCatError.message}</p>;
 
-		fetchData();
-	}, [titleCategory.categoryId]);
-
-	if (error) return <p>Error: {error.message}</p>;
+	console.log("parentCatData", parentCatData);
+	console.log("subCatData", subCatData);
 
 	return (
 		<form onSubmit={handleSubmit} noValidate className="group">
@@ -133,6 +122,7 @@ function RouteComponent() {
 					type="text"
 					onChange={(e) => {
 						const value = e.target.value ?? "";
+						console.log("value", value);
 						setTitleCategory({
 							...titleCategory,
 							title: value,
@@ -191,30 +181,29 @@ function RouteComponent() {
 					{!loadingCategory && (
 						<select
 							id="category"
-							placeholder="Select a category"
+							// placeholder="Select a category"
 							className={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background  peer ${titleCategory.categoryId === 0 ? " italic text-gray-400" : ""}`}
-							onChange={(e) => {
+							onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
 								const value = Number.parseInt(e.target.value) || 0;
 								setTitleCategory({
 									...titleCategory,
 									categoryId: value,
+									subCategoryId: 0, // reset subcategory
 								});
 							}}
 							value={titleCategory.categoryId}
 							onBlur={changeData}
 							required={true}
-							pattern="\d+"
+							// pattern="\d+"
 						>
 							<option value="" className="text-muted-foreground italic">
 								Select a category...
 							</option>
-							{categories?.map((category) => {
-								return (
-									<option key={category.id} value={category.id}>
-										{category.category_name}
-									</option>
-								);
-							})}
+							{parentCatData?.map((category: Category) => (
+								<option key={category.id} value={category.id}>
+									{category.category_name}
+								</option>
+							))}
 						</select>
 					)}
 					<span className="mt-1 hidden text-sm text-red-600 peer-[&:not(:selected):invalid]:block">
@@ -235,10 +224,10 @@ function RouteComponent() {
 					{!loadingSubCategory && (
 						<select
 							id="category-sub"
-							placeholder="Select a sub category"
-							className="block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 placeholder:italic"
+							// placeholder="Select a sub category"
+							className={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 placeholder:italic ${titleCategory.subCategoryId === 0 ? " italic text-gray-400" : ""}`}
 							onChange={(e) => {
-								const value = e.target.value || "";
+								const value = Number.parseInt(e.target.value) || 0;
 								setTitleCategory({
 									...titleCategory,
 									subCategoryId: value,
@@ -247,19 +236,16 @@ function RouteComponent() {
 							value={titleCategory.subCategoryId}
 							onBlur={changeData}
 							required={true}
-							pattern="\d+"
-							disabled={subCategories.length === 0}
+							disabled={subCatData.length === 0}
 						>
 							<option value="" className="text-muted-foreground italic">
 								Select a sub category...
 							</option>
-							{subCategories?.map((category) => {
-								return (
-									<option key={category.id} value={category.id}>
-										{category.category_name}
-									</option>
-								);
-							})}
+							{subCatData?.map((category: Category) => (
+								<option key={category.id} value={category.id}>
+									{category.category_name}
+								</option>
+							))}
 						</select>
 					)}
 				</div>
@@ -336,7 +322,7 @@ function RouteComponent() {
 							type="radio"
 							id="used"
 							name="condition"
-							value={false}
+							value="false"
 							checked={itemDetails.condition === false}
 							onChange={() => {
 								setItemDetails({ ...itemDetails, condition: false });
@@ -352,7 +338,7 @@ function RouteComponent() {
 							type="radio"
 							id="new"
 							name="condition"
-							value={true}
+							value="true"
 							checked={itemDetails.condition === true}
 							onChange={() => {
 								setItemDetails({ ...itemDetails, condition: true });
@@ -386,7 +372,7 @@ function RouteComponent() {
 						value={pricePayment.listingPrice}
 						required={true}
 						onChange={(e) => {
-							checkValue(e.target.value);
+							checkValue(Number(e.target.value));
 							setPricePayment({
 								...pricePayment,
 								listingPrice: e.target.value,
@@ -443,7 +429,6 @@ function RouteComponent() {
 									...pricePayment,
 									creditCardPayment: !pricePayment.creditCardPayment,
 								});
-								checkPaymentRequired();
 							}}
 							onBlur={changeData}
 							checked={pricePayment.creditCardPayment}
@@ -468,7 +453,6 @@ function RouteComponent() {
 									...pricePayment,
 									bankTransferPayment: !pricePayment.bankTransferPayment,
 								});
-								checkPaymentRequired();
 							}}
 							onBlur={changeData}
 							checked={pricePayment.bankTransferPayment}
@@ -493,7 +477,6 @@ function RouteComponent() {
 									...pricePayment,
 									bitcoinPayment: !pricePayment.bitcoinPayment,
 								});
-								checkPaymentRequired();
 							}}
 							onBlur={changeData}
 							checked={pricePayment.bitcoinPayment}
@@ -527,7 +510,7 @@ function RouteComponent() {
 							name="pick-up"
 							value="true"
 							checked={shipping.pickUp === true}
-							onChange={(e) => {
+							onChange={() => {
 								setShipping({ ...shipping, pickUp: true });
 							}}
 							onBlur={changeData}
@@ -546,7 +529,7 @@ function RouteComponent() {
 							name="pick-up"
 							value="false"
 							checked={shipping.pickUp === false}
-							onChange={(e) => {
+							onChange={() => {
 								setShipping({ ...shipping, pickUp: false });
 							}}
 							onBlur={changeData}
@@ -578,7 +561,7 @@ function RouteComponent() {
 							name="shipping-option"
 							value="courier"
 							checked={shipping.shippingOption === "courier"}
-							onChange={(e) => {
+							onChange={() => {
 								setShipping({ ...shipping, shippingOption: "courier" });
 							}}
 							onBlur={changeData}
@@ -598,7 +581,7 @@ function RouteComponent() {
 							name="shipping-option"
 							value="post"
 							checked={shipping.shippingOption === "post"}
-							onChange={(e) => {
+							onChange={() => {
 								setShipping({ ...shipping, shippingOption: "post" });
 							}}
 							onBlur={changeData}

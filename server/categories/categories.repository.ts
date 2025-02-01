@@ -14,7 +14,6 @@ export async function getCategories(parentId: number, active: boolean) {
 			"SELECT * FROM categories WHERE parent_id = $1 AND active = $2 ORDER BY category_name",
 			[parentId, active],
 		);
-		console.log("categories 3", result.rows[0]);
 		return result.rows ?? [];
 	} catch (error) {
 		if (error instanceof Error) {

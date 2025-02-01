@@ -10,9 +10,8 @@ import type { QueryResult } from "pg";
 // Get all categories
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		console.log("categories 1", "--");
-		const categories = await getCategories(0, true);
-		console.log("categories 2", categories);
+		const parentId = req.query.parentId ? Number(req.query.parentId) : 0;
+		const categories = await getCategories(parentId, true);
 
 		return res.status(200).json(categories);
 	} catch (err) {

@@ -33,7 +33,13 @@ async function getListings() {
  * @returns {Promise<Response>} The fetch response promise.
  */
 interface Listing {
-	[key: string]: any;
+	id?: string;
+	title: string;
+	description: string;
+	price: number;
+	categoryId: string;
+	userId: string;
+	status?: "draft" | "active" | "inactive";
 }
 
 /**
