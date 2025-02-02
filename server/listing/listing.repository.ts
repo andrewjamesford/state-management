@@ -17,6 +17,27 @@ export async function getListings() {
 }
 
 /**
+ * getListing - gets a single listing from the database by ID
+ * @param {number} id - The listing ID
+ * @returns listing object or null if not found
+ */
+export async function getListing(id: number) {
+	try {
+		const result = await pool.query(
+			`SELECT l.id, l.title, l.sub_title, l.listing_description, l.listing_price, l.condition_new, c.category_name AS category 
+			FROM listings l 
+			INNER JOIN categories c ON c.id = l.category_id 
+			WHERE l.id = $1
+			LIMIT 1`,
+			[id],
+		);
+		return result.rows[0] ?? null;
+	} catch (error) {
+		throw new Error(error instanceof Error ? error.message : String(error));
+	}
+}
+
+/**
  * addListing - adds a new listing to the database
  * @param {object} listingDetails
  * @returns {object} listing

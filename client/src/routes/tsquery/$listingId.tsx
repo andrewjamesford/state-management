@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { addDays, format } from "date-fns";
 import { useEffect, useState } from "react";
-import { listingSchema } from "~/models/listingSchema";
+import type { listingSchema } from "~/models/listingSchema";
 import Loader from "~/components/loader";
 import api from "~/api";
 
@@ -27,13 +27,79 @@ function RouteComponent() {
 	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
 	const fortnight = format(addDays(today, 14), "yyyy-MM-dd");
 
-	const [titleCategory, setTitleCategory] = useState(
-		listingSchema.titleCategory,
-	);
-	const [itemDetails, setItemDetails] = useState(listingSchema.itemDetails);
-	const [pricePayment, setPricePayment] = useState(listingSchema.pricePayment);
-	const [shipping, setShipping] = useState(listingSchema.shipping);
-	const [checkRequired, setCheckRequired] = useState();
+	const [titleCategory, setTitleCategory] = useState({
+		title: "",
+		subTitle: "",
+		endDate: fortnight,
+		categoryId: 0,
+		subCategoryId: 0,
+	});
+	const [itemDetails, setItemDetails] = useState({
+		description: "",
+		condition: false,
+	});
+	const [pricePayment, setPricePayment] = useState({
+		listingPrice: "",
+		reservePrice: "",
+		creditCardPayment: false,
+		bankTransferPayment: false,
+		bitcoinPayment: false,
+	});
+	const [shipping, setShipping] = useState({
+		pickUp: false,
+		shippingOption: "",
+	});
+	// const [checkRequired, setCheckRequired] = useState();
+
+	const { listingId } = useParams({ from: Route.id });
+	console.log("listingId", listingId);
+	const {
+		data: listingData,
+		isLoading: loadingListing,
+		error: listingError,
+	} = useQuery({
+		queryKey: ["listingData", listingId],
+		queryFn: async () => {
+			if (!listingId) return null;
+			const response = await api.getListing(listingId);
+			if (!response.ok)
+				throw new Error(`Error retrieving listing ${listingId}`);
+			// console.log("response", response.json());
+			return await response.json();
+		},
+		enabled: !!listingId,
+	});
+
+	useEffect(() => {
+		if (listingData) {
+			setTitleCategory({
+				...titleCategory,
+				title: listingData.title,
+				subTitle: listingData.subTitle,
+				endDate: listingData.endDate,
+				categoryId: listingData.categoryId,
+				subCategoryId: listingData.subCategoryId,
+			});
+			setItemDetails({
+				...itemDetails,
+				description: listingData.description,
+				condition: listingData.condition,
+			});
+			setPricePayment({
+				...pricePayment,
+				listingPrice: listingData.listingPrice,
+				reservePrice: listingData.reservePrice,
+				creditCardPayment: listingData.creditCardPayment,
+				bankTransferPayment: listingData.bankTransferPayment,
+				bitcoinPayment: listingData.bitcoinPayment,
+			});
+			setShipping({
+				...shipping,
+				pickUp: listingData.pickUp,
+				shippingOption: listingData.shippingOption,
+			});
+		}
+	}, [listingData, listingId]);
 
 	const changeData = () => {};
 
@@ -100,6 +166,8 @@ function RouteComponent() {
 
 	if (parentError) return <p>Error: {parentError.message}</p>;
 	if (subCatError) return <p>Error: {subCatError.message}</p>;
+	if (listingError) return <p>Error: {listingError.message}</p>;
+	if (loadingListing) return <p>Loading listing data...</p>;
 
 	console.log("parentCatData", parentCatData);
 	console.log("subCatData", subCatData);
@@ -432,7 +500,7 @@ function RouteComponent() {
 							}}
 							onBlur={changeData}
 							checked={pricePayment.creditCardPayment}
-							required={checkRequired}
+							// required={checkRequired}
 						/>
 
 						<label
@@ -456,7 +524,7 @@ function RouteComponent() {
 							}}
 							onBlur={changeData}
 							checked={pricePayment.bankTransferPayment}
-							required={checkRequired}
+							// required={checkRequired}
 						/>
 
 						<label
@@ -480,7 +548,7 @@ function RouteComponent() {
 							}}
 							onBlur={changeData}
 							checked={pricePayment.bitcoinPayment}
-							required={checkRequired}
+							// required={checkRequired}
 						/>
 						<label
 							htmlFor="payment-bitcoin"

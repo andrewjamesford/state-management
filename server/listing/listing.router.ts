@@ -8,6 +8,7 @@ import {
 	addListing,
 	getDraftListing,
 	getListings,
+	getListing,
 	updateDraftListing,
 } from "./listing.repository";
 
@@ -32,6 +33,31 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 		next(err);
 	}
 });
+
+/**
+ * Get all listings
+ *
+ * @name GET /listing
+ * @function
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {Function} next - The next middleware function
+ */
+router.get(
+	"/:listingId",
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const listingId = req.query.listingId;
+			if (listingId) {
+				const getListingResponse = await getListing(Number(listingId));
+				return res.json(getListingResponse);
+			}
+			return res.json({ message: "Listing ID is required" });
+		} catch (err) {
+			next(err);
+		}
+	},
+);
 
 // schema for adding a new listing
 const addListingSchema = Joi.object().keys({

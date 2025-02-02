@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import api from "~/api";
+import ListingTile from "~/components/listingTile";
 
 export const Route = createFileRoute("/tsquery/")({
 	component: RouteComponent,
@@ -14,6 +15,7 @@ interface Listing {
 	listing_price: number;
 	category: string;
 	image: string;
+	reserve_price?: number;
 }
 
 function RouteComponent() {
@@ -35,18 +37,7 @@ function RouteComponent() {
 	return (
 		<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
 			{auctions.map((auction: Listing) => (
-				<Link
-					to={`/tsquery/` + auction.id}
-					key={auction.id}
-					className="border border-gray-300 p-4"
-				>
-					<img src={"https://placehold.co/200"} alt={auction.title} />
-					<h2>{auction.title}</h2>
-					<h3>{auction.sub_title}</h3>
-					<p>{auction.listing_description}</p>
-					<p>Price: {auction.listing_price}</p>
-					<p>{auction.category}</p>
-				</Link>
+				<ListingTile key={auction.id} listing={auction} basePath="/tsquery" />
 			))}
 		</div>
 	);

@@ -28,6 +28,17 @@ async function getListings() {
 }
 
 /**
+ * Fetches a specific listing from the API.
+ * @param {string} id - The ID of the listing to fetch.
+ * @returns {Promise<Response>} The fetch response promise.
+ */
+async function getListing(id: string): Promise<Response> {
+	return await fetch(`${import.meta.env.VITE_API_URL}/listings/${id}`, {
+		headers,
+	});
+}
+
+/**
  * Fetches a draft listing for a specific user from the API.
  * @param {string} userId - The ID of the user.
  * @returns {Promise<Response>} The fetch response promise.
@@ -90,4 +101,5 @@ export default {
 	addListing,
 	saveDraftListing,
 	getDraftListing,
+	getListing,
 };
