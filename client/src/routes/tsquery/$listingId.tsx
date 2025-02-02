@@ -23,7 +23,7 @@ interface Category {
 }
 
 function RouteComponent() {
-	const today = format(new Date(), "yyyy-MM-dd");
+	const today = new Date();
 	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
 	const fortnight = format(addDays(today, 14), "yyyy-MM-dd");
 
@@ -52,54 +52,52 @@ function RouteComponent() {
 	// const [checkRequired, setCheckRequired] = useState();
 
 	const { listingId } = useParams({ from: Route.id });
-	console.log("listingId", listingId);
+	const numericListingId = Number.parseInt(listingId ?? "", 10);
+
 	const {
 		data: listingData,
 		isLoading: loadingListing,
 		error: listingError,
 	} = useQuery({
-		queryKey: ["listingData", listingId],
+		queryKey: ["listingData", numericListingId],
 		queryFn: async () => {
-			if (!listingId) return null;
-			const response = await api.getListing(listingId);
-			if (!response.ok)
-				throw new Error(`Error retrieving listing ${listingId}`);
-			// console.log("response", response.json());
+			const response = await api.getListing(String(numericListingId)); // pass id as string
+			if (!response.ok) {
+				throw new Error(`Error retrieving listing ${numericListingId}`);
+			}
 			return await response.json();
 		},
-		enabled: !!listingId,
+		enabled: !Number.isNaN(numericListingId),
 	});
 
 	useEffect(() => {
 		if (listingData) {
-			setTitleCategory({
-				...titleCategory,
+			setTitleCategory((prev) => ({
+				...prev,
 				title: listingData.title,
-				subTitle: listingData.subTitle,
-				endDate: listingData.endDate,
-				categoryId: listingData.categoryId,
-				subCategoryId: listingData.subCategoryId,
-			});
-			setItemDetails({
-				...itemDetails,
-				description: listingData.description,
-				condition: listingData.condition,
-			});
-			setPricePayment({
-				...pricePayment,
-				listingPrice: listingData.listingPrice,
-				reservePrice: listingData.reservePrice,
-				creditCardPayment: listingData.creditCardPayment,
-				bankTransferPayment: listingData.bankTransferPayment,
-				bitcoinPayment: listingData.bitcoinPayment,
-			});
-			setShipping({
-				...shipping,
-				pickUp: listingData.pickUp,
-				shippingOption: listingData.shippingOption,
-			});
+				subTitle: listingData.sub_title, // mapped from API response
+				// endDate remains unchanged or use listingData.endDate if provided
+				categoryId: prev.categoryId, // unchanged since API returns category name not id
+				subCategoryId: prev.subCategoryId, // unchanged
+			}));
+			setItemDetails((prev) => ({
+				...prev,
+				description: listingData.listing_description, // mapped from API response
+				condition: listingData.condition_new, // mapped from API response
+			}));
+			setPricePayment((prev) => ({
+				...prev,
+				listingPrice: listingData.listing_price
+					? listingData.listing_price.replace(/[^0-9.]/g, "")
+					: "",
+				reservePrice: prev.reservePrice, // keep existing reserve price as string
+				creditCardPayment: prev.creditCardPayment,
+				bankTransferPayment: prev.bankTransferPayment,
+				bitcoinPayment: prev.bitcoinPayment,
+			}));
+			// shipping remains unchanged since API doesn't provide shipping info
 		}
-	}, [listingData, listingId]);
+	}, [listingData]);
 
 	const changeData = () => {};
 
@@ -112,12 +110,27 @@ function RouteComponent() {
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
+		if (pricePayment.reservePrice === "") pricePayment.reservePrice = "0.00";
+
 		const listing: Listing = {
 			titleCategory: titleCategory,
 			itemDetails: itemDetails,
 			pricePayment: pricePayment,
 			shipping: shipping,
 		};
+
+		if (listingId) {
+			const response = await api.updateListing(listingId, { listing: listing });
+			if (!response.ok) {
+				throw new Error("Error updating listing");
+			}
+			const result = await response.json();
+			if (result.error) {
+				throw new Error(result.error);
+			}
+			alert(`${JSON.stringify(result)} listing updated`);
+			return;
+		}
 		const response = await api.addListing({ listing: listing });
 
 		if (!response.ok) {
@@ -140,10 +153,8 @@ function RouteComponent() {
 		queryKey: ["parentCategories"],
 		queryFn: async () => {
 			const response = await api.getCategories();
-			console.log("response", response);
 			if (!response.ok) throw new Error("Error retrieving categories");
 			const result = await response.json();
-			console.log("result", result);
 			return result ?? [];
 		},
 	});
@@ -155,10 +166,8 @@ function RouteComponent() {
 	} = useQuery({
 		queryKey: ["subCategories", titleCategory.categoryId],
 		queryFn: async () => {
-			console.log("subCatData titleCategory", titleCategory.categoryId);
 			if (!titleCategory.categoryId) return [];
 			const response = await api.getCategories(titleCategory.categoryId);
-			console.log("sub response", response);
 			if (!response.ok) throw new Error("Error retrieving sub-categories");
 			return await response.json();
 		},
@@ -168,9 +177,6 @@ function RouteComponent() {
 	if (subCatError) return <p>Error: {subCatError.message}</p>;
 	if (listingError) return <p>Error: {listingError.message}</p>;
 	if (loadingListing) return <p>Loading listing data...</p>;
-
-	console.log("parentCatData", parentCatData);
-	console.log("subCatData", subCatData);
 
 	return (
 		<form onSubmit={handleSubmit} noValidate className="group">
@@ -190,7 +196,6 @@ function RouteComponent() {
 					type="text"
 					onChange={(e) => {
 						const value = e.target.value ?? "";
-						console.log("value", value);
 						setTitleCategory({
 							...titleCategory,
 							title: value,
@@ -669,7 +674,7 @@ function RouteComponent() {
 					type="submit"
 					className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
 				>
-					Start Listing
+					Save
 				</button>
 			</div>
 		</form>

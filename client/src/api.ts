@@ -78,6 +78,20 @@ async function addListing(listing: Listing): Promise<Response> {
 }
 
 /**
+ * Updates an existing listing in the API.
+ * @param {string} id - The ID of the listing to update.
+ * @param {Listing} listing - The updated listing data.
+ * @returns {Promise<Response>} The fetch response promise.
+ */
+async function updateListing(id: string, listing: Listing): Promise<Response> {
+	return await fetch(`${import.meta.env.VITE_API_URL}/listings/${id}`, {
+		method: "PUT",
+		headers,
+		body: JSON.stringify(listing),
+	});
+}
+
+/**
  * Saves a draft listing for a specific user to the API.
  * @param {string} userId - The ID of the user.
  * @param {Listing} listing - The listing data to be saved as a draft.
@@ -99,6 +113,7 @@ export default {
 	getCategories,
 	getListings,
 	addListing,
+	updateListing,
 	saveDraftListing,
 	getDraftListing,
 	getListing,

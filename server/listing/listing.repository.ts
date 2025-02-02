@@ -138,6 +138,63 @@ export const addListing = async (
 };
 
 /**
+ * updateListing - updates a listing in the database
+ * @param {number} id - listing id
+ * @param {ListingDetails} listingDetails
+ * @returns {Promise<number>} number of rows affected
+ */
+export const updateListing = async (
+	id: number,
+	listingDetails: ListingDetails,
+): Promise<number> => {
+	try {
+		const { titleCategory, itemDetails, pricePayment, shipping } =
+			listingDetails;
+		const { title, categoryId, subTitle, endDate } = titleCategory;
+		const { condition, description } = itemDetails;
+		const {
+			listingPrice,
+			reservePrice,
+			creditCardPayment,
+			bankTransferPayment,
+			bitcoinPayment,
+		} = pricePayment;
+		const { pickUp, shippingOption } = shipping;
+
+		const result = await pool.query(
+			`UPDATE listings SET 
+			title=$1, category_id=$2, sub_title=$3, end_date=$4, 
+			listing_description=$5, condition_new=$6, listing_price=$7, 
+			reserve_price=$8, credit_card_payment=$9, bank_transfer_payment=$10, 
+			bitcoin_payment=$11, pick_up=$12, shipping_option=$13 
+			WHERE id=$14;`,
+			[
+				title,
+				categoryId,
+				subTitle,
+				endDate,
+				description,
+				condition,
+				listingPrice,
+				reservePrice,
+				creditCardPayment,
+				bankTransferPayment,
+				bitcoinPayment,
+				pickUp,
+				shippingOption,
+				id,
+			],
+		);
+		return result.rowCount ?? 0;
+	} catch (error) {
+		if (error instanceof Error) {
+			throw new Error(`Error updating listing: ${error.message}`);
+		}
+		throw new Error("Error updating listing: Unknown error");
+	}
+};
+
+/**
  * addDraftListing - adds a draft to the database.
  * @param {object} draft
  * @param {string} userId

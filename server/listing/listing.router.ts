@@ -10,6 +10,7 @@ import {
 	getListings,
 	getListing,
 	updateDraftListing,
+	updateListing,
 } from "./listing.repository";
 
 router.use(express.json());
@@ -47,7 +48,8 @@ router.get(
 	"/:listingId",
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const listingId = req.query.listingId;
+			// Changed to use req.params instead of req.query.
+			const listingId = req.params.listingId;
 			if (listingId) {
 				const getListingResponse = await getListing(Number(listingId));
 				return res.json(getListingResponse);
@@ -117,6 +119,32 @@ router.post(
 			const addListingResponse = await addListing(listing);
 
 			return res.json(addListingResponse);
+		} catch (err) {
+			console.error(err);
+			next(err);
+		}
+	},
+);
+
+/**
+ * Update an existing listing
+ *
+ * @name PUT /listings/:listingId
+ * @function
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {Function} next - The next middleware function
+ */
+router.put(
+	"/:listingId",
+	bodyValidationMiddleware(addListingSchema),
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const listingId = Number(req.params.listingId);
+			const listing = req.body.listing;
+
+			const updateListingResponse = await updateListing(listingId, listing);
+			return res.json(updateListingResponse);
 		} catch (err) {
 			console.error(err);
 			next(err);
