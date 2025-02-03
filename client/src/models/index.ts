@@ -2,7 +2,8 @@ import { addDays, format } from "date-fns";
 
 export const endDate = format(addDays(new Date(), 1), "yyyy-MM-dd");
 
-interface TitleCategory {
+export interface TitleCategory {
+	id: number;
 	userId: string;
 	title: string;
 	categoryId: number;
@@ -11,12 +12,12 @@ interface TitleCategory {
 	endDate: string;
 }
 
-interface ItemDetails {
+export interface ItemDetails {
 	description: string;
 	condition: boolean;
 }
 
-interface PricePayment {
+export interface PricePayment {
 	listingPrice: string;
 	reservePrice: string;
 	creditCardPayment: boolean;
@@ -24,9 +25,16 @@ interface PricePayment {
 	bitcoinPayment: boolean;
 }
 
-interface Shipping {
+export interface Shipping {
 	pickUp: boolean;
 	shippingOption: string;
+}
+
+export interface Listing {
+	titleCategory: TitleCategory;
+	itemDetails: ItemDetails;
+	pricePayment: PricePayment;
+	shipping: Shipping;
 }
 
 export interface ListingSchema {
@@ -38,6 +46,7 @@ export interface ListingSchema {
 
 export const listingSchema: ListingSchema = {
 	titleCategory: {
+		id: 0,
 		userId: "",
 		title: "",
 		categoryId: 0,

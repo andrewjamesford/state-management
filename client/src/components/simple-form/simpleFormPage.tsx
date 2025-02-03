@@ -1,5 +1,5 @@
 import ErrorMessage from "~/components/errorMessage";
-import { listingSchema } from "~/models/listingSchema";
+import { listingSchema } from "~/models";
 import { addDays, format } from "date-fns";
 import { useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";

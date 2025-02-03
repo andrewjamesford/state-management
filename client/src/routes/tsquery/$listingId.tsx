@@ -2,20 +2,20 @@ import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { addDays, format } from "date-fns";
 import { useEffect, useState } from "react";
-import type { listingSchema } from "~/models/listingSchema";
+import type {
+	ItemDetails,
+	PricePayment,
+	Shipping,
+	TitleCategory,
+	Listing,
+} from "~/models";
+import { listingSchema } from "~/models";
 import Loader from "~/components/loader";
 import api from "~/api";
 
 export const Route = createFileRoute("/tsquery/$listingId")({
 	component: RouteComponent,
 });
-
-interface Listing {
-	titleCategory: typeof listingSchema.titleCategory;
-	itemDetails: typeof listingSchema.itemDetails;
-	pricePayment: typeof listingSchema.pricePayment;
-	shipping: typeof listingSchema.shipping;
-}
 
 interface Category {
 	id: number;
@@ -27,29 +27,13 @@ function RouteComponent() {
 	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
 	const fortnight = format(addDays(today, 14), "yyyy-MM-dd");
 
-	const [titleCategory, setTitleCategory] = useState({
-		title: "",
-		subTitle: "",
-		endDate: fortnight,
-		categoryId: 0,
-		subCategoryId: 0,
-	});
-	const [itemDetails, setItemDetails] = useState({
-		description: "",
-		condition: false,
-	});
-	const [pricePayment, setPricePayment] = useState({
-		listingPrice: "",
-		reservePrice: "",
-		creditCardPayment: false,
-		bankTransferPayment: false,
-		bitcoinPayment: false,
-	});
-	const [shipping, setShipping] = useState({
-		pickUp: false,
-		shippingOption: "",
-	});
-	// const [checkRequired, setCheckRequired] = useState();
+	const [titleCategory, setTitleCategory] = useState(
+		listingSchema.titleCategory,
+	);
+	const [itemDetails, setItemDetails] = useState(listingSchema.itemDetails as ItemDetails);
+	const [pricePayment, setPricePayment] = useState(listingSchema.pricePayment as PricePayment);
+	const [shipping, setShipping] = useState(listingSchema.shipping as Shipping);
+	const [checkRequired, setCheckRequired] = useState(true);
 
 	const { listingId } = useParams({ from: Route.id });
 	const numericListingId = Number.parseInt(listingId ?? "", 10);
@@ -72,30 +56,33 @@ function RouteComponent() {
 
 	useEffect(() => {
 		if (listingData) {
+			console.log("listingData", listingData);
 			setTitleCategory((prev) => ({
 				...prev,
 				title: listingData.title,
-				subTitle: listingData.sub_title, // mapped from API response
-				// endDate remains unchanged or use listingData.endDate if provided
-				categoryId: prev.categoryId, // unchanged since API returns category name not id
-				subCategoryId: prev.subCategoryId, // unchanged
+				subTitle: listingData.subtitle,
+				endDate: listingData.enddate,
+				categoryId: listingData.categoryid,
+				subCategoryId: listingData.subcategoryid
 			}));
 			setItemDetails((prev) => ({
 				...prev,
-				description: listingData.listing_description, // mapped from API response
-				condition: listingData.condition_new, // mapped from API response
+				description: listingData.listingdescription,
+				condition: listingData.condition
 			}));
 			setPricePayment((prev) => ({
 				...prev,
-				listingPrice: listingData.listing_price
-					? listingData.listing_price.replace(/[^0-9.]/g, "")
-					: "",
-				reservePrice: prev.reservePrice, // keep existing reserve price as string
-				creditCardPayment: prev.creditCardPayment,
-				bankTransferPayment: prev.bankTransferPayment,
-				bitcoinPayment: prev.bitcoinPayment,
+				listingPrice: listingData.listingprice,
+				reservePrice: listingData.reserveprice,
+				creditCardPayment: listingData.creditcardpayment,
+				bankTransferPayment: listingData.banktransferpayment,
+				bitcoinPayment: listingData.bitcoinpayment,
 			}));
-			// shipping remains unchanged since API doesn't provide shipping info
+			setShipping((prev) => ({
+				...prev,
+				pickUp: listingData.pickup,
+				shippingOption: listingData.shippingoption,
+			}));
 		}
 	}, [listingData]);
 
@@ -120,7 +107,7 @@ function RouteComponent() {
 		};
 
 		if (listingId) {
-			const response = await api.updateListing(listingId, { listing: listing });
+			const response = await api.updateListing(listingId, listing);
 			if (!response.ok) {
 				throw new Error("Error updating listing");
 			}
@@ -176,7 +163,7 @@ function RouteComponent() {
 	if (parentError) return <p>Error: {parentError.message}</p>;
 	if (subCatError) return <p>Error: {subCatError.message}</p>;
 	if (listingError) return <p>Error: {listingError.message}</p>;
-	if (loadingListing) return <p>Loading listing data...</p>;
+	if (loadingListing) return <Loader />;
 
 	return (
 		<form onSubmit={handleSubmit} noValidate className="group">
@@ -505,7 +492,7 @@ function RouteComponent() {
 							}}
 							onBlur={changeData}
 							checked={pricePayment.creditCardPayment}
-							// required={checkRequired}
+							required={checkRequired}
 						/>
 
 						<label
@@ -529,7 +516,7 @@ function RouteComponent() {
 							}}
 							onBlur={changeData}
 							checked={pricePayment.bankTransferPayment}
-							// required={checkRequired}
+							required={checkRequired}
 						/>
 
 						<label
@@ -553,7 +540,7 @@ function RouteComponent() {
 							}}
 							onBlur={changeData}
 							checked={pricePayment.bitcoinPayment}
-							// required={checkRequired}
+							required={checkRequired}
 						/>
 						<label
 							htmlFor="payment-bitcoin"
@@ -672,7 +659,7 @@ function RouteComponent() {
 			<div className="mt-3">
 				<button
 					type="submit"
-					className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+					className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-500 hover:bg-blue-600 text-white border border-blue-600 h-10 px-4 py-2"
 				>
 					Save
 				</button>

@@ -16,7 +16,7 @@ import PageFour from "~/components/multi-page-form/page4";
 // review
 import PageFive from "~/components/multi-page-form/page5";
 
-import { listingSchema } from "~/models/listingSchema";
+import { listingSchema } from "~/models";
 
 interface TitleCategory {
   userId: string;

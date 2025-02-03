@@ -1,3 +1,5 @@
+import type { Listing } from "~/models";
+
 const headers = {
 	Accept: "application/json",
 	"Content-Type": "application/json",
@@ -43,15 +45,7 @@ async function getListing(id: string): Promise<Response> {
  * @param {string} userId - The ID of the user.
  * @returns {Promise<Response>} The fetch response promise.
  */
-interface Listing {
-	id?: string;
-	title: string;
-	description: string;
-	price: number;
-	categoryId: string;
-	userId: string;
-	status?: "draft" | "active" | "inactive";
-}
+
 
 /**
  * Fetches a draft listing for a specific user from the API.

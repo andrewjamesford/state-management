@@ -7,7 +7,25 @@ import { pool } from "../db";
 export async function getListings() {
 	try {
 		const result = await pool.query(
-			`SELECT l.id, l.title, l.sub_title, l.listing_description, l.listing_price, l.condition_new, c.category_name AS category FROM listings l INNER JOIN categories c ON c.id = l.category_id
+			`SELECT
+			l.id,
+			l.title, 
+			l.sub_title as subTitle, 
+			l.category_id as categoryId,
+			c.id as subCategoryId,
+			l.end_date as endDate,
+			l.listing_description as listingDescription, 
+			l.condition_new as condition, 
+			l.listing_price as listingPrice,
+			l.reserve_price as reservePrice,
+			l.credit_card_payment as creditCardPayment,
+			l.bank_transfer_payment as bankTransferPayment,
+			l.bitcoin_payment as bitcoinPayment,
+			l.pick_up as pickUp,
+			l.shipping_option as shippingOption,
+			c.category_name AS category 
+			FROM listings l
+			INNER JOIN categories c ON c.id = l.category_id
       `,
 		);
 		return result.rows ?? [];
@@ -24,7 +42,23 @@ export async function getListings() {
 export async function getListing(id: number) {
 	try {
 		const result = await pool.query(
-			`SELECT l.id, l.title, l.sub_title, l.listing_description, l.listing_price, l.condition_new, c.category_name AS category 
+			`SELECT
+			l.id,
+			l.title,
+			l.sub_title as subTitle,
+			l.category_id as categoryId,
+			c.id as subCategoryId,
+			l.end_date as endDate,
+			l.listing_description as listingDescription, 
+			l.condition_new as condition, 
+			l.listing_price as listingPrice,
+			l.reserve_price as reservePrice,
+			l.credit_card_payment as creditCardPayment,
+			l.bank_transfer_payment as bankTransferPayment,
+			l.bitcoin_payment as bitcoinPayment,
+			l.pick_up as pickUp,
+			l.shipping_option as shippingOption,
+			c.category_name AS category
 			FROM listings l 
 			INNER JOIN categories c ON c.id = l.category_id 
 			WHERE l.id = $1
@@ -191,95 +225,5 @@ export const updateListing = async (
 			throw new Error(`Error updating listing: ${error.message}`);
 		}
 		throw new Error("Error updating listing: Unknown error");
-	}
-};
-
-/**
- * addDraftListing - adds a draft to the database.
- * @param {object} draft
- * @param {string} userId
- * @returns rowcount
- */
-interface Draft {
-	// Define the structure of the draft object here
-	[key: string]: string | number | boolean | object;
-}
-
-export const addDraftListing = async (
-	draft: Draft,
-	userId: string,
-): Promise<number> => {
-	try {
-		const result = await pool.query(
-			`INSERT INTO listings_draft (
-		draft, 
-		user_id) 
-		VALUES ($1, $2);`,
-			[draft, userId],
-		);
-		return result.rowCount ?? 0;
-	} catch (error) {
-		if (error instanceof Error) {
-			throw new Error(`Error updating draft: ${error.message}`);
-		}
-		throw new Error("Error updating draft: Unknown error");
-	}
-};
-
-/**
- * updateDraftListing - updates a draft listing in the database.
- * @param {object} draft
- * @param {string} userId
- * @returns rowcount
- */
-interface UpdateDraft {
-	[key: string]: string | number | boolean | object;
-}
-
-export const updateDraftListing = async (
-	draft: UpdateDraft,
-	userId: string,
-): Promise<number> => {
-	try {
-		const result = await pool.query(
-			`UPDATE listings_draft SET 
-		draft=$1 WHERE user_id=$2;`,
-			[draft, userId],
-		);
-		return result.rowCount ?? 0;
-	} catch (error) {
-		if (error instanceof Error) {
-			throw new Error(`Error updating draft: ${error.message}`);
-		}
-		throw new Error("Error updating draft: Unknown error");
-	}
-};
-
-/**
- * getDraftListing - gets a draft from the database.
- * @param {string} userId
- * @returns draft listing
- */
-interface DraftListing {
-	user_id: string;
-	draft: Record<string, unknown>;
-}
-
-export const getDraftListing = async (
-	userId: string,
-): Promise<DraftListing[]> => {
-	try {
-		const result = await pool.query(
-			`SELECT user_id, draft 
-			FROM listings_draft 
-			WHERE user_id=$1`,
-			[userId],
-		);
-		return result.rows as DraftListing[];
-	} catch (error) {
-		if (error instanceof Error) {
-			throw new Error(`Error getting draft: ${error.message}`);
-		}
-		throw new Error("Error getting draft: Unknown error");
 	}
 };

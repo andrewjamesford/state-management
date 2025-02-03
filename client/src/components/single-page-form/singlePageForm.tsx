@@ -1,7 +1,7 @@
 import api from "~/api";
 import ErrorMessage from "~/components/errorMessage";
 import Loader from "~/components/loader";
-import { listingSchema } from "~/models/listingSchema";
+import { listingSchema } from "~/models";
 import { addDays, format } from "date-fns";
 import { useEffect, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";

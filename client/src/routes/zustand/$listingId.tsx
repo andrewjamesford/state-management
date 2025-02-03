@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { addDays, format } from 'date-fns'
 import { useEffect, useState } from 'react'
-import { listingSchema } from '~/models/listingSchema'
+import { listingSchema } from '~/models'
 import Loader from '~/components/loader'
 import api from '~/api'
 

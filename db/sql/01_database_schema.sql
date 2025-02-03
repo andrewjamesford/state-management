@@ -13,16 +13,12 @@ CREATE TABLE listings (
 	end_date timeStamp,
 	listing_description text,
 	condition_new boolean,
-	listing_price money,
-	reserve_price money,
+	listing_price double,
+	reserve_price double,
 	credit_card_payment boolean,
 	bank_transfer_payment boolean,
 	bitcoin_payment boolean,
 	pick_up boolean,
 	shipping_option varchar(30)
-);
-CREATE TABLE listings_draft (
-	user_id UUID PRIMARY KEY,
-	draft jsonb NOT NULL
 );
 COMMIT;

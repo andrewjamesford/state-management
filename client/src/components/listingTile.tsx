@@ -1,15 +1,5 @@
 import { Link } from "@tanstack/react-router";
-
-interface Listing {
-	id: string;
-	title: string;
-	sub_title: string;
-	listing_description: string;
-	listing_price: number;
-	category: string;
-	image: string;
-	reserve_price?: number;
-}
+import type { Listing } from "~/models";
 
 interface ListingTileProps {
 	listing: Listing;
@@ -17,28 +7,29 @@ interface ListingTileProps {
 }
 
 export default function ListingTile({ listing, basePath }: ListingTileProps) {
+	console.log(listing);
+	if (listing == null) return null;
 	return (
 		<Link
-			to={`${basePath}/${listing.id}`}
+			to={`${basePath}/${listing.titleCategory.id}`}
 			className="border border-gray-300 rounded-lg overflow-hidden flex flex-col min-h-[300px]"
 		>
 			<img
-				src={listing.image || "https://placehold.co/150"}
-				alt={listing.title}
+				src={"https://placehold.co/150"}
+				alt={listing.titleCategory.title}
 				className="w-full"
 			/>
 			<div className="p-4 flex flex-col h-full">
-				<h2 className="text-xl font-bold">{listing.title}</h2>
-				<h3 className="text-lg text-gray-500">{listing.sub_title}</h3>
-				<h4 className="text-sm italic pb-2">{listing.category}</h4>
-				<p>{listing.listing_description}</p>
+				<h2 className="text-xl font-bold">{listing.titleCategory.title}</h2>
+				<h3 className="text-base italic pb-2">{listing.titleCategory.subTitle}</h3>
+				<p className="pb-2">{listing.itemDetails.description}</p>
 				<span className="text-sm mt-auto">
-					{listing.reserve_price == null
+					{listing.pricePayment.listingPrice == null
 						? "No reserve"
-						: listing.listing_price > listing.reserve_price
+						: listing.pricePayment.listingPrice > listing.pricePayment.reservePrice
 							? "Reserve met"
 							: "Reserve not met"}{" "}
-					{listing.listing_price}
+					{listing.pricePayment.listingPrice}
 				</span>
 			</div>
 		</Link>

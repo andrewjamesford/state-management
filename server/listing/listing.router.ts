@@ -4,12 +4,9 @@ const router = express.Router();
 import Joi from "joi";
 import bodyValidationMiddleware from "../middleware/bodyValidationMiddleware";
 import {
-	addDraftListing,
 	addListing,
-	getDraftListing,
 	getListings,
 	getListing,
-	updateDraftListing,
 	updateListing,
 } from "./listing.repository";
 
@@ -36,7 +33,7 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 });
 
 /**
- * Get all listings
+ * Get listing by ID
  *
  * @name GET /listing
  * @function
@@ -48,11 +45,10 @@ router.get(
 	"/:listingId",
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			// Changed to use req.params instead of req.query.
 			const listingId = req.params.listingId;
 			if (listingId) {
-				const getListingResponse = await getListing(Number(listingId));
-				return res.json(getListingResponse);
+				const listing = await getListing(Number(listingId));
+				return res.json(listing);
 			}
 			return res.json({ message: "Listing ID is required" });
 		} catch (err) {
@@ -151,64 +147,5 @@ router.put(
 		}
 	},
 );
-
-/**
- * Save draft listing
- *
- * @name POST /listings/:userId
- * @function
- * @param {string} req.params.userId - The userId of the user to save their draft listing for
- * @param {Object} req.body.listing - The draft listing data to be saved
- * @param {Object} res - The response object
- * @param {Function} next - The next middleware function
- */
-router.post("/:userId", async (req, res, next) => {
-	try {
-		const userId = req?.params?.userId;
-		const draft = req?.body?.listing;
-
-		if (!userId) throw new Error("User ID is required");
-		if (!draft) throw new Error("Draft data is required");
-
-		// Call getDraftListing() to check if the user already has a saved listing
-		const listings = await getDraftListing(userId);
-
-		if (listings !== null && listings !== undefined && listings.length <= 0) {
-			// If no existing listing is found, call addDraftListing() to create a new draft listing for the user
-			const addDraftListingResponse = await addDraftListing(draft, userId);
-
-			if (addDraftListingResponse !== null) return res.json(true);
-		}
-		// If an existing listing is found, call updateDraftListing() to update the draft listing with the new data
-		const updateDraftListingResponse = await updateDraftListing(draft, userId);
-
-		if (updateDraftListingResponse !== null) return res.json(true);
-
-		return res.json(false);
-	} catch (err) {
-		console.error(err);
-		next(err);
-	}
-});
-
-/**
- * Get draft listing by userId address
- *
- * @name GET /listings/:userId
- * @function
- * @param {string} req.params.userId - The userId of the user to get their draft listing from
- * @param {Object} res - The response object
- * @param {Function} next - The next middleware function
- */
-router.get("/:userId", async (req, res, next) => {
-	try {
-		const userId = req.params.userId;
-		const listings = await getDraftListing(userId);
-		return res.json(listings);
-	} catch (err) {
-		console.error(err);
-		next(err);
-	}
-});
 
 export default router;
