@@ -102,7 +102,7 @@ interface Shipping {
 	shippingOption: string;
 }
 
-interface ListingDetails {
+export interface ListingDetails {
 	titleCategory: TitleCategory;
 	itemDetails: ItemDetails;
 	pricePayment: PricePayment;
