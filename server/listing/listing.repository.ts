@@ -47,7 +47,7 @@ export async function getListing(id: number) {
 			l.id,
 			l.title,
 			l.sub_title as subTitle,
-			l.category_id as categoryId,
+			c.parent_id as categoryId,
 			c.id as subCategoryId,
 			l.end_date as endDate,
 			l.listing_description as listingDescription, 

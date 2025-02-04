@@ -30,8 +30,12 @@ function RouteComponent() {
 	const [titleCategory, setTitleCategory] = useState(
 		listingSchema.titleCategory,
 	);
-	const [itemDetails, setItemDetails] = useState(listingSchema.itemDetails as ItemDetails);
-	const [pricePayment, setPricePayment] = useState(listingSchema.pricePayment as PricePayment);
+	const [itemDetails, setItemDetails] = useState(
+		listingSchema.itemDetails as ItemDetails,
+	);
+	const [pricePayment, setPricePayment] = useState(
+		listingSchema.pricePayment as PricePayment,
+	);
 	const [shipping, setShipping] = useState(listingSchema.shipping as Shipping);
 	const [checkRequired, setCheckRequired] = useState(true);
 
@@ -61,14 +65,14 @@ function RouteComponent() {
 				...prev,
 				title: listingData.title,
 				subTitle: listingData.subtitle,
-				endDate: listingData.enddate,
+				endDate: format(listingData.enddate, "yyyy-MM-dd") ?? "",
 				categoryId: listingData.categoryid,
-				subCategoryId: listingData.subcategoryid
+				subCategoryId: listingData.subcategoryid,
 			}));
 			setItemDetails((prev) => ({
 				...prev,
 				description: listingData.listingdescription,
-				condition: listingData.condition
+				condition: listingData.condition,
 			}));
 			setPricePayment((prev) => ({
 				...prev,
@@ -163,7 +167,7 @@ function RouteComponent() {
 	if (parentError) return <p>Error: {parentError.message}</p>;
 	if (subCatError) return <p>Error: {subCatError.message}</p>;
 	if (listingError) return <p>Error: {listingError.message}</p>;
-	if (loadingListing) return <Loader />;
+	if (loadingListing) return <Loader height={50} width={50} />;
 
 	return (
 		<form onSubmit={handleSubmit} noValidate className="group">
