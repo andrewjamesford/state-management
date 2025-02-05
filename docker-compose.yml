@@ -4,23 +4,29 @@ services:
       context: ./client
     ports:
       - "4002:4002"
+      - "9222:9222"
     depends_on:
       - server
     volumes:
       - ./client:/app/
       - /app/node_modules
-    command: "npm run start"
+    environment:
+      NODE_ENV: development
+    command: "npm run dev"
   server:
     build:
       context: ./server
     ports:
       - "5002:5002"
+      - "9229:9229"
     depends_on:
       - db
     volumes:
       - ./server:/app
       - /app/node_modules
-    command: "npm run start"
+    environment:
+      NODE_ENV: development
+    command: "npm run dev"
   db:
     build:
       context: ./db
