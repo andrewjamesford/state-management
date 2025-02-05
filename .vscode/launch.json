@@ -5,13 +5,17 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"name": "Docker: Attach to Node",
 			"type": "node",
 			"request": "attach",
-			"name": "Attach to Remote",
+			"restart": true,
 			"port": 9229,
 			"address": "localhost",
 			"localRoot": "${workspaceFolder}",
-			"remoteRoot": "/app"
+			"remoteRoot": "/app", // See the dockerfile for this location
+			"skipFiles": [
+				"<node_internals>/**"
+			]
 		}
 	]
 }

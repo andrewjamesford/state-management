@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
-import { Schema, ValidationError } from 'joi';
+import type { Request, Response, NextFunction } from "express";
+import type { Schema, ValidationError } from "joi";
 
 /**
  * Middleware to validate the request body against a given schema.
