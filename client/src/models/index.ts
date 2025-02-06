@@ -4,7 +4,6 @@ export const endDate = format(addDays(new Date(), 1), "yyyy-MM-dd");
 
 export interface TitleCategory {
 	id: number;
-	userId: string;
 	title: string;
 	categoryId: number;
 	subCategoryId: number;
@@ -47,7 +46,6 @@ export interface ListingSchema {
 export const listingSchema: ListingSchema = {
 	titleCategory: {
 		id: 0,
-		userId: "",
 		title: "",
 		categoryId: 0,
 		subCategoryId: 0,

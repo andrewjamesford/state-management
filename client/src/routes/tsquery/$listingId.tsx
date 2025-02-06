@@ -1,4 +1,8 @@
-import { createFileRoute, useParams } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	useParams,
+	useNavigate,
+} from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { addDays, format } from "date-fns";
 import { useEffect, useState } from "react";
@@ -40,22 +44,24 @@ function RouteComponent() {
 	const [checkRequired, setCheckRequired] = useState(true);
 
 	const { listingId } = useParams({ from: Route.id });
-	const numericListingId = Number.parseInt(listingId ?? "", 10);
 
 	const {
 		data: listingData,
 		isLoading: loadingListing,
 		error: listingError,
 	} = useQuery({
-		queryKey: ["listingData", numericListingId],
+		queryKey: ["listingData", listingId],
 		queryFn: async () => {
-			const response = await api.getListing(String(numericListingId)); // pass id as string
+			if (listingId === "add") {
+				return null;
+			}
+			const response = await api.getListing(String(listingId)); // pass id as string
 			if (!response.ok) {
-				throw new Error(`Error retrieving listing ${numericListingId}`);
+				throw new Error(`Error retrieving listing ${listingId}`);
 			}
 			return await response.json();
 		},
-		enabled: !Number.isNaN(numericListingId),
+		enabled: !Number.isNaN(listingId),
 	});
 
 	useEffect(() => {
@@ -110,8 +116,10 @@ function RouteComponent() {
 			shipping: shipping,
 		};
 
-		if (listingId) {
-			const response = await api.updateListing(listingId, listing);
+		const listingWrapper = { listing: listing };
+
+		if (listingId !== "add") {
+			const response = await api.updateListing(listingId, listingWrapper);
 			if (!response.ok) {
 				throw new Error("Error updating listing");
 			}
@@ -133,7 +141,10 @@ function RouteComponent() {
 			throw new Error(result.error);
 		}
 
-		alert(`${JSON.stringify(result)} listing added`);
+		if (result.status === 200) {
+			const navigate = useNavigate();
+			navigate({ to: "/tsquery" });
+		}
 	};
 
 	const {
@@ -658,6 +669,7 @@ function RouteComponent() {
 						</label>
 					</div>
 				</div>
+				<input type="hidden" name="id" value={listingId} />
 			</fieldset>
 
 			<div className="mt-3">

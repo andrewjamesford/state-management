@@ -109,6 +109,10 @@ export interface ListingDetails {
 	shipping: Shipping;
 }
 
+export interface Listing {
+	listing: ListingDetails;
+}
+
 export const addListing = async (
 	listingDetails: ListingDetails,
 ): Promise<number> => {
@@ -183,8 +187,8 @@ export const updateListing = async (
 	listingDetails: ListingDetails,
 ): Promise<number> => {
 	try {
-		const { titleCategory, itemDetails, pricePayment, shipping } =
-			listingDetails;
+		const { listing } = listingDetails;
+		const { titleCategory, itemDetails, pricePayment, shipping } = listing;
 		const { title, categoryId, subTitle, endDate } = titleCategory;
 		const { condition, description } = itemDetails;
 		const {

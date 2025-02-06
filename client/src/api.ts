@@ -76,7 +76,7 @@ async function addListing(listing): Promise<Response> {
  * @param {Listing} listing - The updated listing data.
  * @returns {Promise<Response>} The fetch response promise.
  */
-async function updateListing(id: string, listing: Listing): Promise<Response> {
+async function updateListing(id: string, listing): Promise<Response> {
 	return await fetch(`${import.meta.env.VITE_API_URL}/listings/${id}`, {
 		method: "PUT",
 		headers,

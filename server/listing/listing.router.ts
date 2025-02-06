@@ -63,7 +63,7 @@ router.get(
 const listingSchema = Joi.object().keys({
 	listing: Joi.object({
 		titleCategory: Joi.object({
-			userId: Joi.string().optional(),
+			id: Joi.number().optional(),
 			title: Joi.string().required(),
 			subTitle: Joi.string(),
 			categoryId: Joi.number().greater(0).required(),
@@ -97,33 +97,6 @@ const listingSchema = Joi.object().keys({
 			}
 		}),
 });
-
-// const editListingSchema = Joi.object().keys({
-// 	titleCategory: Joi.object({
-// 		id: Joi.optional(),
-// 		userId: Joi.optional(),
-// 		title: Joi.string().required(),
-// 		subTitle: Joi.string(),
-// 		categoryId: Joi.number().greater(0).required(),
-// 		subCategoryId: Joi.number(),
-// 		endDate: Joi.date().greater("now").required(),
-// 	}).required(),
-// 	itemDetails: Joi.object({
-// 		description: Joi.string().required(),
-// 		condition: Joi.boolean().required(),
-// 	}).required(),
-// 	pricePayment: Joi.object({
-// 		listingPrice: Joi.string().required(),
-// 		reservePrice: Joi.string(),
-// 		creditCardPayment: Joi.boolean().required(),
-// 		bankTransferPayment: Joi.boolean().required(),
-// 		bitcoinPayment: Joi.boolean().required(),
-// 	}).required(),
-// 	shipping: Joi.object({
-// 		pickUp: Joi.boolean().required(),
-// 		shippingOption: Joi.string().required(),
-// 	}).required(),
-// });
 
 /**
  * Add a new Listing
