@@ -30,7 +30,7 @@ export async function getListings() {
 		);
 		return result.rows ?? [];
 	} catch (error) {
-		console.log(error);
+		console.error(error);
 		throw new Error(error instanceof Error ? error.message : String(error));
 	}
 }

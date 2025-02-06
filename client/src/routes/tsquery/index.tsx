@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import api from "~/api";
 import ListingTile from "~/components/listingTile";
 import type { Listing } from "~/models";
+import Skeleton from "~/components/skeleton";
 
 export const Route = createFileRoute("/tsquery/")({
 	component: RouteComponent,
@@ -46,12 +47,10 @@ function RouteComponent() {
 					shippingOption: listing.shippingoption,
 				},
 			}));
-			console.log("arrayListings", arrayListings);
 			return arrayListings;
 		},
 	});
 
-	if (isLoading) return <p>Loading...</p>;
 	if (error) return <p>Error: {error.message}</p>;
 	return (
 		<>
@@ -64,7 +63,8 @@ function RouteComponent() {
 				</Link>
 			</div>
 			<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-				{auctions.map((auction: Listing, counter: Key | null | undefined) => (
+				{isLoading && <Skeleton />}
+				{auctions.map((auction: Listing, counter: number) => (
 					<ListingTile
 						key={
 							auction?.titleCategory?.id ? auction.titleCategory.id : counter

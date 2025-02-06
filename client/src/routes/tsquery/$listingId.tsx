@@ -70,7 +70,6 @@ function RouteComponent() {
 
 	useEffect(() => {
 		if (listingData) {
-			console.log("listingData", listingData);
 			setTitleCategory((prev) => ({
 				...prev,
 				title: listingData.title,

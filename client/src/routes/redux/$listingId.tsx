@@ -77,10 +77,8 @@ function RouteComponent() {
 		queryKey: ["parentCategories"],
 		queryFn: async () => {
 			const response = await api.getCategories();
-			console.log("response", response);
 			if (!response.ok) throw new Error("Error retrieving categories");
 			const result = await response.json();
-			console.log("result", result);
 			return result ?? [];
 		},
 	});
@@ -92,10 +90,8 @@ function RouteComponent() {
 	} = useQuery({
 		queryKey: ["subCategories", titleCategory.categoryId],
 		queryFn: async () => {
-			console.log("subCatData titleCategory", titleCategory.categoryId);
 			if (!titleCategory.categoryId) return [];
 			const response = await api.getCategories(titleCategory.categoryId);
-			console.log("sub response", response);
 			if (!response.ok) throw new Error("Error retrieving sub-categories");
 			return await response.json();
 		},
@@ -103,9 +99,6 @@ function RouteComponent() {
 
 	if (parentError) return <p>Error: {parentError.message}</p>;
 	if (subCatError) return <p>Error: {subCatError.message}</p>;
-
-	console.log("parentCatData", parentCatData);
-	console.log("subCatData", subCatData);
 
 	return (
 		<form onSubmit={handleSubmit} noValidate className="group">
@@ -125,7 +118,6 @@ function RouteComponent() {
 					type="text"
 					onChange={(e) => {
 						const value = e.target.value ?? "";
-						console.log("value", value);
 						setTitleCategory({
 							...titleCategory,
 							title: value,
