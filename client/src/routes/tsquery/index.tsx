@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import api from "~/api";
 import ListingTile from "~/components/listingTile";
 import type { Listing } from "~/models";
-import { Key } from "react";
 
 export const Route = createFileRoute("/tsquery/")({
 	component: RouteComponent,
@@ -19,9 +18,10 @@ function RouteComponent() {
 		queryKey: ["listings"],
 		queryFn: async () => {
 			const response = await api.getListings();
-			
+
 			if (!response.ok) throw new Error("Error retrieving listings");
 			const listings = await response.json();
+			// biome-ignore lint/suspicious/noExplicitAny: Saves having to create a new type
 			const arrayListings: Listing[] = listings.map((listing: any) => ({
 				titleCategory: {
 					id: listing.id,
@@ -32,21 +32,21 @@ function RouteComponent() {
 					endDate: listing.enddate,
 				},
 				itemDetails: {
-					description: listing.listingdescription
+					description: listing.listingdescription,
 				},
 				pricePayment: {
 					listingPrice: listing.listingprice,
 					reservePrice: listing.reserveprice,
 					creditCardPayment: listing.creditcardpayment,
 					bankTransferPayment: listing.banktransferpayment,
-					bitcoinPayment: listing.bitcoinpayment
+					bitcoinPayment: listing.bitcoinpayment,
 				},
 				shipping: {
 					pickUp: listing.pickup,
-					shippingOption: listing.shippingoption
-				}
+					shippingOption: listing.shippingoption,
+				},
 			}));
-			console.log("arrayListings",arrayListings);
+			console.log("arrayListings", arrayListings);
 			return arrayListings;
 		},
 	});
@@ -65,7 +65,13 @@ function RouteComponent() {
 			</div>
 			<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
 				{auctions.map((auction: Listing, counter: Key | null | undefined) => (
-					<ListingTile key={auction?.titleCategory?.id ? auction.titleCategory.id : counter} listing={auction} basePath="/tsquery" />
+					<ListingTile
+						key={
+							auction?.titleCategory?.id ? auction.titleCategory.id : counter
+						}
+						listing={auction}
+						basePath="/tsquery"
+					/>
 				))}
 			</div>
 		</>
