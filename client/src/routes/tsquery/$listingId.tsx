@@ -31,6 +31,10 @@ function RouteComponent() {
 	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
 	const fortnight = format(addDays(today, 14), "yyyy-MM-dd");
 
+	const navigate = useNavigate({
+		from: Route.fullPath,
+	});
+
 	const [titleCategory, setTitleCategory] = useState(
 		listingSchema.titleCategory,
 	);
@@ -141,10 +145,15 @@ function RouteComponent() {
 			throw new Error(result.error);
 		}
 
-		if (result.status === 200) {
-			const navigate = useNavigate();
-			navigate({ to: "/tsquery" });
+		if (result === 1) {
+			return navListings();
 		}
+
+		alert(`${JSON.stringify(result.message)}`);
+	};
+
+	const navListings = () => {
+		return navigate({ to: "/tsquery" });
 	};
 
 	const {
