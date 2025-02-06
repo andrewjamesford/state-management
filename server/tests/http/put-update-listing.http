@@ -1,0 +1,31 @@
+PUT {{ API_URL }}/api/listings/2 HTTP/1.1
+Content-Type: application/json
+
+{
+    "listing": {
+        "titleCategory": {
+            "title": "This is a test listing",
+            "categoryId": 1,
+            "subCategoryId": "17",
+            "subTitle": "dddd",
+            "endDate": "2025-09-01"
+        },
+        "itemDetails": {
+            "description": "asdasdasdasdasd",
+            "condition": true
+        },
+        "pricePayment": {
+            "listingPrice": 10,
+            "reservePrice": 20,
+            "creditCardPayment": true,
+            "bankTransferPayment": false,
+            "bitcoinPayment": false
+        },
+        "shipping": {
+            "pickUp": true,
+            "shippingOption": "post"
+        }
+    }
+}
+
+?? status == 200

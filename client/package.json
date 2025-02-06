@@ -6,6 +6,7 @@
 	"license": "GPL-3.0-only",
 	"scripts": {
 		"dev": "vite --host --port 4002",
+		"start": "vite build && npm install -g serve && serve dist --listen 4002",
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "biome check --write ./src",
@@ -13,26 +14,32 @@
 		"report": "biome check --reporter=summary --log-level=warn ./src"
 	},
 	"dependencies": {
-		"crossroad": "^1",
-		"date-fns": "^4",
-		"react": "^19",
-		"react-dom": "^19",
-		"react-error-boundary": "^4",
+		"@tanstack/react-query": "^5.62.15",
+		"@tanstack/react-router": "^1.91.2",
+		"@tanstack/react-query-devtools": "^5.62.15",
+		"@tanstack/router-devtools": "^1.91",
+		"@tanstack/router-plugin": "^1.91",
+		"date-fns": "^4.1",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"react-error-boundary": "^4.1.2",
 		"react-helmet": "^6.1.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
-		"@types/node": "^22",
-		"@types/react": "^19",
-		"@types/react-dom": "^19",
-		"@vitejs/plugin-react": "^4",
-		"autoprefixer": "^10",
-		"jsdoc": "^4",
-		"postcss": "^8",
-		"tailwindcss": "^3",
-		"tailwindcss-animate": "^1",
-		"vite": "^6",
-		"vitest": "^2"
+		"@types/node": "^22.10.2",
+		"@types/react": "^18.3.1",
+		"@types/react-dom": "^18.3.1",
+		"@vitejs/plugin-react": "^4.3.4",
+		"autoprefixer": "^10.4.20",
+		"jsdoc": "^4.0.4",
+		"postcss": "^8.4.49",
+		"tailwindcss": "^3.4.17",
+		"tailwindcss-animate": "^1.0.7",
+		"typescript": "~5.6.2",
+		"vite": "^6.0.3",
+		"vitest": "^2.1.8",
+		"zod": "^3.24.1"
 	},
 	"engines": {
 		"node": ">=22.0.0"

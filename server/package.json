@@ -2,14 +2,14 @@
 	"name": "state-management-server",
 	"version": "1.0.0",
 	"description": "",
-	"main": "index.mjs",
-	"type": "module",
+	"main": "index.ts",
 	"scripts": {
-		"dev": "nodemon --inspect=0.0.0.0:9229 index.mjs",
-		"start": "node --input-type=module index.mjs",
+		"dev": "tsx watch --inspect=0.0.0.0:9229 ./index.ts",
+		"start": "npm run build && node dist/index.js",
+		"build": "tsc",
 		"test": "vitest",
-		"check": "biome check --write ./**/*.*js",
-		"format": "biome format --write ./**/*.*js",
+		"check": "biome check --write ./**/*.ts",
+		"format": "biome format --write ./**/*.ts",
 		"report": "biome check --reporter=summary --log-level=warn ./",
 		"httptest": "httpyac send -a ./http/*.http"
 	},
@@ -18,21 +18,28 @@
 	"dependencies": {
 		"cors": "^2.8.5",
 		"dotenv": "^16.4.5",
-		"express": "^4",
-		"helmet": "^8",
+		"express": "^4.21.2",
+		"helmet": "^8.0.0",
 		"joi": "^17.13.3",
 		"pg": "^8.12.0"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "1.8.2",
+		"@biomejs/biome": "1.9.4",
+		"@types/cors": "^2.8.17",
+		"@types/express": "^4.17.21",
+		"@types/node": "^20.11.19",
+		"@types/pg": "^8.11.0",
+		"@types/supertest": "^6.0.2",
 		"globals": "^15.2.0",
 		"httpyac": "^6.15.1",
 		"jsdoc": "^4.0.3",
-		"nodemon": "^3.1.0",
 		"supertest": "^7.0.0",
-		"vitest": "^2.0.5"
+		"tsx": "^4.19.2",
+		"typescript": "~5.6.2",
+		"vitest": "^2.0.5",
+		"zod": "^3.24.1"
 	},
 	"engines": {
-		"node": ">=20.0.0"
+		"node": ">=22.0.0"
 	}
 }

@@ -10,6 +10,9 @@ services:
     volumes:
       - ./client:/app/
       - /app/node_modules
+    environment:
+      NODE_ENV: development
+    command: "npm run dev"
   server:
     build:
       context: ./server
@@ -21,6 +24,9 @@ services:
     volumes:
       - ./server:/app
       - /app/node_modules
+    environment:
+      NODE_ENV: development
+    command: "npm run dev"
   db:
     build:
       context: ./db

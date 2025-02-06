@@ -36,9 +36,7 @@
 			"public/**/*",
 			"dist/**/*",
 			"node_modules/**/*",
-			"build/**/*",
-			"*.tsx",
-			"*.ts"
+			"build/**/*"
 		]
 	},
 	"vcs": {
