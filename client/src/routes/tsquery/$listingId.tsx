@@ -16,6 +16,7 @@ import type {
 import { listingSchema } from "~/models";
 import Loader from "~/components/loader";
 import api from "~/api";
+import RadioButton from "~/components/RadioButton";
 
 export const Route = createFileRoute("/tsquery/$listingId")({
 	component: RouteComponent,
@@ -395,43 +396,35 @@ function RouteComponent() {
 				<legend className="sr-only">Condition</legend>
 				<div className="mt-6">
 					<label
-						htmlFor="category"
+						htmlFor="condition"
 						className="block text-sm font-medium text-gray-700"
 					>
 						Condition
 					</label>
-					<div className="flex mt-3">
-						<input
-							type="radio"
-							id="used"
-							name="condition"
-							value="false"
-							checked={itemDetails.condition === false}
-							onChange={() => {
-								setItemDetails({ ...itemDetails, condition: false });
-							}}
-							onBlur={changeData}
-						/>
-						<label htmlFor="used" className="ml-2 text-sm text-gray-700">
-							Used
-						</label>
-					</div>
-					<div className="flex mt-3">
-						<input
-							type="radio"
-							id="new"
-							name="condition"
-							value="true"
-							checked={itemDetails.condition === true}
-							onChange={() => {
-								setItemDetails({ ...itemDetails, condition: true });
-							}}
-							onBlur={changeData}
-						/>
-						<label htmlFor="new" className="ml-2 text-sm text-gray-700">
-							New
-						</label>
-					</div>
+					<RadioButton
+						id="used"
+						name="condition"
+						value="false"
+						label="Used"
+						checked={itemDetails.condition === false}
+						onChange={() =>
+							setItemDetails({ ...itemDetails, condition: false })
+						}
+						onBlur={changeData}
+						labelClassName="ml-2 text-sm text-gray-700"
+						containerClassName="flex mt-3"
+					/>
+					<RadioButton
+						id="new"
+						name="condition"
+						value="true"
+						label="New"
+						checked={itemDetails.condition === true}
+						onChange={() => setItemDetails({ ...itemDetails, condition: true })}
+						onBlur={changeData}
+						labelClassName="ml-2 text-sm text-gray-700"
+						containerClassName="flex mt-3"
+					/>
 				</div>
 			</fieldset>
 
@@ -581,49 +574,33 @@ function RouteComponent() {
 
 				<div className="mt-6">
 					<label
-						htmlFor="category"
+						htmlFor="pick-up"
 						className="block text-sm font-medium text-gray-700"
 					>
 						Pick up?
 					</label>
-					<div className="flex mt-3">
-						<input
-							type="radio"
-							id="pick-up-true"
-							name="pick-up"
-							value="true"
-							checked={shipping.pickUp === true}
-							onChange={() => {
-								setShipping({ ...shipping, pickUp: true });
-							}}
-							onBlur={changeData}
-						/>
-						<label
-							htmlFor="pick-up-true"
-							className="ml-2 text-sm text-gray-700"
-						>
-							Yes
-						</label>
-					</div>
-					<div className="flex mt-3">
-						<input
-							type="radio"
-							id="pick-up-false"
-							name="pick-up"
-							value="false"
-							checked={shipping.pickUp === false}
-							onChange={() => {
-								setShipping({ ...shipping, pickUp: false });
-							}}
-							onBlur={changeData}
-						/>
-						<label
-							htmlFor="pick-up-false"
-							className="ml-2 text-sm text-gray-700"
-						>
-							No
-						</label>
-					</div>
+					<RadioButton
+						id="pick-up-true"
+						name="pick-up"
+						value="true"
+						label="Yes"
+						checked={shipping.pickUp === true}
+						onChange={() => setShipping({ ...shipping, pickUp: true })}
+						onBlur={changeData}
+						containerClassName="flex mt-3"
+						labelClassName="ml-2 text-sm text-gray-700"
+					/>
+					<RadioButton
+						id="pick-up-false"
+						name="pick-up"
+						value="false"
+						label="No"
+						checked={shipping.pickUp === false}
+						onChange={() => setShipping({ ...shipping, pickUp: false })}
+						onBlur={changeData}
+						containerClassName="flex mt-3"
+						labelClassName="ml-2 text-sm text-gray-700"
+					/>
 				</div>
 			</fieldset>
 
@@ -636,58 +613,50 @@ function RouteComponent() {
 					>
 						Shipping options
 					</label>
-
-					<div className="flex mt-3">
-						<input
-							type="radio"
-							id="shipping-option-courier"
-							name="shipping-option"
-							value="courier"
-							checked={shipping.shippingOption === "courier"}
-							onChange={() => {
-								setShipping({ ...shipping, shippingOption: "courier" });
-							}}
-							onBlur={changeData}
-						/>
-						<label
-							htmlFor="shipping-option-courier"
-							className="ml-2 text-sm text-gray-700"
-						>
-							Courier
-						</label>
-					</div>
-
-					<div className="flex mt-3">
-						<input
-							type="radio"
-							id="shipping-option-post"
-							name="shipping-option"
-							value="post"
-							checked={shipping.shippingOption === "post"}
-							onChange={() => {
-								setShipping({ ...shipping, shippingOption: "post" });
-							}}
-							onBlur={changeData}
-						/>
-						<label
-							htmlFor="shipping-option-free"
-							className="ml-2 text-sm text-gray-700"
-						>
-							Post
-						</label>
-					</div>
+					<RadioButton
+						id="shipping-option-courier"
+						name="shipping-option"
+						value="courier"
+						label="Courier"
+						checked={shipping.shippingOption === "courier"}
+						onChange={() =>
+							setShipping({ ...shipping, shippingOption: "courier" })
+						}
+						onBlur={changeData}
+						containerClassName="flex mt-3"
+						labelClassName="ml-2 text-sm text-gray-700"
+					/>
+					<RadioButton
+						id="shipping-option-post"
+						name="shipping-option"
+						value="post"
+						label="Post"
+						checked={shipping.shippingOption === "post"}
+						onChange={() =>
+							setShipping({ ...shipping, shippingOption: "post" })
+						}
+						onBlur={changeData}
+						containerClassName="flex mt-3"
+						labelClassName="ml-2 text-sm text-gray-700"
+					/>
 				</div>
 				<input type="hidden" name="id" value={listingId} />
 			</fieldset>
 
 			<div className="mt-3">
-				<button
-					type="submit"
-					className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-500 hover:bg-blue-600 text-white border border-blue-600 h-10 px-4 py-2"
-				>
-					Save
-				</button>
+				<SubmitButton />
 			</div>
 		</form>
+	);
+}
+
+function SubmitButton() {
+	return (
+		<button
+			type="submit"
+			className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-500 hover:bg-blue-600 text-white border border-blue-600 h-10 px-4 py-2"
+		>
+			Save
+		</button>
 	);
 }
