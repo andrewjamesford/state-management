@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { listingSchema } from "~/models";
 import Loader from "~/components/loader";
 import api from "~/api";
+import TextInput from "~/components/textInput";
 
 export const Route = createFileRoute("/redux/$listingId")({
 	component: RouteComponent,
@@ -105,29 +106,25 @@ function RouteComponent() {
 			<h1 className="mt-4 text-2xl font-bold">What are you listing?</h1>
 
 			<div className="mt-6">
-				<label
-					htmlFor="listing-title"
-					className="block text-sm font-medium text-gray-700"
-				>
-					Listing title
-				</label>
-				<input
+				{/* Replace Listing title input */}
+				<TextInput
 					id="listing-title"
+					label="Listing title"
 					placeholder="e.g. iPhone 5c, Red t-shirt"
-					className="peer mt-1 block w-full rounded-md border px-3 py-2 placeholder:italic invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-600"
 					type="text"
-					onChange={(e) => {
-						const value = e.target.value ?? "";
-						setTitleCategory({
-							...titleCategory,
-							title: value,
-						});
-					}}
-					value={titleCategory.title}
-					onBlur={changeData}
-					required={true}
+					required
 					maxLength={80}
 					minLength={3}
+					value={titleCategory.title}
+					onChange={(e) =>
+						setTitleCategory({
+							...titleCategory,
+							title: e.target.value,
+						})
+					}
+					onBlur={changeData}
+					inputClassName="peer mt-1 block w-full rounded-md border px-3 py-2 placeholder:italic invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-600"
+					labelClassName="block text-sm font-medium text-gray-700"
 				/>
 				<span className="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block">
 					Please enter a listing title of 3-80 characters
@@ -136,27 +133,23 @@ function RouteComponent() {
 			</div>
 
 			<div className="mt-6">
-				<label
-					htmlFor="sub-title"
-					className="block text-sm font-medium text-gray-700"
-				>
-					Subtitle (optional)
-				</label>
-				<input
+				{/* Replace Subtitle input */}
+				<TextInput
 					id="sub-title"
+					label="Subtitle (optional)"
 					placeholder="e.g. iPhone 5c, Red t-shirt"
-					className="block w-full px-3 py-2 mt-1 border rounded-md placeholder:italic peer"
 					type="text"
-					onChange={(e) => {
-						const value = e.target.value ?? "";
+					maxLength={50}
+					value={titleCategory.subTitle}
+					onChange={(e) =>
 						setTitleCategory({
 							...titleCategory,
-							subTitle: value,
-						});
-					}}
-					value={titleCategory.subTitle}
+							subTitle: e.target.value,
+						})
+					}
 					onBlur={changeData}
-					maxLength={50}
+					inputClassName="block w-full px-3 py-2 mt-1 border rounded-md placeholder:italic peer"
+					labelClassName="block text-sm font-medium text-gray-700"
 				/>
 				<span className="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block">
 					Please enter a subtitle of max 50 characters
