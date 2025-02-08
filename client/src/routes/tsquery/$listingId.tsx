@@ -16,7 +16,10 @@ import type {
 import { listingSchema } from "~/models";
 import Loader from "~/components/loader";
 import api from "~/api";
-import RadioButton from "~/components/RadioButton";
+import RadioButton from "~/components/radioButton";
+import DateInput from "~/components/dateInput";
+import TextInput from "~/components/textInput";
+import Select from "~/components/select";
 
 export const Route = createFileRoute("/tsquery/$listingId")({
 	component: RouteComponent,
@@ -194,17 +197,13 @@ function RouteComponent() {
 			<h1 className="mt-4 text-2xl font-bold">What are you listing?</h1>
 
 			<div className="mt-6">
-				<label
-					htmlFor="listing-title"
-					className="block text-sm font-medium text-gray-700"
-				>
-					Listing title
-				</label>
-				<input
+				{/* Listing Title */}
+				<TextInput
+					labelClassName="block text-sm font-medium text-gray-700"
+					label="Listing title"
 					id="listing-title"
 					placeholder="e.g. iPhone 5c, Red t-shirt"
-					className="peer mt-1 block w-full rounded-md border px-3 py-2 placeholder:italic invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-600"
-					type="text"
+					value={titleCategory.title}
 					onChange={(e) => {
 						const value = e.target.value ?? "";
 						setTitleCategory({
@@ -212,30 +211,26 @@ function RouteComponent() {
 							title: value,
 						});
 					}}
-					value={titleCategory.title}
 					onBlur={changeData}
 					required={true}
 					maxLength={80}
 					minLength={3}
+					className="peer mt-1 block w-full rounded-md border px-3 py-2 placeholder:italic invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-600"
+					errorMessage="Please enter a listing title of 3-80 characters"
+					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
+					requirementsLabel="80 characters max"
+					requirementsClassName="mt-1 text-sm text-gray-500"
 				/>
-				<span className="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block">
-					Please enter a listing title of 3-80 characters
-				</span>
-				<p className="mt-1 text-sm text-gray-500 ">80 characters max</p>
 			</div>
 
 			<div className="mt-6">
-				<label
-					htmlFor="sub-title"
-					className="block text-sm font-medium text-gray-700"
-				>
-					Subtitle (optional)
-				</label>
-				<input
-					id="sub-title"
+				{/* Subtitle */}
+				<TextInput
+					labelClassName="block text-sm font-medium text-gray-700"
+					label="Subtitle (optional)"
+					id="listing-title"
 					placeholder="e.g. iPhone 5c, Red t-shirt"
-					className="block w-full px-3 py-2 mt-1 border rounded-md placeholder:italic peer"
-					type="text"
+					value={titleCategory.subTitle}
 					onChange={(e) => {
 						const value = e.target.value ?? "";
 						setTitleCategory({
@@ -243,126 +238,98 @@ function RouteComponent() {
 							subTitle: value,
 						});
 					}}
-					value={titleCategory.subTitle}
 					onBlur={changeData}
+					required={false}
 					maxLength={50}
+					className="block w-full px-3 py-2 mt-1 border rounded-md placeholder:italic peer"
+					errorMessage="Please enter a listing title of 3-80 characters"
+					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
+					requirementsLabel="50 characters max"
+					requirementsClassName="mt-1 text-sm text-gray-500"
 				/>
-				<span className="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block">
-					Please enter a subtitle of max 50 characters
-				</span>
-				<p className="mt-1 text-sm text-gray-500">50 characters max</p>
 			</div>
 
 			<div className="mt-6">
-				<label
-					htmlFor="category"
-					className="block text-sm font-medium text-gray-700 "
-				>
-					Category
-				</label>
-				<div className="mt-1">
-					{loadingCategory && <Loader width={20} height={20} />}
-					{!loadingCategory && (
-						<select
-							id="category"
-							// placeholder="Select a category"
-							className={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background  peer ${titleCategory.categoryId === 0 ? " italic text-gray-400" : ""}`}
-							onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-								const value = Number.parseInt(e.target.value) || 0;
-								setTitleCategory({
-									...titleCategory,
-									categoryId: value,
-									subCategoryId: 0, // reset subcategory
-								});
-							}}
-							value={titleCategory.categoryId}
-							onBlur={changeData}
-							required={true}
-							// pattern="\d+"
-						>
-							<option value="" className="text-muted-foreground italic">
-								Select a category...
+				{loadingCategory && <Loader width={20} height={20} />}
+				{!loadingCategory && (
+					<Select
+						label="Category"
+						labelClassName="block text-sm font-medium text-gray-700"
+						id="category"
+						selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${titleCategory.categoryId === 0 ? " italic text-gray-400" : ""}`}
+						onChange={(e) => {
+							const value = Number.parseInt(e.target.value) || 0;
+							setTitleCategory({
+								...titleCategory,
+								categoryId: value,
+								subCategoryId: 0, // reset subcategory
+							});
+						}}
+						value={titleCategory.categoryId}
+						onBlur={changeData}
+						required={true}
+					>
+						<option value="" className="text-muted-foreground italic">
+							Select a category...
+						</option>
+						{parentCatData?.map((category: Category) => (
+							<option key={category.id} value={category.id}>
+								{category.category_name}
 							</option>
-							{parentCatData?.map((category: Category) => (
-								<option key={category.id} value={category.id}>
-									{category.category_name}
-								</option>
-							))}
-						</select>
-					)}
-					<span className="mt-1 hidden text-sm text-red-600 peer-[&:not(:selected):invalid]:block">
-						Please select a category
-					</span>
-				</div>
+						))}
+					</Select>
+				)}
 			</div>
 
 			<div className="mt-6">
-				<label
-					htmlFor="category-sub"
-					className="block text-sm font-medium text-gray-700"
-				>
-					Sub Category
-				</label>
-				<div className="mt-1">
-					{loadingSubCategory && <Loader width={20} height={20} />}
-					{!loadingSubCategory && (
-						<select
-							id="category-sub"
-							// placeholder="Select a sub category"
-							className={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 placeholder:italic ${titleCategory.subCategoryId === 0 ? " italic text-gray-400" : ""}`}
-							onChange={(e) => {
-								const value = Number.parseInt(e.target.value) || 0;
-								setTitleCategory({
-									...titleCategory,
-									subCategoryId: value,
-								});
-							}}
-							value={titleCategory.subCategoryId}
-							onBlur={changeData}
-							required={true}
-							disabled={subCatData.length === 0}
-						>
-							<option value="" className="text-muted-foreground italic">
-								Select a sub category...
-							</option>
-							{subCatData?.map((category: Category) => (
-								<option key={category.id} value={category.id}>
-									{category.category_name}
-								</option>
-							))}
-						</select>
-					)}
-				</div>
-			</div>
-
-			<div className="mt-6">
-				<label
-					htmlFor="end-date"
-					className="block text-sm font-medium text-gray-700"
-				>
-					End date
-				</label>
-				<input
-					id="end-date"
-					className="block w-full px-3 py-2 mt-1 border rounded-md text-black focus:ring-primary focus:border-primary focus:bg-transparent placeholder:italic peer"
-					type="date"
+				<Select
+					label="Sub Category"
+					labelClassName="block text-sm font-medium text-gray-700"
+					id="category-sub"
+					selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${titleCategory.subCategoryId === 0 ? " italic text-gray-400" : ""}`}
 					onChange={(e) => {
-						const value = e.target.value ?? "";
+						const value = Number.parseInt(e.target.value) || 0;
 						setTitleCategory({
 							...titleCategory,
-							endDate: value,
+							subCategoryId: value,
 						});
 					}}
-					value={titleCategory.endDate}
+					value={titleCategory.subCategoryId}
 					onBlur={changeData}
 					required={true}
+					disabled={!subCatData}
+				>
+					<option value="" className="text-muted-foreground italic">
+						Select a sub category...
+					</option>
+					{subCatData?.map((category: Category) => (
+						<option key={category.id} value={category.id}>
+							{category.category_name}
+						</option>
+					))}
+				</Select>
+			</div>
+
+			<div className="mt-6">
+				<DateInput
+					label="End date"
+					labelClassName="block text-sm font-medium text-gray-700"
+					id="end-date"
+					value={titleCategory.endDate}
+					onChange={(e) =>
+						setTitleCategory({
+							...titleCategory,
+							endDate: e.target.value,
+						})
+					}
+					onBlur={changeData}
+					required
 					pattern="\d{4}-\d{2}-\d{2}"
 					min={tomorrow}
 					max={fortnight}
+					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:default):invalid]:block"
+					error="Please select a future date between tomorrow and two weeks from now"
 				/>
-				<span className="mt-1 hidden text-sm text-red-600 peer-[&:not(:default):invalid]:block">
-					Please select a future date between tomorrow and two weeks from now
-				</span>
 			</div>
 
 			<h1 className="mt-4 text-2xl font-bold">Item details</h1>

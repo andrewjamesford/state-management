@@ -7,6 +7,9 @@ interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
 	errorMessage?: string;
 	labelClassName?: string;
 	inputClassName?: string;
+	errorClassName?: string;
+	requirementsClassName?: string;
+	requirementsLabel?: string;
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -15,23 +18,24 @@ const TextInput: React.FC<TextInputProps> = ({
 	errorMessage,
 	labelClassName,
 	inputClassName,
+	errorClassName,
+	requirementsClassName,
+	requirementsLabel,
 	...props
 }) => {
 	return (
 		<div>
-			<label
-				htmlFor={id}
-				className={`${labelClassName || "block text-sm font-medium text-gray-700"}`}
-			>
+			<label htmlFor={id} className={labelClassName}>
 				{label}
 			</label>
-			<input
-				id={id}
-				className={`${inputClassName || "mt-1 block w-full rounded-md border px-3 py-2 placeholder:italic"}`}
-				{...props}
-			/>
+			<input id={id} className={inputClassName} {...props} />
 			{errorMessage && (
-				<span className="mt-1 text-sm text-red-600">{errorMessage}</span>
+				<span className={errorClassName} role="alert">
+					{errorMessage}
+				</span>
+			)}
+			{requirementsLabel && (
+				<p className={requirementsClassName}>{requirementsLabel}</p>
 			)}
 		</div>
 	);
