@@ -43,9 +43,18 @@ function RouteComponent() {
 		from: Route.fullPath,
 	});
 
-	// const navListings = () => {
-	// 	return navigate({ to: "/tsquery" });
-	// };
+	const [titleCategory, setTitleCategory] = useState(
+		listingSchema.titleCategory,
+	);
+	const [itemDetails, setItemDetails] = useState(
+		listingSchema.itemDetails as ItemDetails,
+	);
+	const [pricePayment, setPricePayment] = useState(
+		listingSchema.pricePayment as PricePayment,
+	);
+	const [shipping, setShipping] = useState(listingSchema.shipping as Shipping);
+	const [checkRequired, setCheckRequired] = useState(true);
+
 	const { listingId } = useParams({ from: Route.id });
 
 	const {
@@ -55,32 +64,90 @@ function RouteComponent() {
 	} = useQuery({
 		queryKey: ["listingData", listingId],
 		queryFn: async () => {
-			const response = await api.getListing(String(listingId));
+			const response = await api.getListing(String(listingId)); // pass id as string
 			if (!response.ok) {
 				throw new Error(`Error retrieving listing ${listingId}`);
 			}
 			return await response.json();
 		},
-		refetchOnWindowFocus: true,
+		enabled: !Number.isNaN(listingId),
 	});
-
-	const [titleCategory, setTitleCategory] = useState(
-		listingSchema.titleCategory,
-	);
-	const [itemDetails, setItemDetails] = useState(listingSchema.itemDetails);
-	const [pricePayment, setPricePayment] = useState(listingSchema.pricePayment);
-	const [shipping, setShipping] = useState(listingSchema.shipping);
 
 	useEffect(() => {
 		if (listingData) {
-			setTitleCategory(
-				listingData.titleCategory || listingSchema.titleCategory,
-			);
-			setItemDetails(listingData.itemDetails || listingSchema.itemDetails);
-			setPricePayment(listingData.pricePayment || listingSchema.pricePayment);
-			setShipping(listingData.shipping || listingSchema.shipping);
+			setTitleCategory((prev) => ({
+				...prev,
+				title: listingData.title,
+				subTitle: listingData.subtitle,
+				endDate: format(listingData.enddate, "yyyy-MM-dd") ?? "",
+				categoryId: listingData.categoryid,
+				subCategoryId: listingData.subcategoryid,
+			}));
+			setItemDetails((prev) => ({
+				...prev,
+				description: listingData.listingdescription,
+				condition: listingData.condition,
+			}));
+			setPricePayment((prev) => ({
+				...prev,
+				listingPrice: listingData.listingprice,
+				reservePrice: listingData.reserveprice,
+				creditCardPayment: listingData.creditcardpayment,
+				bankTransferPayment: listingData.banktransferpayment,
+				bitcoinPayment: listingData.bitcoinpayment,
+			}));
+			setShipping((prev) => ({
+				...prev,
+				pickUp: listingData.pickup,
+				shippingOption: listingData.shippingoption,
+			}));
 		}
 	}, [listingData]);
+
+	const changeData = () => {};
+
+	const checkValue = (value: number) => {
+		if (value > 10) {
+			throw new Error("Price must be less than $10");
+		}
+	};
+
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+
+		if (pricePayment.reservePrice === "") pricePayment.reservePrice = "0.00";
+
+		const listing: Listing = {
+			titleCategory: titleCategory,
+			itemDetails: itemDetails,
+			pricePayment: pricePayment,
+			shipping: shipping,
+		};
+
+		const listingWrapper = { listing: listing };
+
+		const response = await api.updateListing(listingId, listingWrapper);
+		if (!response.ok) {
+			throw new Error("Error updating listing");
+		}
+		const result = await response.json();
+		if (result.error) {
+			throw new Error(result.error);
+		}
+		alert(`${JSON.stringify(result)} listing updated`);
+
+		if (result.error) {
+			throw new Error(result.error);
+		}
+
+		if (result === 1) {
+			return navListings();
+		}
+	};
+
+	const navListings = () => {
+		return navigate({ to: "/tsquery" });
+	};
 
 	const {
 		data: parentCatData,
@@ -101,99 +168,19 @@ function RouteComponent() {
 		isLoading: loadingSubCategory,
 		error: subCatError,
 	} = useQuery({
-		queryKey: ["subCategories", listingData?.categoryId ?? 0],
+		queryKey: ["subCategories", titleCategory.categoryId],
 		queryFn: async () => {
-			if (!listingData.categoryId) return [];
-			const response = await api.getCategories(listingData.categoryId);
+			if (!titleCategory.categoryId) return [];
+			const response = await api.getCategories(titleCategory.categoryId);
 			if (!response.ok) throw new Error("Error retrieving sub-categories");
 			return await response.json();
 		},
 	});
 
-	// useEffect(() => {
-	// 	if (listingData) {
-	// 		setlistingData((prev) => ({
-	// 			...prev,
-	// 			title: listingData.title,
-	// 			subTitle: listingData.subtitle,
-	// 			endDate: format(listingData.enddate, "yyyy-MM-dd") ?? "",
-	// 			categoryId: listingData.parent_id ? listingData.categoryid : 0,
-	// 			subCategoryId: listingData.subcategoryid
-	// 				? listingData.subcategoryid
-	// 				: 0,
-	// 		}));
-	// 		setItemDetails((prev) => ({
-	// 			...prev,
-	// 			description: listingData.listingdescription,
-	// 			condition: listingData.condition,
-	// 		}));
-	// 		setPricePayment((prev) => ({
-	// 			...prev,
-	// 			listingPrice: listingData.listingprice,
-	// 			reservePrice: listingData.reserveprice,
-	// 			creditCardPayment: listingData.creditcardpayment,
-	// 			bankTransferPayment: listingData.banktransferpayment,
-	// 			bitcoinPayment: listingData.bitcoinpayment,
-	// 		}));
-	// 		setShipping((prev) => ({
-	// 			...prev,
-	// 			pickUp: listingData.pickup,
-	// 			shippingOption: listingData.shippingoption,
-	// 		}));
-	// 	}
-	// }, [listingData]);
-
-	const changeData = () => {};
-
-	const checkValue = (value: number) => {
-		if (value > 10) {
-			throw new Error("Price must be less than $10");
-		}
-	};
-
-	const queryClient = useQueryClient();
-	const mutation = useMutation({
-		mutationFn: async ({
-			listingId,
-			listingWrapper,
-		}: {
-			listingId: string;
-			listingWrapper: { listing: Listing };
-		}) => {
-			const response = await api.updateListing(listingId, listingWrapper);
-			if (!response.ok) throw new Error("Error updating listing");
-			return await response.json();
-		},
-		onSuccess: (data, variables) => {
-			alert(`${JSON.stringify(data)} listing updated`);
-			queryClient.invalidateQueries({
-				queryKey: ["listingData", variables.listingId],
-			});
-			// navListings();
-		},
-		onError: (error: Error) => {
-			alert(error.message || "An error occurred");
-		},
-	});
-
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		if (pricePayment.reservePrice === "") pricePayment.reservePrice = "0.00";
-		const listing: Listing = {
-			titleCategory,
-			itemDetails,
-			pricePayment,
-			shipping,
-		};
-		const listingWrapper = { listing };
-		mutation.mutate({ listingId, listingWrapper });
-	};
-
 	if (parentError) return <p>Error: {parentError.message}</p>;
 	if (subCatError) return <p>Error: {subCatError.message}</p>;
-
-	if (loadingListing) return <Loader height={50} width={50} />;
 	if (listingError) return <p>Error: {listingError.message}</p>;
+	if (loadingListing) return <Loader height={50} width={50} />;
 
 	return (
 		<form onSubmit={handleSubmit} noValidate className="group">
