@@ -80,6 +80,7 @@ export async function getListing(id: number) {
 interface TitleCategory {
 	title: string;
 	categoryId: number;
+	subCategoryId: number;
 	subTitle: string;
 	endDate: string;
 }
@@ -189,7 +190,8 @@ export const updateListing = async (
 	try {
 		const { listing } = listingDetails;
 		const { titleCategory, itemDetails, pricePayment, shipping } = listing;
-		const { title, categoryId, subTitle, endDate } = titleCategory;
+		const { title, categoryId, subTitle, endDate, subCategoryId } =
+			titleCategory;
 		const { condition, description } = itemDetails;
 		const {
 			listingPrice,

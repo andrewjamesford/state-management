@@ -20,8 +20,8 @@ import RadioButton from "~/components/radioButton";
 import DateInput from "~/components/dateInput";
 import TextInput from "~/components/textInput";
 import Select from "~/components/select";
-import Textarea from "~/components/Textarea";
-import MoneyTextInput from "~/components/MoneyTextInput";
+import Textarea from "~/components/textarea";
+import MoneyTextInput from "~/components/moneyTextInput";
 import Checkbox from "~/components/Checkbox";
 
 export const Route = createFileRoute("/tsquery/$listingId")({
@@ -43,7 +43,7 @@ function RouteComponent() {
 	});
 
 	const [titleCategory, setTitleCategory] = useState(
-		listingSchema.titleCategory,
+		listingSchema.titleCategory as TitleCategory,
 	);
 	const [itemDetails, setItemDetails] = useState(
 		listingSchema.itemDetails as ItemDetails,
@@ -52,7 +52,6 @@ function RouteComponent() {
 		listingSchema.pricePayment as PricePayment,
 	);
 	const [shipping, setShipping] = useState(listingSchema.shipping as Shipping);
-	const [checkRequired, setCheckRequired] = useState(true);
 
 	const { listingId } = useParams({ from: Route.id });
 
@@ -110,8 +109,10 @@ function RouteComponent() {
 				title: listingData.title,
 				subTitle: listingData.subtitle,
 				endDate: format(listingData.enddate, "yyyy-MM-dd") ?? "",
-				categoryId: listingData.categoryid,
-				subCategoryId: listingData.subcategoryid,
+				categoryId: listingData.parent_id ? listingData.categoryid : 0,
+				subCategoryId: listingData.subcategoryid
+					? listingData.subcategoryid
+					: 0,
 			}));
 			setItemDetails((prev) => ({
 				...prev,
@@ -276,7 +277,7 @@ function RouteComponent() {
 						onBlur={changeData}
 						required={true}
 					>
-						<option value="0" className="text-muted-foreground italic">
+						<option value={0} className="text-muted-foreground italic">
 							Select a category...
 						</option>
 						{parentCatData?.map((category: Category) => (
@@ -290,6 +291,7 @@ function RouteComponent() {
 
 			<div className="mt-6">
 				{/* Sub Category */}
+				{loadingSubCategory && <Loader width={20} height={20} />}
 				<Select
 					label="Sub Category"
 					labelClassName="block text-sm font-medium text-gray-700"
@@ -307,7 +309,7 @@ function RouteComponent() {
 					required={true}
 					disabled={!subCatData}
 				>
-					<option value="0" className="text-muted-foreground italic">
+					<option value={0} className="text-muted-foreground italic">
 						Select a sub category...
 					</option>
 					{subCatData?.map((category: Category) => (
@@ -455,7 +457,6 @@ function RouteComponent() {
 								});
 							}}
 							onBlur={changeData}
-							required={checkRequired}
 						/>
 					</div>
 					<div className="flex mt-3">
@@ -470,7 +471,6 @@ function RouteComponent() {
 								});
 							}}
 							onBlur={changeData}
-							required={checkRequired}
 						/>
 					</div>
 					<div className="flex mt-3">
@@ -485,7 +485,6 @@ function RouteComponent() {
 								});
 							}}
 							onBlur={changeData}
-							required={checkRequired}
 						/>
 					</div>
 				</div>
