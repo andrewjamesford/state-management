@@ -20,6 +20,9 @@ import RadioButton from "~/components/radioButton";
 import DateInput from "~/components/dateInput";
 import TextInput from "~/components/textInput";
 import Select from "~/components/select";
+import Textarea from "~/components/Textarea";
+import MoneyTextInput from "~/components/MoneyTextInput";
+import Checkbox from "~/components/Checkbox";
 
 export const Route = createFileRoute("/tsquery/$listingId")({
 	component: RouteComponent,
@@ -334,16 +337,10 @@ function RouteComponent() {
 
 			<h1 className="mt-4 text-2xl font-bold">Item details</h1>
 			<div className="mt-6">
-				<label
-					htmlFor="listing-description"
-					className="block text-sm font-medium text-gray-700"
-				>
-					Description
-				</label>
-
-				<textarea
+				<Textarea
+					label="Description"
+					labelClassName="block text-sm font-medium text-gray-700"
 					id="listing-description"
-					className="block w-full px-3 py-2 mt-1 border rounded-md invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-600 peer"
 					value={itemDetails.description}
 					onChange={(e) => {
 						const value = e.target.value ?? "";
@@ -353,11 +350,11 @@ function RouteComponent() {
 					required={true}
 					maxLength={500}
 					minLength={10}
+					className="block w-full px-3 py-2 mt-1 border rounded-md placeholder:italic"
 					placeholder="Describe your item"
+					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
+					errorMessage="Please enter a description of 10-500 characters"
 				/>
-				<span className="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block">
-					Please enter a description of 10-500 characters
-				</span>
 			</div>
 			<fieldset>
 				<legend className="sr-only">Condition</legend>
@@ -397,60 +394,40 @@ function RouteComponent() {
 
 			<h1 className="mt-4 text-2xl font-bold">Price &amp; Payment</h1>
 			<div className="mt-6">
-				<label
-					htmlFor="listing-price"
-					className="block text-sm font-medium text-gray-700"
-				>
-					Start price
-				</label>
-				<span className="flex">
-					<span className="pt-3 pr-2 text-lg">$</span>
-					<input
-						id="listing-price"
-						placeholder="$10.00"
-						className="block w-full px-3 py-2 mt-1 border rounded-md placeholder:italic"
-						type="number"
-						min={1}
-						step={1}
-						value={pricePayment.listingPrice}
-						required={true}
-						onChange={(e) => {
-							checkValue(Number(e.target.value));
-							setPricePayment({
-								...pricePayment,
-								listingPrice: e.target.value,
-							});
-						}}
-						onBlur={changeData}
-					/>
-				</span>
+				<MoneyTextInput
+					label="Start price"
+					labelClassName="block text-sm font-medium text-gray-700"
+					id="listing-price"
+					placeholder="$10.00"
+					value={pricePayment.listingPrice}
+					onChange={(e) => {
+						checkValue(Number(e.target.value));
+						setPricePayment({
+							...pricePayment,
+							listingPrice: e.target.value,
+						});
+					}}
+					onBlur={changeData}
+					required={true}
+					errorMessage="Price must be less than $10"
+					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
+				/>
 			</div>
 			<div className="mt-6">
-				<label
-					htmlFor="listing-reserve"
-					className="block text-sm font-medium text-gray-700"
-				>
-					Reserve price (optional)
-				</label>
-				<span className="flex">
-					<span className="pt-3 pr-2 text-lg">$</span>
-					<input
-						id="listing-reserve"
-						placeholder="$20.00"
-						className="block w-full px-3 py-2 mt-1 border rounded-md placeholder:italic"
-						type="number"
-						min={0}
-						step={1}
-						value={pricePayment.reservePrice}
-						onChange={(e) => {
-							setPricePayment({
-								...pricePayment,
-								reservePrice: e.target.value,
-							});
-						}}
-						onBlur={changeData}
-					/>
-				</span>
+				<MoneyTextInput
+					label="Reserve price (optional)"
+					labelClassName="block text-sm font-medium text-gray-700"
+					id="listing-reserve"
+					placeholder="$20.00"
+					value={pricePayment.reservePrice}
+					onChange={(e) => {
+						setPricePayment({
+							...pricePayment,
+							reservePrice: e.target.value,
+						});
+					}}
+					onBlur={changeData}
+				/>
 			</div>
 			<fieldset>
 				<legend className="sr-only">Payment options</legend>
@@ -462,11 +439,10 @@ function RouteComponent() {
 						Payment options
 					</label>
 					<div className="flex mt-3">
-						<input
-							type="checkbox"
+						<Checkbox
 							id="payment-credit"
-							name="payment-type"
-							value="credit-card"
+							label="Credit card"
+							checked={pricePayment.creditCardPayment}
 							onChange={() => {
 								setPricePayment({
 									...pricePayment,
@@ -474,23 +450,14 @@ function RouteComponent() {
 								});
 							}}
 							onBlur={changeData}
-							checked={pricePayment.creditCardPayment}
 							required={checkRequired}
 						/>
-
-						<label
-							htmlFor="payment-credit"
-							className="ml-2 text-sm text-gray-700"
-						>
-							Credit Card
-						</label>
 					</div>
 					<div className="flex mt-3">
-						<input
-							type="checkbox"
+						<Checkbox
 							id="payment-bank"
-							name="payment-type"
-							value="bank-transfer"
+							label="Bank Transfer"
+							checked={pricePayment.bankTransferPayment}
 							onChange={() => {
 								setPricePayment({
 									...pricePayment,
@@ -498,23 +465,14 @@ function RouteComponent() {
 								});
 							}}
 							onBlur={changeData}
-							checked={pricePayment.bankTransferPayment}
 							required={checkRequired}
 						/>
-
-						<label
-							htmlFor="payment-bank"
-							className="ml-2 text-sm text-gray-700"
-						>
-							Bank Transfer
-						</label>
 					</div>
 					<div className="flex mt-3">
-						<input
-							type="checkbox"
+						<Checkbox
 							id="payment-bitcoin"
-							name="payment-type"
-							value="bitcoin"
+							label="Bitcoin"
+							checked={pricePayment.bitcoinPayment}
 							onChange={() => {
 								setPricePayment({
 									...pricePayment,
@@ -522,15 +480,8 @@ function RouteComponent() {
 								});
 							}}
 							onBlur={changeData}
-							checked={pricePayment.bitcoinPayment}
 							required={checkRequired}
 						/>
-						<label
-							htmlFor="payment-bitcoin"
-							className="ml-2 text-sm text-gray-700"
-						>
-							Bitcoin
-						</label>
 					</div>
 				</div>
 			</fieldset>
