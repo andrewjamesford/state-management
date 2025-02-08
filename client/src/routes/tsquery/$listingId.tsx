@@ -10,8 +10,9 @@ import type {
 	ItemDetails,
 	PricePayment,
 	Shipping,
-	TitleCategory,
+	listingData,
 	Listing,
+	TitleCategory,
 } from "~/models";
 import { listingSchema } from "~/models";
 import Loader from "~/components/loader";
@@ -42,17 +43,9 @@ function RouteComponent() {
 		from: Route.fullPath,
 	});
 
-	const [titleCategory, setTitleCategory] = useState(
-		listingSchema.titleCategory as TitleCategory,
-	);
-	const [itemDetails, setItemDetails] = useState(
-		listingSchema.itemDetails as ItemDetails,
-	);
-	const [pricePayment, setPricePayment] = useState(
-		listingSchema.pricePayment as PricePayment,
-	);
-	const [shipping, setShipping] = useState(listingSchema.shipping as Shipping);
-
+	// const navListings = () => {
+	// 	return navigate({ to: "/tsquery" });
+	// };
 	const { listingId } = useParams({ from: Route.id });
 
 	const {
@@ -68,8 +61,26 @@ function RouteComponent() {
 			}
 			return await response.json();
 		},
-		enabled: !!listingId,
+		refetchOnWindowFocus: true,
 	});
+
+	const [titleCategory, setTitleCategory] = useState(
+		listingSchema.titleCategory,
+	);
+	const [itemDetails, setItemDetails] = useState(listingSchema.itemDetails);
+	const [pricePayment, setPricePayment] = useState(listingSchema.pricePayment);
+	const [shipping, setShipping] = useState(listingSchema.shipping);
+
+	useEffect(() => {
+		if (listingData) {
+			setTitleCategory(
+				listingData.titleCategory || listingSchema.titleCategory,
+			);
+			setItemDetails(listingData.itemDetails || listingSchema.itemDetails);
+			setPricePayment(listingData.pricePayment || listingSchema.pricePayment);
+			setShipping(listingData.shipping || listingSchema.shipping);
+		}
+	}, [listingData]);
 
 	const {
 		data: parentCatData,
@@ -90,47 +101,47 @@ function RouteComponent() {
 		isLoading: loadingSubCategory,
 		error: subCatError,
 	} = useQuery({
-		queryKey: ["subCategories", titleCategory.categoryId],
+		queryKey: ["subCategories", listingData?.categoryId ?? 0],
 		queryFn: async () => {
-			if (!titleCategory.categoryId) return [];
-			const response = await api.getCategories(titleCategory.categoryId);
+			if (!listingData.categoryId) return [];
+			const response = await api.getCategories(listingData.categoryId);
 			if (!response.ok) throw new Error("Error retrieving sub-categories");
 			return await response.json();
 		},
 	});
 
-	useEffect(() => {
-		if (listingData) {
-			setTitleCategory((prev) => ({
-				...prev,
-				title: listingData.title,
-				subTitle: listingData.subtitle,
-				endDate: format(listingData.enddate, "yyyy-MM-dd") ?? "",
-				categoryId: listingData.parent_id ? listingData.categoryid : 0,
-				subCategoryId: listingData.subcategoryid
-					? listingData.subcategoryid
-					: 0,
-			}));
-			setItemDetails((prev) => ({
-				...prev,
-				description: listingData.listingdescription,
-				condition: listingData.condition,
-			}));
-			setPricePayment((prev) => ({
-				...prev,
-				listingPrice: listingData.listingprice,
-				reservePrice: listingData.reserveprice,
-				creditCardPayment: listingData.creditcardpayment,
-				bankTransferPayment: listingData.banktransferpayment,
-				bitcoinPayment: listingData.bitcoinpayment,
-			}));
-			setShipping((prev) => ({
-				...prev,
-				pickUp: listingData.pickup,
-				shippingOption: listingData.shippingoption,
-			}));
-		}
-	}, [listingData]);
+	// useEffect(() => {
+	// 	if (listingData) {
+	// 		setlistingData((prev) => ({
+	// 			...prev,
+	// 			title: listingData.title,
+	// 			subTitle: listingData.subtitle,
+	// 			endDate: format(listingData.enddate, "yyyy-MM-dd") ?? "",
+	// 			categoryId: listingData.parent_id ? listingData.categoryid : 0,
+	// 			subCategoryId: listingData.subcategoryid
+	// 				? listingData.subcategoryid
+	// 				: 0,
+	// 		}));
+	// 		setItemDetails((prev) => ({
+	// 			...prev,
+	// 			description: listingData.listingdescription,
+	// 			condition: listingData.condition,
+	// 		}));
+	// 		setPricePayment((prev) => ({
+	// 			...prev,
+	// 			listingPrice: listingData.listingprice,
+	// 			reservePrice: listingData.reserveprice,
+	// 			creditCardPayment: listingData.creditcardpayment,
+	// 			bankTransferPayment: listingData.banktransferpayment,
+	// 			bitcoinPayment: listingData.bitcoinpayment,
+	// 		}));
+	// 		setShipping((prev) => ({
+	// 			...prev,
+	// 			pickUp: listingData.pickup,
+	// 			shippingOption: listingData.shippingoption,
+	// 		}));
+	// 	}
+	// }, [listingData]);
 
 	const changeData = () => {};
 
@@ -158,6 +169,7 @@ function RouteComponent() {
 			queryClient.invalidateQueries({
 				queryKey: ["listingData", variables.listingId],
 			});
+			// navListings();
 		},
 		onError: (error: Error) => {
 			alert(error.message || "An error occurred");
@@ -168,10 +180,10 @@ function RouteComponent() {
 		e.preventDefault();
 		if (pricePayment.reservePrice === "") pricePayment.reservePrice = "0.00";
 		const listing: Listing = {
-			titleCategory: titleCategory,
-			itemDetails: itemDetails,
-			pricePayment: pricePayment,
-			shipping: shipping,
+			titleCategory,
+			itemDetails,
+			pricePayment,
+			shipping,
 		};
 		const listingWrapper = { listing };
 		mutation.mutate({ listingId, listingWrapper });
@@ -179,8 +191,9 @@ function RouteComponent() {
 
 	if (parentError) return <p>Error: {parentError.message}</p>;
 	if (subCatError) return <p>Error: {subCatError.message}</p>;
-	if (listingError) return <p>Error: {listingError.message}</p>;
+
 	if (loadingListing) return <Loader height={50} width={50} />;
+	if (listingError) return <p>Error: {listingError.message}</p>;
 
 	return (
 		<form onSubmit={handleSubmit} noValidate className="group">
@@ -224,7 +237,7 @@ function RouteComponent() {
 					onChange={(e) => {
 						const value = e.target.value ?? "";
 						setTitleCategory({
-							...titleCategory,
+							...listingData,
 							subTitle: value,
 						});
 					}}
@@ -247,11 +260,11 @@ function RouteComponent() {
 						label="Category"
 						labelClassName="block text-sm font-medium text-gray-700"
 						id="category"
-						selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${titleCategory.categoryId === 0 ? " italic text-gray-400" : ""}`}
+						selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${listingData.categoryId === 0 ? " italic text-gray-400" : ""}`}
 						onChange={(e) => {
 							const value = Number.parseInt(e.target.value) || 0;
 							setTitleCategory({
-								...titleCategory,
+								...listingData,
 								categoryId: value,
 								subCategoryId: 0, // reset subcategory
 							});
@@ -279,15 +292,15 @@ function RouteComponent() {
 					label="Sub Category"
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="category-sub"
-					selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${titleCategory.subCategoryId === 0 ? " italic text-gray-400" : ""}`}
+					selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${listingData.subCategoryId === 0 ? " italic text-gray-400" : ""}`}
 					onChange={(e) => {
 						const value = Number.parseInt(e.target.value) || 0;
 						setTitleCategory({
-							...titleCategory,
+							...listingData,
 							subCategoryId: value,
 						});
 					}}
-					value={titleCategory.subCategoryId}
+					value={listingData.subCategoryId}
 					onBlur={changeData}
 					required={true}
 					disabled={!subCatData}
@@ -308,10 +321,10 @@ function RouteComponent() {
 					label="End date"
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="end-date"
-					value={titleCategory.endDate}
+					value={listingData.endDate}
 					onChange={(e) =>
 						setTitleCategory({
-							...titleCategory,
+							...listingData,
 							endDate: e.target.value,
 						})
 					}
