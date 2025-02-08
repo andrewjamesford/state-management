@@ -3,7 +3,7 @@ import {
 	useParams,
 	useNavigate,
 } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { addDays, format } from "date-fns";
 import { useEffect, useState } from "react";
 import type {
@@ -75,6 +75,34 @@ function RouteComponent() {
 		enabled: !Number.isNaN(listingId),
 	});
 
+	const {
+		data: parentCatData,
+		isLoading: loadingCategory,
+		error: parentError,
+	} = useQuery({
+		queryKey: ["parentCategories"],
+		queryFn: async () => {
+			const response = await api.getCategories();
+			if (!response.ok) throw new Error("Error retrieving categories");
+			const result = await response.json();
+			return result ?? [];
+		},
+	});
+
+	const {
+		data: subCatData,
+		isLoading: loadingSubCategory,
+		error: subCatError,
+	} = useQuery({
+		queryKey: ["subCategories", titleCategory.categoryId],
+		queryFn: async () => {
+			if (!titleCategory.categoryId) return [];
+			const response = await api.getCategories(titleCategory.categoryId);
+			if (!response.ok) throw new Error("Error retrieving sub-categories");
+			return await response.json();
+		},
+	});
+
 	useEffect(() => {
 		if (listingData) {
 			setTitleCategory((prev) => ({
@@ -114,81 +142,56 @@ function RouteComponent() {
 		}
 	};
 
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+	const queryClient = useQueryClient();
+	const mutation = useMutation({
+		mutationFn: async ({
+			listingId,
+			listingWrapper,
+		}: {
+			listingId: string;
+			listingWrapper: { listing: Listing };
+		}) => {
+			if (listingId !== "add") {
+				const response = await api.updateListing(listingId, listingWrapper);
+				if (!response.ok) throw new Error("Error updating listing");
+				return await response.json();
+			}
+			const response = await api.addListing(listingWrapper);
+			if (!response.ok) throw new Error("Error adding listing");
+			return await response.json();
+		},
+		onSuccess: (data, variables) => {
+			if (variables.listingId !== "add") {
+				alert(`${JSON.stringify(data)} listing updated`);
+			} else {
+				if (data === 1) return navListings();
+				alert(`${JSON.stringify(data.message)}`);
+			}
+			queryClient.invalidateQueries({
+				queryKey: ["listingData", variables.listingId],
+			});
+		},
+		onError: (error: any) => {
+			alert(error.message || "An error occurred");
+		},
+	});
+
+	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-
 		if (pricePayment.reservePrice === "") pricePayment.reservePrice = "0.00";
-
 		const listing: Listing = {
 			titleCategory: titleCategory,
 			itemDetails: itemDetails,
 			pricePayment: pricePayment,
 			shipping: shipping,
 		};
-
-		const listingWrapper = { listing: listing };
-
-		if (listingId !== "add") {
-			const response = await api.updateListing(listingId, listingWrapper);
-			if (!response.ok) {
-				throw new Error("Error updating listing");
-			}
-			const result = await response.json();
-			if (result.error) {
-				throw new Error(result.error);
-			}
-			alert(`${JSON.stringify(result)} listing updated`);
-			return;
-		}
-		const response = await api.addListing({ listing: listing });
-
-		if (!response.ok) {
-			throw new Error("Error adding listing");
-		}
-		const result = await response.json();
-
-		if (result.error) {
-			throw new Error(result.error);
-		}
-
-		if (result === 1) {
-			return navListings();
-		}
-
-		alert(`${JSON.stringify(result.message)}`);
+		const listingWrapper = { listing };
+		mutation.mutate({ listingId, listingWrapper });
 	};
 
 	const navListings = () => {
 		return navigate({ to: "/tsquery" });
 	};
-
-	const {
-		data: parentCatData,
-		isLoading: loadingCategory,
-		error: parentError,
-	} = useQuery({
-		queryKey: ["parentCategories"],
-		queryFn: async () => {
-			const response = await api.getCategories();
-			if (!response.ok) throw new Error("Error retrieving categories");
-			const result = await response.json();
-			return result ?? [];
-		},
-	});
-
-	const {
-		data: subCatData,
-		isLoading: loadingSubCategory,
-		error: subCatError,
-	} = useQuery({
-		queryKey: ["subCategories", titleCategory.categoryId],
-		queryFn: async () => {
-			if (!titleCategory.categoryId) return [];
-			const response = await api.getCategories(titleCategory.categoryId);
-			if (!response.ok) throw new Error("Error retrieving sub-categories");
-			return await response.json();
-		},
-	});
 
 	if (parentError) return <p>Error: {parentError.message}</p>;
 	if (subCatError) return <p>Error: {subCatError.message}</p>;
@@ -231,7 +234,7 @@ function RouteComponent() {
 				<TextInput
 					labelClassName="block text-sm font-medium text-gray-700"
 					label="Subtitle (optional)"
-					id="listing-title"
+					id="category-sub"
 					placeholder="e.g. iPhone 5c, Red t-shirt"
 					value={titleCategory.subTitle}
 					onChange={(e) => {
@@ -253,6 +256,7 @@ function RouteComponent() {
 			</div>
 
 			<div className="mt-6">
+				{/* Category */}
 				{loadingCategory && <Loader width={20} height={20} />}
 				{!loadingCategory && (
 					<Select
@@ -272,7 +276,7 @@ function RouteComponent() {
 						onBlur={changeData}
 						required={true}
 					>
-						<option value="" className="text-muted-foreground italic">
+						<option value="0" className="text-muted-foreground italic">
 							Select a category...
 						</option>
 						{parentCatData?.map((category: Category) => (
@@ -285,6 +289,7 @@ function RouteComponent() {
 			</div>
 
 			<div className="mt-6">
+				{/* Sub Category */}
 				<Select
 					label="Sub Category"
 					labelClassName="block text-sm font-medium text-gray-700"
@@ -302,7 +307,7 @@ function RouteComponent() {
 					required={true}
 					disabled={!subCatData}
 				>
-					<option value="" className="text-muted-foreground italic">
+					<option value="0" className="text-muted-foreground italic">
 						Select a sub category...
 					</option>
 					{subCatData?.map((category: Category) => (
