@@ -11,7 +11,15 @@
 			"url": "http://localhost:4002",
 			"webRoot": "${workspaceFolder}",
 			"disableNetworkCache": true,
-			"userDataDir": false
+			"userDataDir": false,
+			"port": 9222,
+		},
+		{
+			"type": "chrome",
+			"request": "attach",
+			"name": "Attach to Chrome",
+			"port": 9222,
+			"webRoot": "${workspaceFolder}"
 		}
 	]
 }

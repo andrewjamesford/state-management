@@ -14,6 +14,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as TsqueryIndexImport } from './routes/tsquery/index'
+import { Route as TsqueryAddImport } from './routes/tsquery/add'
 import { Route as TsqueryListingIdImport } from './routes/tsquery/$listingId'
 
 // Create Virtual Routes
@@ -31,6 +32,12 @@ const IndexLazyRoute = IndexLazyImport.update({
 const TsqueryIndexRoute = TsqueryIndexImport.update({
   id: '/tsquery/',
   path: '/tsquery/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const TsqueryAddRoute = TsqueryAddImport.update({
+  id: '/tsquery/add',
+  path: '/tsquery/add',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -58,6 +65,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TsqueryListingIdImport
       parentRoute: typeof rootRoute
     }
+    '/tsquery/add': {
+      id: '/tsquery/add'
+      path: '/tsquery/add'
+      fullPath: '/tsquery/add'
+      preLoaderRoute: typeof TsqueryAddImport
+      parentRoute: typeof rootRoute
+    }
     '/tsquery/': {
       id: '/tsquery/'
       path: '/tsquery'
@@ -73,12 +87,14 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
   '/tsquery/$listingId': typeof TsqueryListingIdRoute
+  '/tsquery/add': typeof TsqueryAddRoute
   '/tsquery': typeof TsqueryIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
   '/tsquery/$listingId': typeof TsqueryListingIdRoute
+  '/tsquery/add': typeof TsqueryAddRoute
   '/tsquery': typeof TsqueryIndexRoute
 }
 
@@ -86,27 +102,30 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
   '/tsquery/$listingId': typeof TsqueryListingIdRoute
+  '/tsquery/add': typeof TsqueryAddRoute
   '/tsquery/': typeof TsqueryIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/tsquery/$listingId' | '/tsquery'
+  fullPaths: '/' | '/tsquery/$listingId' | '/tsquery/add' | '/tsquery'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/tsquery/$listingId' | '/tsquery'
-  id: '__root__' | '/' | '/tsquery/$listingId' | '/tsquery/'
+  to: '/' | '/tsquery/$listingId' | '/tsquery/add' | '/tsquery'
+  id: '__root__' | '/' | '/tsquery/$listingId' | '/tsquery/add' | '/tsquery/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
   TsqueryListingIdRoute: typeof TsqueryListingIdRoute
+  TsqueryAddRoute: typeof TsqueryAddRoute
   TsqueryIndexRoute: typeof TsqueryIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   TsqueryListingIdRoute: TsqueryListingIdRoute,
+  TsqueryAddRoute: TsqueryAddRoute,
   TsqueryIndexRoute: TsqueryIndexRoute,
 }
 
@@ -122,6 +141,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/tsquery/$listingId",
+        "/tsquery/add",
         "/tsquery/"
       ]
     },
@@ -130,6 +150,9 @@ export const routeTree = rootRoute
     },
     "/tsquery/$listingId": {
       "filePath": "tsquery/$listingId.tsx"
+    },
+    "/tsquery/add": {
+      "filePath": "tsquery/add.tsx"
     },
     "/tsquery/": {
       "filePath": "tsquery/index.tsx"

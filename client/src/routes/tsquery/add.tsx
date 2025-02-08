@@ -1,11 +1,7 @@
-import {
-	createFileRoute,
-	useParams,
-	useNavigate,
-} from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { addDays, format } from "date-fns";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type {
 	ItemDetails,
 	PricePayment,
@@ -24,7 +20,7 @@ import Textarea from "~/components/textarea";
 import MoneyTextInput from "~/components/moneyTextInput";
 import Checkbox from "~/components/Checkbox";
 
-export const Route = createFileRoute("/tsquery/$listingId")({
+export const Route = createFileRoute("/tsquery/add")({
 	component: RouteComponent,
 });
 
@@ -34,6 +30,8 @@ interface Category {
 }
 
 function RouteComponent() {
+	// Hardcode listingId as "add"
+	const listingId = "add";
 	const today = new Date();
 	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
 	const fortnight = format(addDays(today, 14), "yyyy-MM-dd");
@@ -53,23 +51,7 @@ function RouteComponent() {
 	);
 	const [shipping, setShipping] = useState(listingSchema.shipping as Shipping);
 
-	const { listingId } = useParams({ from: Route.id });
-
-	const {
-		data: listingData,
-		isLoading: loadingListing,
-		error: listingError,
-	} = useQuery({
-		queryKey: ["listingData", listingId],
-		queryFn: async () => {
-			const response = await api.getListing(String(listingId));
-			if (!response.ok) {
-				throw new Error(`Error retrieving listing ${listingId}`);
-			}
-			return await response.json();
-		},
-		enabled: !!listingId,
-	});
+	// Removed: useParams and listingData query & useEffect for editing
 
 	const {
 		data: parentCatData,
@@ -99,39 +81,6 @@ function RouteComponent() {
 		},
 	});
 
-	useEffect(() => {
-		if (listingData) {
-			setTitleCategory((prev) => ({
-				...prev,
-				title: listingData.title,
-				subTitle: listingData.subtitle,
-				endDate: format(listingData.enddate, "yyyy-MM-dd") ?? "",
-				categoryId: listingData.parent_id ? listingData.categoryid : 0,
-				subCategoryId: listingData.subcategoryid
-					? listingData.subcategoryid
-					: 0,
-			}));
-			setItemDetails((prev) => ({
-				...prev,
-				description: listingData.listingdescription,
-				condition: listingData.condition,
-			}));
-			setPricePayment((prev) => ({
-				...prev,
-				listingPrice: listingData.listingprice,
-				reservePrice: listingData.reserveprice,
-				creditCardPayment: listingData.creditcardpayment,
-				bankTransferPayment: listingData.banktransferpayment,
-				bitcoinPayment: listingData.bitcoinpayment,
-			}));
-			setShipping((prev) => ({
-				...prev,
-				pickUp: listingData.pickup,
-				shippingOption: listingData.shippingoption,
-			}));
-		}
-	}, [listingData]);
-
 	const changeData = () => {};
 
 	const checkValue = (value: number) => {
@@ -143,23 +92,23 @@ function RouteComponent() {
 	const queryClient = useQueryClient();
 	const mutation = useMutation({
 		mutationFn: async ({
-			listingId,
 			listingWrapper,
 		}: {
-			listingId: string;
 			listingWrapper: { listing: Listing };
 		}) => {
-			const response = await api.updateListing(listingId, listingWrapper);
-			if (!response.ok) throw new Error("Error updating listing");
+			// Always add a new listing
+			const response = await api.addListing(listingWrapper);
+			if (!response.ok) throw new Error("Error adding listing");
 			return await response.json();
 		},
-		onSuccess: (data, variables) => {
-			alert(`${JSON.stringify(data)} listing updated`);
+		onSuccess: (data) => {
+			if (data === 1) return navListings();
+			alert(`${JSON.stringify(data.message)}`);
 			queryClient.invalidateQueries({
-				queryKey: ["listingData", variables.listingId],
+				queryKey: ["listingData", listingId],
 			});
 		},
-		onError: (error: Error) => {
+		onError: (error: any) => {
 			alert(error.message || "An error occurred");
 		},
 	});
@@ -174,13 +123,16 @@ function RouteComponent() {
 			shipping: shipping,
 		};
 		const listingWrapper = { listing };
-		mutation.mutate({ listingId, listingWrapper });
+		mutation.mutate({ listingWrapper });
+	};
+
+	const navListings = () => {
+		return navigate({ to: "/tsquery" });
 	};
 
 	if (parentError) return <p>Error: {parentError.message}</p>;
 	if (subCatError) return <p>Error: {subCatError.message}</p>;
-	if (listingError) return <p>Error: {listingError.message}</p>;
-	if (loadingListing) return <Loader height={50} width={50} />;
+	if (loadingCategory) return <Loader height={50} width={50} />;
 
 	return (
 		<form onSubmit={handleSubmit} noValidate className="group">
@@ -433,12 +385,12 @@ function RouteComponent() {
 							id="payment-credit"
 							label="Credit card"
 							checked={pricePayment.creditCardPayment}
-							onChange={() => {
+							onChange={() =>
 								setPricePayment({
 									...pricePayment,
 									creditCardPayment: !pricePayment.creditCardPayment,
-								});
-							}}
+								})
+							}
 							onBlur={changeData}
 						/>
 					</div>
@@ -447,12 +399,12 @@ function RouteComponent() {
 							id="payment-bank"
 							label="Bank Transfer"
 							checked={pricePayment.bankTransferPayment}
-							onChange={() => {
+							onChange={() =>
 								setPricePayment({
 									...pricePayment,
 									bankTransferPayment: !pricePayment.bankTransferPayment,
-								});
-							}}
+								})
+							}
 							onBlur={changeData}
 						/>
 					</div>
@@ -461,12 +413,12 @@ function RouteComponent() {
 							id="payment-bitcoin"
 							label="Bitcoin"
 							checked={pricePayment.bitcoinPayment}
-							onChange={() => {
+							onChange={() =>
 								setPricePayment({
 									...pricePayment,
 									bitcoinPayment: !pricePayment.bitcoinPayment,
-								});
-							}}
+								})
+							}
 							onBlur={changeData}
 						/>
 					</div>
@@ -476,7 +428,6 @@ function RouteComponent() {
 			<h1 className="mt-4 text-2xl font-bold">Shipping & pick-up</h1>
 			<fieldset>
 				<legend className="sr-only">Pick up?</legend>
-
 				<div className="mt-6">
 					<label
 						htmlFor="pick-up"
@@ -509,45 +460,7 @@ function RouteComponent() {
 				</div>
 			</fieldset>
 
-			<fieldset>
-				<legend className="sr-only">Shipping options</legend>
-				<div className="mt-6">
-					<label
-						htmlFor="shipping-option"
-						className="block text-sm font-medium text-gray-700"
-					>
-						Shipping options
-					</label>
-					<RadioButton
-						id="shipping-option-courier"
-						name="shipping-option"
-						value="courier"
-						label="Courier"
-						checked={shipping.shippingOption === "courier"}
-						onChange={() =>
-							setShipping({ ...shipping, shippingOption: "courier" })
-						}
-						onBlur={changeData}
-						containerClassName="flex mt-3"
-						labelClassName="ml-2 text-sm text-gray-700"
-					/>
-					<RadioButton
-						id="shipping-option-post"
-						name="shipping-option"
-						value="post"
-						label="Post"
-						checked={shipping.shippingOption === "post"}
-						onChange={() =>
-							setShipping({ ...shipping, shippingOption: "post" })
-						}
-						onBlur={changeData}
-						containerClassName="flex mt-3"
-						labelClassName="ml-2 text-sm text-gray-700"
-					/>
-				</div>
-				<input type="hidden" name="id" value={listingId} />
-			</fieldset>
-
+			{/* Removed: hidden input for listingId */}
 			<div className="mt-3">
 				<SubmitButton />
 			</div>
