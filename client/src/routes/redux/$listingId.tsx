@@ -21,6 +21,7 @@ import {
 } from "~/store/listingApi";
 import type { Listing } from "~/models";
 import Loader from "~/components/loader";
+import type { ListingState } from "~/types/listing";
 // ... import other components
 
 export const Route = createFileRoute("/redux/$listingId")({
@@ -31,9 +32,15 @@ function RouteComponent() {
 	const dispatch = useDispatch();
 	const navigate = useNavigate({ from: Route.fullPath });
 	const { listingId } = useParams({ from: Route.id });
-	const { titleCategory, itemDetails, pricePayment, shipping } = useSelector(
-		(state: RootState) => state.listing,
+	const listing = useSelector(
+		(state: RootState) => state.listing as ListingState,
 	);
+	const {
+		titleCategory = {},
+		itemDetails = {},
+		pricePayment = {},
+		shipping = {},
+	} = listing;
 
 	const today = new Date();
 	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
@@ -49,10 +56,36 @@ function RouteComponent() {
 
 	useEffect(() => {
 		if (listingData) {
-			dispatch(setTitleCategory({ ...listingData.titleCategory }));
-			dispatch(setItemDetails({ ...listingData.itemDetails }));
-			dispatch(setPricePayment({ ...listingData.pricePayment }));
-			dispatch(setShipping({ ...listingData.shipping }));
+			dispatch(
+				setTitleCategory({
+					title: listingData.title,
+					subTitle: listingData.subtitle,
+					categoryId: listingData.categoryid,
+					subCategoryId: listingData.subcategoryid,
+					endDate: listingData.enddate.split("T")[0],
+				}),
+			);
+			dispatch(
+				setItemDetails({
+					condition: listingData.condition,
+					description: listingData.listingdescription,
+				}),
+			);
+			dispatch(
+				setPricePayment({
+					listingPrice: Number(listingData.listingprice),
+					reservePrice: Number(listingData.reserveprice),
+					creditCardPayment: listingData.creditcardpayment,
+					bankTransferPayment: listingData.banktransferpayment,
+					bitcoinPayment: listingData.bitcoinpayment,
+				}),
+			);
+			dispatch(
+				setShipping({
+					pickUp: listingData.pickup,
+					shippingOption: listingData.shippingoption,
+				}),
+			);
 		}
 	}, [listingData, dispatch]);
 

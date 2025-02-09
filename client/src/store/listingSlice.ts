@@ -1,34 +1,22 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type {
-	ItemDetails,
-	PricePayment,
-	Shipping,
-	TitleCategory,
-} from "~/models";
-
-interface ListingState {
-	titleCategory: TitleCategory;
-	itemDetails: ItemDetails;
-	pricePayment: PricePayment;
-	shipping: Shipping;
-}
+import { createSlice } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
+import type { ListingState } from "~/types/listing";
 
 const initialState: ListingState = {
 	titleCategory: {
-		id: 0,
 		title: "",
+		subTitle: "",
 		categoryId: 0,
 		subCategoryId: 0,
-		subTitle: "",
 		endDate: "",
 	},
 	itemDetails: {
-		description: "",
 		condition: false,
+		description: "",
 	},
 	pricePayment: {
-		listingPrice: "",
-		reservePrice: "",
+		listingPrice: 0,
+		reservePrice: 0,
 		creditCardPayment: false,
 		bankTransferPayment: false,
 		bitcoinPayment: false,
