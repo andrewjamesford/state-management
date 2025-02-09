@@ -3,14 +3,13 @@ import {
 	useParams,
 	useNavigate,
 } from "@tanstack/react-router";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { addDays, format, isWithinInterval } from "date-fns";
 import { useEffect, useState } from "react";
 import type {
 	ItemDetails,
 	PricePayment,
 	Shipping,
-	listingData,
 	Listing,
 	TitleCategory,
 } from "~/models";
@@ -24,7 +23,6 @@ import Select from "~/components/select";
 import Textarea from "~/components/textarea";
 import MoneyTextInput from "~/components/moneyTextInput";
 import Checkbox from "~/components/Checkbox";
-import { list } from "postcss";
 
 export const Route = createFileRoute("/tsquery/$listingId")({
 	component: RouteComponent,
@@ -144,37 +142,42 @@ function RouteComponent() {
 		}
 	}, [loadingListing]);
 
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+	// Add mutation hook for updating the listing
+	const updateListingMutation = useMutation({
+		mutationFn: async (listing: Listing) => {
+			if (pricePayment.reservePrice === "") pricePayment.reservePrice = "0.00";
+			const listingWrapper = { listing };
+			const response = await api.updateListing(listingId, listingWrapper);
+			if (!response.ok) {
+				throw new Error("Error updating listing");
+			}
+			const result = await response.json();
+			if (result.error) {
+				throw new Error(result.error);
+			}
+			return result;
+		},
+	});
+
+	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-
-		if (pricePayment.reservePrice === "") pricePayment.reservePrice = "0.00";
-
 		const listing: Listing = {
 			titleCategory: titleCategory,
 			itemDetails: itemDetails,
 			pricePayment: pricePayment,
 			shipping: shipping,
 		};
-
-		const listingWrapper = { listing: listing };
-
-		const response = await api.updateListing(listingId, listingWrapper);
-		if (!response.ok) {
-			throw new Error("Error updating listing");
-		}
-		const result = await response.json();
-		if (result.error) {
-			throw new Error(result.error);
-		}
-		alert(`${JSON.stringify(result)} listing updated`);
-
-		if (result.error) {
-			throw new Error(result.error);
-		}
-
-		if (result === 1) {
-			return navListings();
-		}
+		updateListingMutation.mutate(listing, {
+			onSuccess: (result) => {
+				alert(`${JSON.stringify(result)} listing updated`);
+				if (result === 1) {
+					navListings();
+				}
+			},
+			onError: (error: Error) => {
+				alert(error.message);
+			},
+		});
 	};
 
 	const navListings = () => {
