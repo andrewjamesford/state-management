@@ -5,7 +5,6 @@ import type {
 	Shipping,
 	TitleCategory,
 } from "~/models";
-import { listingSchema } from "~/models";
 
 interface ListingState {
 	titleCategory: TitleCategory;
@@ -15,10 +14,29 @@ interface ListingState {
 }
 
 const initialState: ListingState = {
-	titleCategory: listingSchema.titleCategory,
-	itemDetails: listingSchema.itemDetails,
-	pricePayment: listingSchema.pricePayment,
-	shipping: listingSchema.shipping,
+	titleCategory: {
+		id: 0,
+		title: "",
+		categoryId: 0,
+		subCategoryId: 0,
+		subTitle: "",
+		endDate: "",
+	},
+	itemDetails: {
+		description: "",
+		condition: false,
+	},
+	pricePayment: {
+		listingPrice: "",
+		reservePrice: "",
+		creditCardPayment: false,
+		bankTransferPayment: false,
+		bitcoinPayment: false,
+	},
+	shipping: {
+		pickUp: false,
+		shippingOption: "",
+	},
 };
 
 const listingSlice = createSlice({
