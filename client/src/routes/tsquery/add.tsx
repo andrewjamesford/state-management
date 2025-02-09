@@ -51,8 +51,6 @@ function RouteComponent() {
 	);
 	const [shipping, setShipping] = useState(listingSchema.shipping as Shipping);
 
-	// Removed: useParams and listingData query & useEffect for editing
-
 	const {
 		data: parentCatData,
 		isLoading: loadingCategory,
@@ -108,7 +106,7 @@ function RouteComponent() {
 				queryKey: ["listingData", listingId],
 			});
 		},
-		onError: (error: any) => {
+		onError: (error: Error) => {
 			alert(error.message || "An error occurred");
 		},
 	});
@@ -256,6 +254,7 @@ function RouteComponent() {
 			</div>
 
 			<div className="mt-6">
+				{/* End date */}
 				<DateInput
 					label="End date"
 					labelClassName="block text-sm font-medium text-gray-700"
@@ -279,6 +278,7 @@ function RouteComponent() {
 
 			<h1 className="mt-4 text-2xl font-bold">Item details</h1>
 			<div className="mt-6">
+				{/* Description */}
 				<Textarea
 					label="Description"
 					labelClassName="block text-sm font-medium text-gray-700"

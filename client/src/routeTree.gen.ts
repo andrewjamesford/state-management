@@ -14,8 +14,11 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as TsqueryIndexImport } from './routes/tsquery/index'
+import { Route as ReduxIndexImport } from './routes/redux/index'
 import { Route as TsqueryAddImport } from './routes/tsquery/add'
 import { Route as TsqueryListingIdImport } from './routes/tsquery/$listingId'
+import { Route as ReduxAddImport } from './routes/redux/add'
+import { Route as ReduxListingIdImport } from './routes/redux/$listingId'
 
 // Create Virtual Routes
 
@@ -35,6 +38,12 @@ const TsqueryIndexRoute = TsqueryIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const ReduxIndexRoute = ReduxIndexImport.update({
+  id: '/redux/',
+  path: '/redux/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const TsqueryAddRoute = TsqueryAddImport.update({
   id: '/tsquery/add',
   path: '/tsquery/add',
@@ -47,6 +56,18 @@ const TsqueryListingIdRoute = TsqueryListingIdImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const ReduxAddRoute = ReduxAddImport.update({
+  id: '/redux/add',
+  path: '/redux/add',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ReduxListingIdRoute = ReduxListingIdImport.update({
+  id: '/redux/$listingId',
+  path: '/redux/$listingId',
+  getParentRoute: () => rootRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -56,6 +77,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/redux/$listingId': {
+      id: '/redux/$listingId'
+      path: '/redux/$listingId'
+      fullPath: '/redux/$listingId'
+      preLoaderRoute: typeof ReduxListingIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/redux/add': {
+      id: '/redux/add'
+      path: '/redux/add'
+      fullPath: '/redux/add'
+      preLoaderRoute: typeof ReduxAddImport
       parentRoute: typeof rootRoute
     }
     '/tsquery/$listingId': {
@@ -72,6 +107,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TsqueryAddImport
       parentRoute: typeof rootRoute
     }
+    '/redux/': {
+      id: '/redux/'
+      path: '/redux'
+      fullPath: '/redux'
+      preLoaderRoute: typeof ReduxIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/tsquery/': {
       id: '/tsquery/'
       path: '/tsquery'
@@ -86,46 +128,83 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
+  '/redux/$listingId': typeof ReduxListingIdRoute
+  '/redux/add': typeof ReduxAddRoute
   '/tsquery/$listingId': typeof TsqueryListingIdRoute
   '/tsquery/add': typeof TsqueryAddRoute
+  '/redux': typeof ReduxIndexRoute
   '/tsquery': typeof TsqueryIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
+  '/redux/$listingId': typeof ReduxListingIdRoute
+  '/redux/add': typeof ReduxAddRoute
   '/tsquery/$listingId': typeof TsqueryListingIdRoute
   '/tsquery/add': typeof TsqueryAddRoute
+  '/redux': typeof ReduxIndexRoute
   '/tsquery': typeof TsqueryIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
+  '/redux/$listingId': typeof ReduxListingIdRoute
+  '/redux/add': typeof ReduxAddRoute
   '/tsquery/$listingId': typeof TsqueryListingIdRoute
   '/tsquery/add': typeof TsqueryAddRoute
+  '/redux/': typeof ReduxIndexRoute
   '/tsquery/': typeof TsqueryIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/tsquery/$listingId' | '/tsquery/add' | '/tsquery'
+  fullPaths:
+    | '/'
+    | '/redux/$listingId'
+    | '/redux/add'
+    | '/tsquery/$listingId'
+    | '/tsquery/add'
+    | '/redux'
+    | '/tsquery'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/tsquery/$listingId' | '/tsquery/add' | '/tsquery'
-  id: '__root__' | '/' | '/tsquery/$listingId' | '/tsquery/add' | '/tsquery/'
+  to:
+    | '/'
+    | '/redux/$listingId'
+    | '/redux/add'
+    | '/tsquery/$listingId'
+    | '/tsquery/add'
+    | '/redux'
+    | '/tsquery'
+  id:
+    | '__root__'
+    | '/'
+    | '/redux/$listingId'
+    | '/redux/add'
+    | '/tsquery/$listingId'
+    | '/tsquery/add'
+    | '/redux/'
+    | '/tsquery/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
+  ReduxListingIdRoute: typeof ReduxListingIdRoute
+  ReduxAddRoute: typeof ReduxAddRoute
   TsqueryListingIdRoute: typeof TsqueryListingIdRoute
   TsqueryAddRoute: typeof TsqueryAddRoute
+  ReduxIndexRoute: typeof ReduxIndexRoute
   TsqueryIndexRoute: typeof TsqueryIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
+  ReduxListingIdRoute: ReduxListingIdRoute,
+  ReduxAddRoute: ReduxAddRoute,
   TsqueryListingIdRoute: TsqueryListingIdRoute,
   TsqueryAddRoute: TsqueryAddRoute,
+  ReduxIndexRoute: ReduxIndexRoute,
   TsqueryIndexRoute: TsqueryIndexRoute,
 }
 
@@ -140,19 +219,31 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/redux/$listingId",
+        "/redux/add",
         "/tsquery/$listingId",
         "/tsquery/add",
+        "/redux/",
         "/tsquery/"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
     },
+    "/redux/$listingId": {
+      "filePath": "redux/$listingId.tsx"
+    },
+    "/redux/add": {
+      "filePath": "redux/add.tsx"
+    },
     "/tsquery/$listingId": {
       "filePath": "tsquery/$listingId.tsx"
     },
     "/tsquery/add": {
       "filePath": "tsquery/add.tsx"
+    },
+    "/redux/": {
+      "filePath": "redux/index.tsx"
     },
     "/tsquery/": {
       "filePath": "tsquery/index.tsx"
