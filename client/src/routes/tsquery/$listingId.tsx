@@ -4,7 +4,7 @@ import {
 	useNavigate,
 } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { addDays, format } from "date-fns";
+import { addDays, format, isWithinInterval } from "date-fns";
 import { useEffect, useState } from "react";
 import type {
 	ItemDetails,
@@ -24,6 +24,7 @@ import Select from "~/components/select";
 import Textarea from "~/components/textarea";
 import MoneyTextInput from "~/components/moneyTextInput";
 import Checkbox from "~/components/Checkbox";
+import { list } from "postcss";
 
 export const Route = createFileRoute("/tsquery/$listingId")({
 	component: RouteComponent,
@@ -44,7 +45,7 @@ function RouteComponent() {
 	});
 
 	const [titleCategory, setTitleCategory] = useState(
-		listingSchema.titleCategory,
+		listingSchema.titleCategory as TitleCategory,
 	);
 	const [itemDetails, setItemDetails] = useState(
 		listingSchema.itemDetails as ItemDetails,
@@ -53,9 +54,9 @@ function RouteComponent() {
 		listingSchema.pricePayment as PricePayment,
 	);
 	const [shipping, setShipping] = useState(listingSchema.shipping as Shipping);
-	const [checkRequired, setCheckRequired] = useState(true);
 
 	const { listingId } = useParams({ from: Route.id });
+	let prevDate = format(tomorrow, "yyyy-MM-dd");
 
 	const {
 		data: listingData,
@@ -73,15 +74,56 @@ function RouteComponent() {
 		enabled: !Number.isNaN(listingId),
 	});
 
+	const {
+		data: parentCatData,
+		isLoading: loadingCategory,
+		error: parentError,
+	} = useQuery({
+		queryKey: ["parentCategories"],
+		queryFn: async () => {
+			const response = await api.getCategories();
+			if (!response.ok) throw new Error("Error retrieving categories");
+			const result = await response.json();
+			return result ?? [];
+		},
+	});
+
+	const {
+		data: subCatData,
+		isLoading: loadingSubCategory,
+		error: subCatError,
+	} = useQuery({
+		queryKey: ["subCategories", titleCategory.categoryId],
+		queryFn: async () => {
+			console.log("3=>", titleCategory.categoryId, titleCategory.subCategoryId);
+			if (!titleCategory.categoryId) return [];
+			const response = await api.getCategories(titleCategory.categoryId);
+			if (!response.ok) throw new Error("Error retrieving sub-categories");
+			return await response.json();
+		},
+	});
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		if (listingData) {
+			const isValidDate: boolean = isWithinInterval(
+				new Date(listingData.enddate),
+				{
+					start: tomorrow,
+					end: fortnight,
+				},
+			);
+			if (isValidDate) {
+				prevDate = format(listingData.enddate, "yyyy-MM-dd");
+			}
+			console.log("1=>", listingData.categoryid, listingData.subcategoryid);
 			setTitleCategory((prev) => ({
 				...prev,
 				title: listingData.title,
 				subTitle: listingData.subtitle,
-				endDate: format(listingData.enddate, "yyyy-MM-dd") ?? "",
-				categoryId: listingData.categoryid,
-				subCategoryId: listingData.subcategoryid,
+				endDate: format(prevDate, "yyyy-MM-dd"),
+				categoryId: listingData?.categoryid,
+				subCategoryId: listingData?.subcategoryid,
 			}));
 			setItemDetails((prev) => ({
 				...prev,
@@ -102,15 +144,8 @@ function RouteComponent() {
 				shippingOption: listingData.shippingoption,
 			}));
 		}
-	}, [listingData]);
-
-	const changeData = () => {};
-
-	const checkValue = (value: number) => {
-		if (value > 10) {
-			throw new Error("Price must be less than $10");
-		}
-	};
+		console.log("2=>", listingData?.categoryid, listingData?.subcategoryid);
+	}, [loadingListing]);
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -149,34 +184,6 @@ function RouteComponent() {
 		return navigate({ to: "/tsquery" });
 	};
 
-	const {
-		data: parentCatData,
-		isLoading: loadingCategory,
-		error: parentError,
-	} = useQuery({
-		queryKey: ["parentCategories"],
-		queryFn: async () => {
-			const response = await api.getCategories();
-			if (!response.ok) throw new Error("Error retrieving categories");
-			const result = await response.json();
-			return result ?? [];
-		},
-	});
-
-	const {
-		data: subCatData,
-		isLoading: loadingSubCategory,
-		error: subCatError,
-	} = useQuery({
-		queryKey: ["subCategories", titleCategory.categoryId],
-		queryFn: async () => {
-			if (!titleCategory.categoryId) return [];
-			const response = await api.getCategories(titleCategory.categoryId);
-			if (!response.ok) throw new Error("Error retrieving sub-categories");
-			return await response.json();
-		},
-	});
-
 	if (parentError) return <p>Error: {parentError.message}</p>;
 	if (subCatError) return <p>Error: {subCatError.message}</p>;
 	if (listingError) return <p>Error: {listingError.message}</p>;
@@ -201,7 +208,6 @@ function RouteComponent() {
 							title: value,
 						});
 					}}
-					onBlur={changeData}
 					required={true}
 					maxLength={80}
 					minLength={3}
@@ -218,18 +224,16 @@ function RouteComponent() {
 				<TextInput
 					labelClassName="block text-sm font-medium text-gray-700"
 					label="Subtitle (optional)"
-					id="category-sub"
+					id="sub-title"
 					placeholder="e.g. iPhone 5c, Red t-shirt"
 					value={titleCategory.subTitle}
 					onChange={(e) => {
 						const value = e.target.value ?? "";
 						setTitleCategory({
-							...listingData,
+							...titleCategory,
 							subTitle: value,
 						});
 					}}
-					onBlur={changeData}
-					required={false}
 					maxLength={50}
 					className="block w-full px-3 py-2 mt-1 border rounded-md placeholder:italic peer"
 					errorMessage="Please enter a listing title of 3-80 characters"
@@ -242,80 +246,86 @@ function RouteComponent() {
 			<div className="mt-6">
 				{/* Category */}
 				{loadingCategory && <Loader width={20} height={20} />}
+
 				{!loadingCategory && (
 					<Select
 						label="Category"
 						labelClassName="block text-sm font-medium text-gray-700"
 						id="category"
-						selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${listingData.categoryId === 0 ? " italic text-gray-400" : ""}`}
+						selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${titleCategory.categoryId === 0 ? " italic text-gray-400" : ""}`}
 						onChange={(e) => {
 							const value = Number.parseInt(e.target.value) || 0;
 							setTitleCategory({
-								...listingData,
+								...titleCategory,
 								categoryId: value,
 								subCategoryId: 0, // reset subcategory
 							});
 						}}
 						value={titleCategory.categoryId}
-						onBlur={changeData}
 						required={true}
-					>
-						<option value={0} className="text-muted-foreground italic">
-							Select a category...
-						</option>
-						{parentCatData?.map((category: Category) => (
-							<option key={category.id} value={category.id}>
-								{category.category_name}
-							</option>
-						))}
-					</Select>
+						options={[
+							{
+								value: 0,
+								label: "Select a category...",
+								className: "text-muted-foreground italic",
+							},
+							...(parentCatData ?? []).map((category: Category) => ({
+								value: category.id,
+								label: category.category_name,
+							})),
+						]}
+					/>
 				)}
 			</div>
 
 			<div className="mt-6">
 				{/* Sub Category */}
 				{loadingSubCategory && <Loader width={20} height={20} />}
-				<Select
-					label="Sub Category"
-					labelClassName="block text-sm font-medium text-gray-700"
-					id="category-sub"
-					selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${listingData.subCategoryId === 0 ? " italic text-gray-400" : ""}`}
-					onChange={(e) => {
-						const value = Number.parseInt(e.target.value) || 0;
-						setTitleCategory({
-							...listingData,
-							subCategoryId: value,
-						});
-					}}
-					value={listingData.subCategoryId}
-					onBlur={changeData}
-					required={true}
-					disabled={!subCatData}
-				>
-					<option value={0} className="text-muted-foreground italic">
-						Select a sub category...
-					</option>
-					{subCatData?.map((category: Category) => (
-						<option key={category.id} value={category.id}>
-							{category.category_name}
-						</option>
-					))}
-				</Select>
+
+				{!loadingSubCategory && (
+					<Select
+						label="Sub Category"
+						labelClassName="block text-sm font-medium text-gray-700"
+						id="category-sub"
+						selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${titleCategory.subCategoryId === 0 ? " italic text-gray-400" : ""}`}
+						onChange={(e) => {
+							const value = Number.parseInt(e.target.value) || 0;
+							setTitleCategory({
+								...titleCategory,
+								subCategoryId: value,
+							});
+						}}
+						value={titleCategory.subCategoryId}
+						required={true}
+						disabled={!subCatData}
+						options={[
+							{
+								value: 0,
+								label: "Select a sub category...",
+								className: "text-muted-foreground italic",
+							},
+							...(subCatData ?? []).map((category: Category) => ({
+								value: category.id,
+								label: category.category_name,
+							})),
+						]}
+					/>
+				)}
 			</div>
 
 			<div className="mt-6">
+				{/* End Date */}
 				<DateInput
 					label="End date"
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="end-date"
-					value={listingData.endDate}
+					value={titleCategory.endDate}
 					onChange={(e) =>
 						setTitleCategory({
-							...listingData,
+							...titleCategory,
 							endDate: e.target.value,
 						})
 					}
-					onBlur={changeData}
 					required
 					pattern="\d{4}-\d{2}-\d{2}"
 					min={tomorrow}
@@ -327,6 +337,7 @@ function RouteComponent() {
 
 			<h1 className="mt-4 text-2xl font-bold">Item details</h1>
 			<div className="mt-6">
+				{/* Description */}
 				<Textarea
 					label="Description"
 					labelClassName="block text-sm font-medium text-gray-700"
@@ -336,7 +347,6 @@ function RouteComponent() {
 						const value = e.target.value ?? "";
 						setItemDetails({ ...itemDetails, description: value });
 					}}
-					onBlur={changeData}
 					required={true}
 					maxLength={500}
 					minLength={10}
@@ -349,6 +359,7 @@ function RouteComponent() {
 			<fieldset>
 				<legend className="sr-only">Condition</legend>
 				<div className="mt-6">
+					{/* New & Used Condition */}
 					<label
 						htmlFor="condition"
 						className="block text-sm font-medium text-gray-700"
@@ -364,7 +375,6 @@ function RouteComponent() {
 						onChange={() =>
 							setItemDetails({ ...itemDetails, condition: false })
 						}
-						onBlur={changeData}
 						labelClassName="ml-2 text-sm text-gray-700"
 						containerClassName="flex mt-3"
 					/>
@@ -375,7 +385,6 @@ function RouteComponent() {
 						label="New"
 						checked={itemDetails.condition === true}
 						onChange={() => setItemDetails({ ...itemDetails, condition: true })}
-						onBlur={changeData}
 						labelClassName="ml-2 text-sm text-gray-700"
 						containerClassName="flex mt-3"
 					/>
@@ -384,6 +393,7 @@ function RouteComponent() {
 
 			<h1 className="mt-4 text-2xl font-bold">Price &amp; Payment</h1>
 			<div className="mt-6">
+				{/* Start price */}
 				<MoneyTextInput
 					label="Start price"
 					labelClassName="block text-sm font-medium text-gray-700"
@@ -391,19 +401,15 @@ function RouteComponent() {
 					placeholder="$10.00"
 					value={pricePayment.listingPrice}
 					onChange={(e) => {
-						checkValue(Number(e.target.value));
 						setPricePayment({
 							...pricePayment,
 							listingPrice: e.target.value,
 						});
 					}}
-					onBlur={changeData}
-					required={true}
-					errorMessage="Price must be less than $10"
-					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
 				/>
 			</div>
 			<div className="mt-6">
+				{/* Reserve price */}
 				<MoneyTextInput
 					label="Reserve price (optional)"
 					labelClassName="block text-sm font-medium text-gray-700"
@@ -416,12 +422,12 @@ function RouteComponent() {
 							reservePrice: e.target.value,
 						});
 					}}
-					onBlur={changeData}
 				/>
 			</div>
 			<fieldset>
 				<legend className="sr-only">Payment options</legend>
 				<div className="mt-6">
+					{/* Payment options */}
 					<label
 						htmlFor="category"
 						className="block text-sm font-medium text-gray-700"
@@ -439,7 +445,6 @@ function RouteComponent() {
 									creditCardPayment: !pricePayment.creditCardPayment,
 								});
 							}}
-							onBlur={changeData}
 						/>
 					</div>
 					<div className="flex mt-3">
@@ -453,7 +458,6 @@ function RouteComponent() {
 									bankTransferPayment: !pricePayment.bankTransferPayment,
 								});
 							}}
-							onBlur={changeData}
 						/>
 					</div>
 					<div className="flex mt-3">
@@ -467,7 +471,6 @@ function RouteComponent() {
 									bitcoinPayment: !pricePayment.bitcoinPayment,
 								});
 							}}
-							onBlur={changeData}
 						/>
 					</div>
 				</div>
@@ -476,7 +479,7 @@ function RouteComponent() {
 			<h1 className="mt-4 text-2xl font-bold">Shipping & pick-up</h1>
 			<fieldset>
 				<legend className="sr-only">Pick up?</legend>
-
+				{/* Pick up  */}
 				<div className="mt-6">
 					<label
 						htmlFor="pick-up"
@@ -491,7 +494,6 @@ function RouteComponent() {
 						label="Yes"
 						checked={shipping.pickUp === true}
 						onChange={() => setShipping({ ...shipping, pickUp: true })}
-						onBlur={changeData}
 						containerClassName="flex mt-3"
 						labelClassName="ml-2 text-sm text-gray-700"
 					/>
@@ -502,7 +504,6 @@ function RouteComponent() {
 						label="No"
 						checked={shipping.pickUp === false}
 						onChange={() => setShipping({ ...shipping, pickUp: false })}
-						onBlur={changeData}
 						containerClassName="flex mt-3"
 						labelClassName="ml-2 text-sm text-gray-700"
 					/>
@@ -511,6 +512,7 @@ function RouteComponent() {
 
 			<fieldset>
 				<legend className="sr-only">Shipping options</legend>
+				{/* Shipping options */}
 				<div className="mt-6">
 					<label
 						htmlFor="shipping-option"
@@ -527,7 +529,6 @@ function RouteComponent() {
 						onChange={() =>
 							setShipping({ ...shipping, shippingOption: "courier" })
 						}
-						onBlur={changeData}
 						containerClassName="flex mt-3"
 						labelClassName="ml-2 text-sm text-gray-700"
 					/>
@@ -540,7 +541,6 @@ function RouteComponent() {
 						onChange={() =>
 							setShipping({ ...shipping, shippingOption: "post" })
 						}
-						onBlur={changeData}
 						containerClassName="flex mt-3"
 						labelClassName="ml-2 text-sm text-gray-700"
 					/>

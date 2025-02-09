@@ -7,16 +7,22 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 	labelClassName?: string;
 	errorMessage?: string;
 	errorMessageClassName?: string;
+	options?: {
+		value: string | number;
+		label: string;
+		className?: string;
+		disabled?: boolean;
+	}[];
 }
 
 const Select: React.FC<SelectProps> = ({
 	selectClassName = "",
 	label,
 	labelClassName = "",
-	children,
 	onChange,
 	errorMessage,
 	errorMessageClassName,
+	options = [],
 	...props
 }) => {
 	const [selectedText, setSelectedText] = useState("");
@@ -36,7 +42,16 @@ const Select: React.FC<SelectProps> = ({
 			)}
 
 			<select {...props} onChange={handleChange} className={selectClassName}>
-				{children}
+				{options.map((o) => (
+					<option
+						key={o.value}
+						value={o.value}
+						className={o.className}
+						disabled={o.disabled}
+					>
+						{o.label}
+					</option>
+				))}
 			</select>
 
 			<span className={errorMessageClassName} role="alert">

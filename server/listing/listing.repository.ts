@@ -211,7 +211,7 @@ export const updateListing = async (
 			WHERE id=$14;`,
 			[
 				title,
-				categoryId,
+				subCategoryId,
 				subTitle,
 				endDate,
 				description,
