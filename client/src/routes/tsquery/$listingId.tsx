@@ -95,7 +95,6 @@ function RouteComponent() {
 	} = useQuery({
 		queryKey: ["subCategories", titleCategory.categoryId],
 		queryFn: async () => {
-			console.log("3=>", titleCategory.categoryId, titleCategory.subCategoryId);
 			if (!titleCategory.categoryId) return [];
 			const response = await api.getCategories(titleCategory.categoryId);
 			if (!response.ok) throw new Error("Error retrieving sub-categories");
@@ -116,7 +115,6 @@ function RouteComponent() {
 			if (isValidDate) {
 				prevDate = format(listingData.enddate, "yyyy-MM-dd");
 			}
-			console.log("1=>", listingData.categoryid, listingData.subcategoryid);
 			setTitleCategory((prev) => ({
 				...prev,
 				title: listingData.title,
@@ -144,7 +142,6 @@ function RouteComponent() {
 				shippingOption: listingData.shippingoption,
 			}));
 		}
-		console.log("2=>", listingData?.categoryid, listingData?.subcategoryid);
 	}, [loadingListing]);
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
