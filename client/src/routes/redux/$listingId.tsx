@@ -28,19 +28,41 @@ export const Route = createFileRoute("/redux/$listingId")({
 	component: RouteComponent,
 });
 
+// Add initial state types and values
+const initialState: Listing = {
+	titleCategory: {
+		id: 0,
+		title: "",
+		subTitle: "",
+		categoryId: 0,
+		subCategoryId: 0,
+		endDate: "",
+	},
+	itemDetails: {
+		condition: false,
+		description: "",
+	},
+	pricePayment: {
+		listingPrice: "",
+		reservePrice: "",
+		creditCardPayment: false,
+		bankTransferPayment: false,
+		bitcoinPayment: false,
+	},
+	shipping: {
+		pickUp: false,
+		shippingOption: "",
+	},
+};
+
 function RouteComponent() {
 	const dispatch = useDispatch();
 	const navigate = useNavigate({ from: Route.fullPath });
 	const { listingId } = useParams({ from: Route.id });
-	const listing = useSelector(
-		(state: RootState) => state.listing as ListingState,
-	);
-	const {
-		titleCategory = {},
-		itemDetails = {},
-		pricePayment = {},
-		shipping = {},
-	} = listing;
+	const listing =
+		useSelector((state: RootState) => state.listing) || initialState;
+
+	const { titleCategory, itemDetails, pricePayment, shipping } = listing;
 
 	const today = new Date();
 	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
@@ -55,14 +77,15 @@ function RouteComponent() {
 	const [updateListing] = useUpdateListingMutation();
 
 	useEffect(() => {
+		console.log("listingData", listingData);
 		if (listingData) {
 			dispatch(
 				setTitleCategory({
-					title: listingData.title,
+					title: listingData?.title,
 					subTitle: listingData.subtitle,
 					categoryId: listingData.categoryid,
 					subCategoryId: listingData.subcategoryid,
-					endDate: listingData.enddate.split("T")[0],
+					endDate: listingData.enddate,
 				}),
 			);
 			dispatch(
@@ -73,7 +96,7 @@ function RouteComponent() {
 			);
 			dispatch(
 				setPricePayment({
-					listingPrice: Number(listingData.listingprice),
+					listingPrice: listingData.listingprice,
 					reservePrice: Number(listingData.reserveprice),
 					creditCardPayment: listingData.creditcardpayment,
 					bankTransferPayment: listingData.banktransferpayment,

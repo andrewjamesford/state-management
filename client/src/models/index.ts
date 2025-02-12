@@ -16,6 +16,25 @@ export interface ItemDetails {
 	condition: boolean;
 }
 
+export interface RawListing {
+	id: number;
+	title: string;
+	subtitle: string;
+	categoryid: number;
+	subcategoryid: number;
+	enddate: string;
+	listingdescription: string;
+	condition: boolean;
+	listingprice: string;
+	reserveprice: string;
+	creditcardpayment: boolean;
+	banktransferpayment: boolean;
+	bitcoinpayment: boolean;
+	pickup: boolean;
+	shippingoption: string;
+	category: string;
+}
+
 export interface PricePayment {
 	listingPrice: string;
 	reservePrice: string;
@@ -68,3 +87,10 @@ export const listingSchema: ListingSchema = {
 		shippingOption: "post",
 	},
 };
+
+export interface Category {
+	id: number;
+	category_name: string;
+	parent_id: number;
+	active: boolean;
+}

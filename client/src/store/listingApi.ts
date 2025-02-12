@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { Listing, Category } from "~/models";
+import type { Category, Listing, RawListing } from "~/models";
 
 export const listingApi = createApi({
 	reducerPath: "listingApi",
@@ -8,8 +8,8 @@ export const listingApi = createApi({
 	endpoints: (builder) => ({
 		getListings: builder.query<Listing[], void>({
 			query: () => "listings",
-			transformResponse: (response: any[]) =>
-				response.map((listing: any) => ({
+			transformResponse: (response: RawListing[]) =>
+				response.map((listing: RawListing) => ({
 					titleCategory: {
 						id: listing.id,
 						title: listing.title,
@@ -39,6 +39,31 @@ export const listingApi = createApi({
 		getListing: builder.query<Listing, string>({
 			query: (id) => `listings/${id}`,
 			providesTags: ["Listing"],
+			transformResponse: (response: RawListing) => ({
+				titleCategory: {
+					id: response.id,
+					title: response.title,
+					categoryId: response.categoryid,
+					subCategoryId: response.subcategoryid,
+					subTitle: response.subtitle,
+					endDate: response.enddate,
+				},
+				itemDetails: {
+					description: response.listingdescription,
+					condition: response.condition,
+				},
+				pricePayment: {
+					listingPrice: response.listingprice,
+					reservePrice: response.reserveprice,
+					creditCardPayment: response.creditcardpayment,
+					bankTransferPayment: response.banktransferpayment,
+					bitcoinPayment: response.bitcoinpayment,
+				},
+				shipping: {
+					pickUp: response.pickup,
+					shippingOption: response.shippingoption,
+				},
+			}),
 		}),
 		addListing: builder.mutation<number, { listing: Listing }>({
 			query: (body) => ({

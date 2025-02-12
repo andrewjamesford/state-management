@@ -1,9 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type { ListingState } from "~/types/listing";
 
-const initialState: ListingState = {
+import type {
+	Listing,
+	TitleCategory,
+	PricePayment,
+	ItemDetails,
+	Shipping,
+} from "~/models";
+
+const initialState: Listing = {
 	titleCategory: {
+		id: 0,
 		title: "",
 		subTitle: "",
 		categoryId: 0,
@@ -15,8 +23,8 @@ const initialState: ListingState = {
 		description: "",
 	},
 	pricePayment: {
-		listingPrice: 0,
-		reservePrice: 0,
+		listingPrice: "0",
+		reservePrice: "0",
 		creditCardPayment: false,
 		bankTransferPayment: false,
 		bitcoinPayment: false,
