@@ -33,6 +33,38 @@ interface Category {
 	category_name: string;
 }
 
+/**
+ * A React component for editing listing details.
+ * Uses TanStack Router for routing and TanStack Query for data management.
+ *
+ * Features:
+ * - Loads and displays existing listing data for editing
+ * - Manages form state for title/category, item details, price/payment, and shipping
+ * - Handles category/subcategory selection with dynamic loading
+ * - Validates dates within allowed range
+ * - Supports multiple payment methods
+ * - Handles shipping and pickup options
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <RouteComponent />
+ * ```
+ *
+ * @remarks
+ * The component uses several custom form components:
+ * - TextInput for text fields
+ * - Select for category dropdowns
+ * - DateInput for date selection
+ * - Textarea for description
+ * - MoneyTextInput for prices
+ * - RadioButton for binary choices
+ * - Checkbox for multiple selections
+ *
+ * Form data is validated and submitted via mutation to update the listing.
+ * On successful update, user is redirected to listings page.
+ */
+
 function RouteComponent() {
 	const today = new Date();
 	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
