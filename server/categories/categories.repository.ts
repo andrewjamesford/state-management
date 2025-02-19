@@ -8,7 +8,7 @@ import { pool } from "../db";
  * @returns {Promise<Array>} A promise that resolves to an array of category objects.
  * @throws {Error} If there is an error executing the query.
  */
-export async function getCategories(parentId: number, active: boolean) {
+export async function getCategories(parentId = 0, active = true) {
 	try {
 		const result = await pool.query(
 			"SELECT * FROM categories WHERE parent_id = $1 AND active = $2 ORDER BY category_name",
