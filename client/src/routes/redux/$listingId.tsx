@@ -29,6 +29,7 @@ import Select from "~/components/select";
 import Textarea from "~/components/textarea";
 import MoneyTextInput from "~/components/moneyTextInput";
 import Checkbox from "~/components/Checkbox";
+import ErrorMessage from "~/components/errorMessage";
 
 export const Route = createFileRoute("/redux/$listingId")({
 	component: RouteComponent,
@@ -65,58 +66,45 @@ function RouteComponent() {
 	const dispatch = useDispatch();
 	const navigate = useNavigate({ from: Route.fullPath });
 	const { listingId } = useParams({ from: Route.id });
-	const listing =
-		useSelector((state: RootState) => state.listing) || initialState;
 
-	const { titleCategory, itemDetails, pricePayment, shipping } = listing;
+	const listing = useSelector((state: RootState) =>
+		state.listing
+			? {
+					titleCategory:
+						state.listing.titleCategory || initialState.titleCategory,
+					itemDetails: state.listing.itemDetails || initialState.itemDetails,
+					pricePayment: state.listing.pricePayment || initialState.pricePayment,
+					shipping: state.listing.shipping || initialState.shipping,
+				}
+			: initialState,
+	);
 
 	const today = new Date();
 	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
 	const fortnight = format(addDays(today, 14), "yyyy-MM-dd");
 
-	const { data: listingData, isLoading: loadingListing } =
-		useGetListingQuery(listingId);
-	const { data: parentCatData, isLoading: loadingCategory } =
-		useGetParentCategoriesQuery();
-	const { data: subCatData, isLoading: loadingSubCategory } =
-		useGetSubCategoriesQuery(titleCategory.categoryId || 0);
+	const {
+		data: listingData,
+		isLoading: loadingListing,
+		isError: loadingError,
+	} = useGetListingQuery(listingId);
+	const { titleCategory, itemDetails, pricePayment, shipping } =
+		listingData || initialState;
+	// const { data: parentCatData, isLoading: loadingCategory } =
+	// 	useGetParentCategoriesQuery();
+	// const { data: subCatData, isLoading: loadingSubCategory } =
+	// 	useGetSubCategoriesQuery(titleCategory.categoryId || 0);
 	const [updateListing] = useUpdateListingMutation();
 
-	useEffect(() => {
-		console.log("listingData", listingData);
-		if (listingData && !loadingListing) {
-			dispatch(
-				setTitleCategory({
-					title: listingData?.title,
-					subTitle: listingData.subtitle,
-					categoryId: listingData.categoryid,
-					subCategoryId: listingData.subcategoryid,
-					endDate: listingData.enddate,
-				}),
-			);
-			dispatch(
-				setItemDetails({
-					condition: listingData.condition,
-					description: listingData.listingdescription,
-				}),
-			);
-			dispatch(
-				setPricePayment({
-					listingPrice: listingData.listingprice,
-					reservePrice: Number(listingData.reserveprice),
-					creditCardPayment: listingData.creditcardpayment,
-					bankTransferPayment: listingData.banktransferpayment,
-					bitcoinPayment: listingData.bitcoinpayment,
-				}),
-			);
-			dispatch(
-				setShipping({
-					pickUp: listingData.pickup,
-					shippingOption: listingData.shippingoption,
-				}),
-			);
-		}
-	}, [listingData, loadingListing, dispatch]);
+	// useEffect(() => {
+	// 	if (listingData) {
+	// 		dispatch(
+	// 			setTitleCategory({
+	// 				title: titleCategory.title || "",
+	// 			}),
+	// 		);
+	// 	}
+	// }, [listingData, titleCategory, dispatch]);
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -141,6 +129,7 @@ function RouteComponent() {
 	};
 
 	if (loadingListing) return <Loader />;
+	if (loadingError) return <ErrorMessage message="Failed to load listing" />;
 
 	return (
 		<form onSubmit={handleSubmit}>
@@ -156,10 +145,11 @@ function RouteComponent() {
 					value={titleCategory.title}
 					onChange={(e) => {
 						const value = e.target.value ?? "";
-						setTitleCategory({
-							...titleCategory,
-							title: value,
-						});
+						dispatch(
+							setTitleCategory({
+								title: value,
+							}),
+						);
 					}}
 					required={true}
 					maxLength={80}
@@ -168,6 +158,30 @@ function RouteComponent() {
 					errorMessage="Please enter a listing title of 3-80 characters"
 					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
 					requirementsLabel="80 characters max"
+					requirementsClassName="mt-1 text-sm text-gray-500"
+				/>
+			</div>
+
+			<div className="mt-6">
+				{/* Subtitle */}
+				<TextInput
+					labelClassName="block text-sm font-medium text-gray-700"
+					label="Subtitle (optional)"
+					id="sub-title"
+					placeholder="e.g. iPhone 5c, Red t-shirt"
+					value={titleCategory.subTitle}
+					onChange={(e) => {
+						const value = e.target.value ?? "";
+						setTitleCategory({
+							...titleCategory,
+							subTitle: value,
+						});
+					}}
+					maxLength={50}
+					className="block w-full px-3 py-2 mt-1 border rounded-md placeholder:italic peer"
+					errorMessage="Please enter a listing title of 3-80 characters"
+					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
+					requirementsLabel="50 characters max"
 					requirementsClassName="mt-1 text-sm text-gray-500"
 				/>
 			</div>

@@ -12,7 +12,7 @@ import type {
 const initialState: Listing = {
 	titleCategory: {
 		id: 0,
-		title: "This is Initial Title",
+		title: "",
 		subTitle: "",
 		categoryId: 0,
 		subCategoryId: 0,

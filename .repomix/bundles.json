@@ -1,0 +1,19 @@
+{
+  "bundles": {
+    "server-bundle": {
+      "name": "server-bundle",
+      "description": "The nodejs express backend",
+      "created": "2025-02-19T04:03:55.587Z",
+      "lastUsed": "2025-02-19T04:03:55.587Z",
+      "tags": [
+        "nodejs",
+        "typescript",
+        "express",
+        "postgres"
+      ],
+      "files": [
+        "server"
+      ]
+    }
+  }
+}
