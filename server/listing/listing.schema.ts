@@ -2,6 +2,7 @@ import Joi from "joi";
 
 // Schema for adding/updating a listing
 export const listingSchema = Joi.object({
+	id: Joi.number().optional(),
 	title: Joi.string().required(),
 	subTitle: Joi.string().optional(),
 	categoryId: Joi.number().greater(0).required(),
