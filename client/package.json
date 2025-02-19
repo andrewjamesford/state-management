@@ -11,7 +11,8 @@
 		"preview": "vite preview",
 		"check": "biome check --write ./src",
 		"format": "biome format --write ./src",
-		"report": "biome check --reporter=summary --log-level=warn ./src"
+		"report": "biome check --reporter=summary --log-level=warn ./src",
+		"test": "vitest"
 	},
 	"dependencies": {
 		"@reduxjs/toolkit": "^2.5.1",

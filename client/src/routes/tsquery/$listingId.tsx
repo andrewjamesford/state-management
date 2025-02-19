@@ -6,13 +6,7 @@ import {
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { addDays, format, isWithinInterval } from "date-fns";
 import { useEffect, useState } from "react";
-import type {
-	ItemDetails,
-	PricePayment,
-	Shipping,
-	Listing,
-	TitleCategory,
-} from "~/models";
+import type { Listing } from "~/models";
 import { listingSchema } from "~/models";
 import Loader from "~/components/loader";
 import api from "~/api";
@@ -74,19 +68,10 @@ function RouteComponent() {
 		from: Route.fullPath,
 	});
 
-	const [titleCategory, setTitleCategory] = useState(
-		listingSchema.titleCategory as TitleCategory,
-	);
-	const [itemDetails, setItemDetails] = useState(
-		listingSchema.itemDetails as ItemDetails,
-	);
-	const [pricePayment, setPricePayment] = useState(
-		listingSchema.pricePayment as PricePayment,
-	);
-	const [shipping, setShipping] = useState(listingSchema.shipping as Shipping);
+	const [listing, setListing] = useState(listingSchema);
 
 	const { listingId } = useParams({ from: Route.id });
-	let prevDate = format(tomorrow, "yyyy-MM-dd");
+	const prevDate = format(tomorrow, "yyyy-MM-dd");
 
 	const {
 		data: listingData,
@@ -123,16 +108,15 @@ function RouteComponent() {
 		isLoading: loadingSubCategory,
 		error: subCatError,
 	} = useQuery({
-		queryKey: ["subCategories", titleCategory.categoryId],
+		queryKey: ["subCategories", listing.categoryId],
 		queryFn: async () => {
-			if (!titleCategory.categoryId) return [];
-			const response = await api.getCategories(titleCategory.categoryId);
+			if (!listing.categoryId) return [];
+			const response = await api.getCategories(listing.categoryId);
 			if (!response.ok) throw new Error("Error retrieving sub-categories");
 			return await response.json();
 		},
 	});
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		if (listingData) {
 			const isValidDate: boolean = isWithinInterval(
@@ -142,44 +126,35 @@ function RouteComponent() {
 					end: fortnight,
 				},
 			);
-			if (isValidDate) {
-				prevDate = format(listingData.enddate, "yyyy-MM-dd");
-			}
-			setTitleCategory((prev) => ({
+			const newEndDate = isValidDate
+				? format(listingData.enddate, "yyyy-MM-dd")
+				: format(tomorrow, "yyyy-MM-dd");
+
+			setListing((prev) => ({
 				...prev,
 				title: listingData.title,
 				subTitle: listingData.subtitle,
-				endDate: format(prevDate, "yyyy-MM-dd"),
+				endDate: newEndDate,
 				categoryId: listingData?.categoryid,
 				subCategoryId: listingData?.subcategoryid,
-			}));
-			setItemDetails((prev) => ({
-				...prev,
 				description: listingData.listingdescription,
 				condition: listingData.condition,
-			}));
-			setPricePayment((prev) => ({
-				...prev,
 				listingPrice: listingData.listingprice,
 				reservePrice: listingData.reserveprice,
 				creditCardPayment: listingData.creditcardpayment,
 				bankTransferPayment: listingData.banktransferpayment,
 				bitcoinPayment: listingData.bitcoinpayment,
-			}));
-			setShipping((prev) => ({
-				...prev,
 				pickUp: listingData.pickup,
 				shippingOption: listingData.shippingoption,
 			}));
 		}
-	}, [loadingListing]);
+	}, [loadingListing, listingData]);
 
 	// Add mutation hook for updating the listing
 	const updateListingMutation = useMutation({
 		mutationFn: async (listing: Listing) => {
-			if (pricePayment.reservePrice === "") pricePayment.reservePrice = "0.00";
-			const listingWrapper = { listing };
-			const response = await api.updateListing(listingId, listingWrapper);
+			if (listing.reservePrice === "") listing.reservePrice = "0.00";
+			const response = await api.updateListing(listingId, listing);
 			if (!response.ok) {
 				throw new Error("Error updating listing");
 			}
@@ -193,12 +168,6 @@ function RouteComponent() {
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		const listing: Listing = {
-			titleCategory: titleCategory,
-			itemDetails: itemDetails,
-			pricePayment: pricePayment,
-			shipping: shipping,
-		};
 		updateListingMutation.mutate(listing, {
 			onSuccess: (result) => {
 				alert(`${JSON.stringify(result)} listing updated`);
@@ -232,13 +201,13 @@ function RouteComponent() {
 					label="Listing title"
 					id="listing-title"
 					placeholder="e.g. iPhone 5c, Red t-shirt"
-					value={titleCategory.title}
+					value={listing.title}
 					onChange={(e) => {
 						const value = e.target.value ?? "";
-						setTitleCategory({
-							...titleCategory,
+						setListing((prev) => ({
+							...prev,
 							title: value,
-						});
+						}));
 					}}
 					required={true}
 					maxLength={80}
@@ -258,13 +227,13 @@ function RouteComponent() {
 					label="Subtitle (optional)"
 					id="sub-title"
 					placeholder="e.g. iPhone 5c, Red t-shirt"
-					value={titleCategory.subTitle}
+					value={listing.subTitle}
 					onChange={(e) => {
 						const value = e.target.value ?? "";
-						setTitleCategory({
-							...titleCategory,
+						setListing((prev) => ({
+							...prev,
 							subTitle: value,
-						});
+						}));
 					}}
 					maxLength={50}
 					className="block w-full px-3 py-2 mt-1 border rounded-md placeholder:italic peer"
@@ -284,16 +253,16 @@ function RouteComponent() {
 						label="Category"
 						labelClassName="block text-sm font-medium text-gray-700"
 						id="category"
-						selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${titleCategory.categoryId === 0 ? " italic text-gray-400" : ""}`}
+						selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${listing.categoryId === 0 ? " italic text-gray-400" : ""}`}
 						onChange={(e) => {
 							const value = Number.parseInt(e.target.value) || 0;
-							setTitleCategory({
-								...titleCategory,
+							setListing((prev) => ({
+								...prev,
 								categoryId: value,
-								subCategoryId: 0, // reset subcategory
-							});
+								subCategoryId: 0,
+							}));
 						}}
-						value={titleCategory.categoryId}
+						value={listing.categoryId}
 						required={true}
 						options={[
 							{
@@ -319,15 +288,15 @@ function RouteComponent() {
 						label="Sub Category"
 						labelClassName="block text-sm font-medium text-gray-700"
 						id="category-sub"
-						selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${titleCategory.subCategoryId === 0 ? " italic text-gray-400" : ""}`}
+						selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${listing.subCategoryId === 0 ? " italic text-gray-400" : ""}`}
 						onChange={(e) => {
 							const value = Number.parseInt(e.target.value) || 0;
-							setTitleCategory({
-								...titleCategory,
-								subCategoryId: value,
-							});
+							setListing((prev) => ({
+								...prev,
+								titleCategory: { ...prev, subCategoryId: value },
+							}));
 						}}
-						value={titleCategory.subCategoryId}
+						value={listing.subCategoryId}
 						required={true}
 						disabled={!subCatData}
 						options={[
@@ -351,12 +320,12 @@ function RouteComponent() {
 					label="End date"
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="end-date"
-					value={titleCategory.endDate}
+					value={listing.endDate}
 					onChange={(e) =>
-						setTitleCategory({
-							...titleCategory,
+						setListing((prev) => ({
+							...prev,
 							endDate: e.target.value,
-						})
+						}))
 					}
 					required
 					pattern="\d{4}-\d{2}-\d{2}"
@@ -374,10 +343,13 @@ function RouteComponent() {
 					label="Description"
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="listing-description"
-					value={itemDetails.description}
+					value={listing.description}
 					onChange={(e) => {
 						const value = e.target.value ?? "";
-						setItemDetails({ ...itemDetails, description: value });
+						setListing((prev) => ({
+							...prev,
+							description: value,
+						}));
 					}}
 					required={true}
 					maxLength={500}
@@ -403,9 +375,12 @@ function RouteComponent() {
 						name="condition"
 						value="false"
 						label="Used"
-						checked={itemDetails.condition === false}
+						checked={listing.condition === false}
 						onChange={() =>
-							setItemDetails({ ...itemDetails, condition: false })
+							setListing((prev) => ({
+								...prev,
+								condition: false,
+							}))
 						}
 						labelClassName="ml-2 text-sm text-gray-700"
 						containerClassName="flex mt-3"
@@ -415,8 +390,13 @@ function RouteComponent() {
 						name="condition"
 						value="true"
 						label="New"
-						checked={itemDetails.condition === true}
-						onChange={() => setItemDetails({ ...itemDetails, condition: true })}
+						checked={listing.condition === true}
+						onChange={() =>
+							setListing((prev) => ({
+								...prev,
+								condition: true,
+							}))
+						}
 						labelClassName="ml-2 text-sm text-gray-700"
 						containerClassName="flex mt-3"
 					/>
@@ -431,12 +411,12 @@ function RouteComponent() {
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="listing-price"
 					placeholder="$10.00"
-					value={pricePayment.listingPrice}
+					value={listing.listingPrice}
 					onChange={(e) => {
-						setPricePayment({
-							...pricePayment,
+						setListing((prev) => ({
+							...prev,
 							listingPrice: e.target.value,
-						});
+						}));
 					}}
 				/>
 			</div>
@@ -447,12 +427,12 @@ function RouteComponent() {
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="listing-reserve"
 					placeholder="$20.00"
-					value={pricePayment.reservePrice}
+					value={listing.reservePrice}
 					onChange={(e) => {
-						setPricePayment({
-							...pricePayment,
+						setListing((prev) => ({
+							...prev,
 							reservePrice: e.target.value,
-						});
+						}));
 					}}
 				/>
 			</div>
@@ -470,12 +450,12 @@ function RouteComponent() {
 						<Checkbox
 							id="payment-credit"
 							label="Credit card"
-							checked={pricePayment.creditCardPayment}
+							checked={listing.creditCardPayment}
 							onChange={() => {
-								setPricePayment({
-									...pricePayment,
-									creditCardPayment: !pricePayment.creditCardPayment,
-								});
+								setListing((prev) => ({
+									...prev,
+									creditCardPayment: !prev.creditCardPayment,
+								}));
 							}}
 						/>
 					</div>
@@ -483,12 +463,12 @@ function RouteComponent() {
 						<Checkbox
 							id="payment-bank"
 							label="Bank Transfer"
-							checked={pricePayment.bankTransferPayment}
+							checked={listing.bankTransferPayment}
 							onChange={() => {
-								setPricePayment({
-									...pricePayment,
-									bankTransferPayment: !pricePayment.bankTransferPayment,
-								});
+								setListing((prev) => ({
+									...prev,
+									bankTransferPayment: !prev.bankTransferPayment,
+								}));
 							}}
 						/>
 					</div>
@@ -496,12 +476,12 @@ function RouteComponent() {
 						<Checkbox
 							id="payment-bitcoin"
 							label="Bitcoin"
-							checked={pricePayment.bitcoinPayment}
+							checked={listing.bitcoinPayment}
 							onChange={() => {
-								setPricePayment({
-									...pricePayment,
-									bitcoinPayment: !pricePayment.bitcoinPayment,
-								});
+								setListing((prev) => ({
+									...prev,
+									bitcoinPayment: !prev.bitcoinPayment,
+								}));
 							}}
 						/>
 					</div>
@@ -524,8 +504,13 @@ function RouteComponent() {
 						name="pick-up"
 						value="true"
 						label="Yes"
-						checked={shipping.pickUp === true}
-						onChange={() => setShipping({ ...shipping, pickUp: true })}
+						checked={listing.pickUp === true}
+						onChange={() =>
+							setListing((prev) => ({
+								...prev,
+								pickUp: true,
+							}))
+						}
 						containerClassName="flex mt-3"
 						labelClassName="ml-2 text-sm text-gray-700"
 					/>
@@ -534,8 +519,13 @@ function RouteComponent() {
 						name="pick-up"
 						value="false"
 						label="No"
-						checked={shipping.pickUp === false}
-						onChange={() => setShipping({ ...shipping, pickUp: false })}
+						checked={listing.pickUp === false}
+						onChange={() =>
+							setListing((prev) => ({
+								...prev,
+								pickUp: false,
+							}))
+						}
 						containerClassName="flex mt-3"
 						labelClassName="ml-2 text-sm text-gray-700"
 					/>
@@ -557,9 +547,12 @@ function RouteComponent() {
 						name="shipping-option"
 						value="courier"
 						label="Courier"
-						checked={shipping.shippingOption === "courier"}
+						checked={listing.shippingOption === "courier"}
 						onChange={() =>
-							setShipping({ ...shipping, shippingOption: "courier" })
+							setListing((prev) => ({
+								...prev,
+								shippingOption: "courier",
+							}))
 						}
 						containerClassName="flex mt-3"
 						labelClassName="ml-2 text-sm text-gray-700"
@@ -569,9 +562,12 @@ function RouteComponent() {
 						name="shipping-option"
 						value="post"
 						label="Post"
-						checked={shipping.shippingOption === "post"}
+						checked={listing.shippingOption === "post"}
 						onChange={() =>
-							setShipping({ ...shipping, shippingOption: "post" })
+							setListing((prev) => ({
+								...prev,
+								shippingOption: "post",
+							}))
 						}
 						containerClassName="flex mt-3"
 						labelClassName="ml-2 text-sm text-gray-700"
