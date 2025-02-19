@@ -5,7 +5,6 @@ import express, {
 } from "express";
 const router = express.Router();
 import { getCategories } from "./categories.repository";
-import type { QueryResult } from "pg";
 
 // Get all categories
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {

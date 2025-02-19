@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
-import { Schema, ValidationError } from 'joi';
+import type { Request, Response, NextFunction } from "express";
+import type { Schema, ValidationError } from "joi";
 
 /**
  * Middleware to validate query parameters against a given schema.
@@ -15,17 +15,18 @@ interface ValidationResult {
 	error?: ValidationError;
 }
 
-const queryParamValidationMiddleware = (schema: Schema) => (req: Request, res: Response, next: NextFunction) => {
-	const { error }: ValidationResult = schema.validate(req.query);
+const queryParamValidationMiddleware =
+	(schema: Schema) => (req: Request, res: Response, next: NextFunction) => {
+		const { error }: ValidationResult = schema.validate(req.query);
 
-	if (error) {
-		const { details }: { details: ValidationErrorDetail[] } = error;
-		const message = details.map((detail) => detail.message).join(",");
+		if (error) {
+			const { details }: { details: ValidationErrorDetail[] } = error;
+			const message = details.map((detail) => detail.message).join(",");
 
-		res.status(200).json({ message });
-	} else {
-		next();
-	}
-};
+			res.status(200).json({ message });
+		} else {
+			next();
+		}
+	};
 
 export default queryParamValidationMiddleware;

@@ -1,4 +1,5 @@
 import { pool } from "../db";
+import type { Listing } from "./listing.model";
 
 /**
  * getListings - gets all listings from the database
@@ -36,7 +37,7 @@ export async function getListings() {
 }
 
 /**
- * getListing - gets a single listing from the database by ID
+ * GetListing - gets a single listing from the database by ID
  * @param {number} id - The listing ID
  * @returns listing object or null if not found
  */
@@ -77,63 +78,25 @@ export async function getListing(id: number) {
  * @param {object} listingDetails
  * @returns {object} listing
  */
-interface TitleCategory {
-	title: string;
-	categoryId: number;
-	subCategoryId: number;
-	subTitle: string;
-	endDate: string;
-}
 
-interface ItemDetails {
-	condition: boolean;
-	description: string;
-}
-
-interface PricePayment {
-	listingPrice: number;
-	reservePrice: number;
-	creditCardPayment: boolean;
-	bankTransferPayment: boolean;
-	bitcoinPayment: boolean;
-}
-
-interface Shipping {
-	pickUp: boolean;
-	shippingOption: string;
-}
-
-export interface ListingDetails {
-	titleCategory: TitleCategory;
-	itemDetails: ItemDetails;
-	pricePayment: PricePayment;
-	shipping: Shipping;
-}
-
-export interface Listing {
-	listing: ListingDetails;
-}
-
-export const addListing = async (
-	listingDetails: ListingDetails,
-): Promise<number> => {
+export const addListing = async (listingDetails: Listing): Promise<number> => {
 	try {
-		const { titleCategory, itemDetails, pricePayment, shipping } =
-			listingDetails;
-
-		const { title, categoryId, subTitle, endDate } = titleCategory;
-
-		const { condition, description } = itemDetails;
-
 		const {
+			title,
+			subTitle,
+			categoryId,
+			subCategoryId,
+			endDate,
+			description,
+			condition,
 			listingPrice,
 			reservePrice,
 			creditCardPayment,
 			bankTransferPayment,
 			bitcoinPayment,
-		} = pricePayment;
-
-		const { pickUp, shippingOption } = shipping;
+			pickUp,
+			shippingOption,
+		} = listingDetails;
 
 		const result = await pool.query(
 			`INSERT INTO listings (
@@ -178,29 +141,31 @@ export const addListing = async (
 };
 
 /**
- * updateListing - updates a listing in the database
+ * UpdateListing - updates a listing in the database
  * @param {number} id - listing id
- * @param {ListingDetails} listingDetails
+ * @param {Listing} listingDetails
  * @returns {Promise<number>} number of rows affected
  */
 export const updateListing = async (
 	id: number,
-	listingDetails: ListingDetails,
+	listingDetails: Listing,
 ): Promise<number> => {
 	try {
-		const { listing } = listingDetails;
-		const { titleCategory, itemDetails, pricePayment, shipping } = listing;
-		const { title, categoryId, subTitle, endDate, subCategoryId } =
-			titleCategory;
-		const { condition, description } = itemDetails;
 		const {
+			title,
+			subTitle,
+			subCategoryId,
+			endDate,
+			description,
+			condition,
 			listingPrice,
 			reservePrice,
 			creditCardPayment,
 			bankTransferPayment,
 			bitcoinPayment,
-		} = pricePayment;
-		const { pickUp, shippingOption } = shipping;
+			pickUp,
+			shippingOption,
+		} = listingDetails;
 
 		const result = await pool.query(
 			`UPDATE listings SET 
