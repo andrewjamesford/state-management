@@ -77,28 +77,11 @@ describe("addListing", () => {
 	it("should add a new listing to the database", async () => {
 		const mock = vi.fn().mockImplementation(addListing);
 		const newListing = {
-			titleCategory: {
-				title: "",
-				categoryId: 0,
-				subCategoryId: 0,
-				subTitle: "",
-				endDate: "2026-09-29",
-			},
-			itemDetails: {
-				description: "",
-				condition: false,
-			},
-			pricePayment: {
-				listingPrice: "",
-				reservePrice: "",
-				creditCardPayment: false,
-				bankTransferPayment: false,
-				bitcoinPayment: false,
-			},
-			shipping: {
-				pickUp: true,
-				shippingOption: "post",
-			},
+			title: "New Listing",
+			description: "New Description",
+			price: 300,
+			categoryId: 3,
+			subCategoryId: 3,
 		};
 
 		mock.mockImplementationOnce(() => 1);
