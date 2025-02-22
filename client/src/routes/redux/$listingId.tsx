@@ -16,7 +16,6 @@ import {
 } from "~/store/listingApi";
 import { type Category, type Listing, listingSchema } from "~/models";
 import Loader from "~/components/loader";
-import type { ListingState } from "~/types/listing";
 import RadioButton from "~/components/radioButton";
 import DateInput from "~/components/dateInput";
 import TextInput from "~/components/textInput";
@@ -25,6 +24,7 @@ import Textarea from "~/components/textarea";
 import MoneyTextInput from "~/components/moneyTextInput";
 import Checkbox from "~/components/Checkbox";
 import ErrorMessage from "~/components/errorMessage";
+import SubmitButton from "~/components/submitButton";
 
 export const Route = createFileRoute("/redux/$listingId")({
 	component: RouteComponent,
@@ -75,6 +75,9 @@ function RouteComponent() {
 				id: listingId,
 				listing: formState,
 			}).unwrap();
+			if (result?.message) {
+				alert(result.message);
+			}
 			if (result === 1) {
 				navigate({ to: "/redux" });
 			}
@@ -87,7 +90,7 @@ function RouteComponent() {
 	if (loadingError) return <ErrorMessage message="Failed to load listing" />;
 
 	return (
-		<form onSubmit={handleSubmit}>
+		<form onSubmit={handleSubmit} noValidate className="group">
 			<h1 className="mt-4 text-2xl font-bold">What are you listing?</h1>
 			<div className="mt-6">
 				{/* Listing Title */}
@@ -475,16 +478,5 @@ function RouteComponent() {
 				<SubmitButton />
 			</div>
 		</form>
-	);
-}
-
-function SubmitButton() {
-	return (
-		<button
-			type="submit"
-			className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-500 hover:bg-blue-600 text-white border border-blue-600 h-10 px-4 py-2"
-		>
-			Save
-		</button>
 	);
 }

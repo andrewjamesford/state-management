@@ -68,10 +68,10 @@ export const listingApi = createApi({
 			}),
 		}),
 		addListing: builder.mutation<number, { listing: Listing }>({
-			query: (body) => ({
+			query: ({ listing }) => ({
 				url: "listings",
 				method: "POST",
-				body,
+				body: listing,
 			}),
 			invalidatesTags: ["Listing"],
 		}),
@@ -79,7 +79,7 @@ export const listingApi = createApi({
 			query: ({ id, listing }) => ({
 				url: `listings/${id}`,
 				method: "PUT",
-				body: { listing },
+				body: listing,
 			}),
 			invalidatesTags: ["Listing"],
 		}),
