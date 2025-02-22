@@ -86,7 +86,6 @@ function RouteComponent() {
 	if (loadingListing) return <Loader />;
 	if (loadingError) return <ErrorMessage message="Failed to load listing" />;
 
-	console.log("formState", formState);
 	return (
 		<form onSubmit={handleSubmit}>
 			<h1 className="mt-4 text-2xl font-bold">What are you listing?</h1>
@@ -100,7 +99,6 @@ function RouteComponent() {
 					value={formState.title}
 					onChange={(e) => {
 						const value = e.target.value ?? "";
-						console.log(value);
 						setFormState((prev) => ({
 							...prev,
 							title: value,

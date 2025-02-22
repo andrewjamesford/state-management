@@ -95,7 +95,6 @@ function RouteComponent() {
 					value={formState.title}
 					onChange={(e) => {
 						const value = e.target.value ?? "";
-						console.log(value);
 						setFormState((prev) => ({
 							...prev,
 							title: value,
