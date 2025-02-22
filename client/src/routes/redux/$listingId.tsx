@@ -3,10 +3,8 @@ import {
 	useParams,
 	useNavigate,
 } from "@tanstack/react-router";
-import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { addDays, format } from "date-fns";
-import type { RootState } from "~/store";
 
 import {
 	useGetListingQuery,
@@ -58,25 +56,11 @@ const initialState: Listing = {
 };
 
 function RouteComponent() {
-	const dispatch = useDispatch();
 	const navigate = useNavigate({ from: Route.fullPath });
 	const { listingId } = useParams({ from: Route.id });
 
-	// Get initial state from Redux
-	const reduxListing = useSelector((state: RootState) =>
-		state.listing
-			? {
-					titleCategory:
-						state.listing.titleCategory || initialState.titleCategory,
-					itemDetails: state.listing.itemDetails || initialState.itemDetails,
-					pricePayment: state.listing.pricePayment || initialState.pricePayment,
-					shipping: state.listing.shipping || initialState.shipping,
-				}
-			: initialState,
-	);
-
 	// Local state for form
-	const [formState, setFormState] = useState<Listing>(reduxListing);
+	const [formState, setFormState] = useState<Listing>(initialState);
 
 	const today = new Date();
 	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
@@ -97,24 +81,44 @@ function RouteComponent() {
 
 	useEffect(() => {
 		if (listingData) {
-			setFormState(listingData);
+			setFormState({
+				titleCategory: {
+					id: listingData.id,
+					title: listingData.title,
+					subTitle: listingData.subTitle,
+					categoryId: listingData.categoryId,
+					subCategoryId: listingData.subCategoryId,
+					endDate: listingData.endDate,
+				},
+				itemDetails: {
+					condition: listingData.condition,
+					description: listingData.description,
+				},
+				pricePayment: {
+					listingPrice: listingData.listingPrice,
+					reservePrice: listingData.reservePrice || "0.00",
+					creditCardPayment: listingData.creditCardPayment || false,
+					bankTransferPayment: listingData.bankTransferPayment || false,
+					bitcoinPayment: listingData.bitcoinPayment || false,
+				},
+				shipping: {
+					pickUp: listingData.pickUp || false,
+					shippingOption: listingData.shippingOption || "",
+				},
+			});
 		}
 	}, [listingData]);
 
+	const [updateListing] = useUpdateListingMutation();
+
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		const listing: Listing = {
-			titleCategory,
-			itemDetails,
-			pricePayment: {
-				...pricePayment,
-				reservePrice: pricePayment.reservePrice || "0.00",
-			},
-			shipping,
-		};
-
 		try {
-			const result = await updateListing({ id: listingId, listing }).unwrap();
+			const result = await updateListing({
+				id: listingId,
+				listing: formState
+			}).unwrap();
+			
 			if (result === 1) {
 				navigate({ to: "/redux" });
 			}
