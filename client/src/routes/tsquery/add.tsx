@@ -64,8 +64,6 @@ function RouteComponent() {
 		},
 	});
 
-	const changeData = () => {};
-
 	const checkValue = (value: number) => {
 		if (value > 10) {
 			throw new Error("Price must be less than $10");

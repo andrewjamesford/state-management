@@ -18,26 +18,18 @@ export interface ListingResponse {
 }
 
 export interface ListingState {
-	titleCategory: {
-		title: string;
-		subTitle: string;
-		categoryId: number;
-		subCategoryId: number;
-		endDate: string;
-	};
-	itemDetails: {
-		condition: boolean;
-		description: string;
-	};
-	pricePayment: {
-		listingPrice: number;
-		reservePrice: number;
-		creditCardPayment: boolean;
-		bankTransferPayment: boolean;
-		bitcoinPayment: boolean;
-	};
-	shipping: {
-		pickUp: boolean;
-		shippingOption: string;
-	};
+	title: string;
+	subTitle: string;
+	categoryId: number;
+	subCategoryId: number;
+	endDate: string;
+	condition: boolean;
+	description: string;
+	listingPrice: number;
+	reservePrice: number;
+	creditCardPayment: boolean;
+	bankTransferPayment: boolean;
+	bitcoinPayment: boolean;
+	pickUp: boolean;
+	shippingOption: string;
 }
