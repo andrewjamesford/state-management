@@ -45,9 +45,7 @@ function RouteComponent() {
 				{isLoading && <Skeleton layoutType="card" repeat={3} />}
 				{auctions.map((auction: Listing, counter: number) => (
 					<ListingTile
-						key={
-							auction?.titleCategory?.id ? auction.titleCategory.id : counter
-						}
+						key={auction?.id ? auction.id : counter}
 						listing={auction}
 						basePath="/redux"
 					/>

@@ -2,25 +2,6 @@ import { addDays, format } from "date-fns";
 
 export const endDate = format(addDays(new Date(), 1), "yyyy-MM-dd");
 
-export interface RawListing {
-	id: number;
-	title: string;
-	subtitle: string;
-	categoryid: number;
-	subcategoryid: number;
-	enddate: string;
-	listingdescription: string;
-	condition: boolean;
-	listingprice: string;
-	reserveprice: string;
-	creditcardpayment: boolean;
-	banktransferpayment: boolean;
-	bitcoinpayment: boolean;
-	pickup: boolean;
-	shippingoption: string;
-	category: string;
-}
-
 export interface Listing {
 	id: number;
 	title: string;
@@ -37,6 +18,7 @@ export interface Listing {
 	bitcoinPayment: boolean;
 	pickUp: boolean;
 	shippingOption: string;
+	category?: string;
 }
 
 export interface ListingSchema {
