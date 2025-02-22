@@ -8,30 +8,38 @@ interface ListingTileProps {
 
 export default function ListingTile({ listing, basePath }: ListingTileProps) {
 	if (listing == null) return null;
+	console.log(listing);
+	const lPrice = Number(listing.listingPrice);
+	const rPrice = Number(listing.reservePrice);
 	return (
 		<Link
-			to={`${basePath}/${listing.titleCategory.id}`}
+			to={`${basePath}/${listing.id}`}
 			className="border border-gray-300 rounded-lg overflow-hidden flex flex-col min-h-[300px]"
 		>
 			<img
 				src={"https://placehold.co/150"}
-				alt={listing.titleCategory.title}
+				alt={listing.title}
 				className="w-full"
 			/>
 			<div className="p-4 flex flex-col h-full">
-				<h2 className="text-xl font-bold">{listing.titleCategory.title}</h2>
-				<h3 className="text-base italic pb-2">
-					{listing.titleCategory.subTitle}
-				</h3>
-				<p className="pb-2">{listing.itemDetails.description}</p>
+				<h2 className="text-xl font-bold">{listing.title}</h2>
+				<h3 className="text-base italic pb-2">{listing.subTitle}</h3>
+				<p className="pb-2">{listing.description}</p>
 				<span className="text-sm mt-auto">
-					{listing.pricePayment.listingPrice == null
-						? "No reserve"
-						: listing.pricePayment.listingPrice >
-								listing.pricePayment.reservePrice
-							? "Reserve met"
-							: "Reserve not met"}{" "}
-					{listing.pricePayment.listingPrice}
+					<span className="block">
+						{lPrice === 0
+							? "No reserve"
+							: lPrice > rPrice
+								? "Reserve met"
+								: "Reserve not met"}
+					</span>
+
+					<span className="block italic">
+						{lPrice.toLocaleString(undefined, {
+							style: "currency",
+							currency: "USD",
+						})}
+					</span>
 				</span>
 			</div>
 		</Link>

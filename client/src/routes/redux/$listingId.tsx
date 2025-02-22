@@ -14,7 +14,7 @@ import {
 	useGetParentCategoriesQuery,
 	useGetSubCategoriesQuery,
 } from "~/store/listingApi";
-import type { Listing } from "~/models";
+import { type Listing, listingSchema } from "~/models";
 import Loader from "~/components/loader";
 import type { ListingState } from "~/types/listing";
 import RadioButton from "~/components/radioButton";
@@ -31,26 +31,8 @@ export const Route = createFileRoute("/redux/$listingId")({
 });
 
 // Add initial state types and values
-const initialState: Listing = {
-	id: 0,
-	title: "",
-	subTitle: "",
-	categoryId: 0,
-	subCategoryId: 0,
-	endDate: "",
-	condition: false,
-	description: "",
-	listingPrice: "",
-	reservePrice: "",
-	creditCardPayment: false,
-	bankTransferPayment: false,
-	bitcoinPayment: false,
-	pickUp: false,
-	shippingOption: "",
-};
 
 function RouteComponent() {
-	const dispatch = useDispatch();
 	const navigate = useNavigate({ from: Route.fullPath });
 	const { listingId } = useParams({ from: Route.id });
 
@@ -58,7 +40,7 @@ function RouteComponent() {
 
 	// Get initial state from Redux
 	const reduxListing = useSelector((state: RootState) =>
-		state.listing ? state.listing : initialState,
+		state.listing ? state.listing : listingSchema,
 	);
 
 	// Local state for form
