@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import api from "~/api";
 import ListingTile from "~/components/listingTile";
-import type { Listing } from "~/models";
+import type { Listing, RawListing } from "~/models";
 import Skeleton from "~/components/skeleton";
 
 export const Route = createFileRoute("/tsquery/")({
@@ -21,31 +21,24 @@ function RouteComponent() {
 			const response = await api.getListings();
 
 			if (!response.ok) throw new Error("Error retrieving listings");
+
 			const listings = await response.json();
-			// biome-ignore lint/suspicious/noExplicitAny: Saves having to create a new type
-			const arrayListings: Listing[] = listings.map((listing: any) => ({
-				titleCategory: {
-					id: listing.id,
-					title: listing.title,
-					categoryId: listing.categoryid,
-					subCategoryId: listing.subcategoryid,
-					subTitle: listing.subtitle,
-					endDate: listing.enddate,
-				},
-				itemDetails: {
-					description: listing.listingdescription,
-				},
-				pricePayment: {
-					listingPrice: listing.listingprice,
-					reservePrice: listing.reserveprice,
-					creditCardPayment: listing.creditcardpayment,
-					bankTransferPayment: listing.banktransferpayment,
-					bitcoinPayment: listing.bitcoinpayment,
-				},
-				shipping: {
-					pickUp: listing.pickup,
-					shippingOption: listing.shippingoption,
-				},
+			// Transform the raw listings into a more usable format
+			const arrayListings: Listing[] = listings.map((listing: RawListing) => ({
+				id: listing.id,
+				title: listing.title,
+				categoryId: listing.categoryid,
+				subCategoryId: listing.subcategoryid,
+				subTitle: listing.subtitle,
+				endDate: listing.enddate,
+				description: listing.listingdescription,
+				listingPrice: listing.listingprice,
+				reservePrice: listing.reserveprice,
+				creditCardPayment: listing.creditcardpayment,
+				bankTransferPayment: listing.banktransferpayment,
+				bitcoinPayment: listing.bitcoinpayment,
+				pickUp: listing.pickup,
+				shippingOption: listing.shippingoption,
 			}));
 			return arrayListings;
 		},
@@ -66,9 +59,7 @@ function RouteComponent() {
 				{isLoading && <Skeleton layoutType="card" repeat={3} />}
 				{auctions.map((auction: Listing, counter: number) => (
 					<ListingTile
-						key={
-							auction?.titleCategory?.id ? auction.titleCategory.id : counter
-						}
+						key={auction?.id ? auction.id : counter}
 						listing={auction}
 						basePath="/tsquery"
 					/>
