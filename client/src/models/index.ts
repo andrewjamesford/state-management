@@ -49,8 +49,8 @@ export interface ListingSchema {
 	endDate: string;
 	description: string;
 	condition: boolean;
-	listingPrice: string;
-	reservePrice: string;
+	listingPrice: number;
+	reservePrice: number;
 	creditCardPayment: boolean;
 	bankTransferPayment: boolean;
 	bitcoinPayment: boolean;
@@ -67,8 +67,8 @@ export const listingSchema: ListingSchema = {
 	endDate: endDate,
 	description: "",
 	condition: false,
-	listingPrice: "",
-	reservePrice: "",
+	listingPrice: 0,
+	reservePrice: 0,
 	creditCardPayment: false,
 	bankTransferPayment: false,
 	bitcoinPayment: false,

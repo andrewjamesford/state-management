@@ -55,7 +55,7 @@ interface Category {
  * - RadioButton for binary choices
  * - Checkbox for multiple selections
  *
- * Form data is validated and submitted via mutation to update the listing.
+ * Form data is validated and submitted via mutation to update the formState.
  * On successful update, user is redirected to listings page.
  */
 
@@ -68,7 +68,7 @@ function RouteComponent() {
 		from: Route.fullPath,
 	});
 
-	const [listing, setListing] = useState(listingSchema);
+	const [formState, setFormState] = useState(listingSchema);
 
 	const { listingId } = useParams({ from: Route.id });
 	const prevDate = format(tomorrow, "yyyy-MM-dd");
@@ -108,10 +108,10 @@ function RouteComponent() {
 		isLoading: loadingSubCategory,
 		error: subCatError,
 	} = useQuery({
-		queryKey: ["subCategories", listing.categoryId],
+		queryKey: ["subCategories", formState.categoryId],
 		queryFn: async () => {
-			if (!listing.categoryId) return [];
-			const response = await api.getCategories(listing.categoryId);
+			if (!formState.categoryId) return [];
+			const response = await api.getCategories(formState.categoryId);
 			if (!response.ok) throw new Error("Error retrieving sub-categories");
 			return await response.json();
 		},
@@ -130,7 +130,7 @@ function RouteComponent() {
 				? format(listingData.enddate, "yyyy-MM-dd")
 				: format(tomorrow, "yyyy-MM-dd");
 
-			setListing((prev) => ({
+			setFormState((prev) => ({
 				...prev,
 				title: listingData.title,
 				subTitle: listingData.subtitle,
@@ -153,7 +153,7 @@ function RouteComponent() {
 	// Add mutation hook for updating the listing
 	const updateListingMutation = useMutation({
 		mutationFn: async (listing: Listing) => {
-			if (listing.reservePrice === "") listing.reservePrice = "0.00";
+			if (formState.reservePrice === "") formState.reservePrice = "0.00";
 			const response = await api.updateListing(listingId, listing);
 			if (!response.ok) {
 				throw new Error("Error updating listing");
@@ -168,7 +168,7 @@ function RouteComponent() {
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		updateListingMutation.mutate(listing, {
+		updateListingMutation.mutate(formState, {
 			onSuccess: (result) => {
 				alert(`${JSON.stringify(result)} listing updated`);
 				if (result === 1) {
@@ -201,10 +201,10 @@ function RouteComponent() {
 					label="Listing title"
 					id="listing-title"
 					placeholder="e.g. iPhone 5c, Red t-shirt"
-					value={listing.title}
+					value={formState.title}
 					onChange={(e) => {
 						const value = e.target.value ?? "";
-						setListing((prev) => ({
+						setFormState((prev) => ({
 							...prev,
 							title: value,
 						}));
@@ -227,10 +227,10 @@ function RouteComponent() {
 					label="Subtitle (optional)"
 					id="sub-title"
 					placeholder="e.g. iPhone 5c, Red t-shirt"
-					value={listing.subTitle}
+					value={formState.subTitle}
 					onChange={(e) => {
 						const value = e.target.value ?? "";
-						setListing((prev) => ({
+						setFormState((prev) => ({
 							...prev,
 							subTitle: value,
 						}));
@@ -253,16 +253,16 @@ function RouteComponent() {
 						label="Category"
 						labelClassName="block text-sm font-medium text-gray-700"
 						id="category"
-						selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${listing.categoryId === 0 ? " italic text-gray-400" : ""}`}
+						selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${formState.categoryId === 0 ? " italic text-gray-400" : ""}`}
 						onChange={(e) => {
 							const value = Number.parseInt(e.target.value) || 0;
-							setListing((prev) => ({
+							setFormState((prev) => ({
 								...prev,
 								categoryId: value,
 								subCategoryId: 0,
 							}));
 						}}
-						value={listing.categoryId}
+						value={formState.categoryId}
 						required={true}
 						options={[
 							{
@@ -288,15 +288,15 @@ function RouteComponent() {
 						label="Sub Category"
 						labelClassName="block text-sm font-medium text-gray-700"
 						id="category-sub"
-						selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${listing.subCategoryId === 0 ? " italic text-gray-400" : ""}`}
+						selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${formState.subCategoryId === 0 ? " italic text-gray-400" : ""}`}
 						onChange={(e) => {
 							const value = Number.parseInt(e.target.value) || 0;
-							setListing((prev) => ({
+							setFormState((prev) => ({
 								...prev,
 								titleCategory: { ...prev, subCategoryId: value },
 							}));
 						}}
-						value={listing.subCategoryId}
+						value={formState.subCategoryId}
 						required={true}
 						disabled={!subCatData}
 						options={[
@@ -320,9 +320,9 @@ function RouteComponent() {
 					label="End date"
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="end-date"
-					value={listing.endDate}
+					value={formState.endDate}
 					onChange={(e) =>
-						setListing((prev) => ({
+						setFormState((prev) => ({
 							...prev,
 							endDate: e.target.value,
 						}))
@@ -343,10 +343,10 @@ function RouteComponent() {
 					label="Description"
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="listing-description"
-					value={listing.description}
+					value={formState.description}
 					onChange={(e) => {
 						const value = e.target.value ?? "";
-						setListing((prev) => ({
+						setFormState((prev) => ({
 							...prev,
 							description: value,
 						}));
@@ -375,9 +375,9 @@ function RouteComponent() {
 						name="condition"
 						value="false"
 						label="Used"
-						checked={listing.condition === false}
+						checked={formState.condition === false}
 						onChange={() =>
-							setListing((prev) => ({
+							setFormState((prev) => ({
 								...prev,
 								condition: false,
 							}))
@@ -390,9 +390,9 @@ function RouteComponent() {
 						name="condition"
 						value="true"
 						label="New"
-						checked={listing.condition === true}
+						checked={formState.condition === true}
 						onChange={() =>
-							setListing((prev) => ({
+							setFormState((prev) => ({
 								...prev,
 								condition: true,
 							}))
@@ -411,11 +411,11 @@ function RouteComponent() {
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="listing-price"
 					placeholder="$10.00"
-					value={listing.listingPrice}
+					value={formState.listingPrice}
 					onChange={(e) => {
-						setListing((prev) => ({
+						setFormState((prev) => ({
 							...prev,
-							listingPrice: e.target.value,
+							listingPrice: Number(e.target.value),
 						}));
 					}}
 				/>
@@ -427,11 +427,11 @@ function RouteComponent() {
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="listing-reserve"
 					placeholder="$20.00"
-					value={listing.reservePrice}
+					value={formState.reservePrice}
 					onChange={(e) => {
-						setListing((prev) => ({
+						setFormState((prev) => ({
 							...prev,
-							reservePrice: e.target.value,
+							reservePrice: Number(e.target.value),
 						}));
 					}}
 				/>
@@ -450,9 +450,9 @@ function RouteComponent() {
 						<Checkbox
 							id="payment-credit"
 							label="Credit card"
-							checked={listing.creditCardPayment}
+							checked={formState.creditCardPayment}
 							onChange={() => {
-								setListing((prev) => ({
+								setFormState((prev) => ({
 									...prev,
 									creditCardPayment: !prev.creditCardPayment,
 								}));
@@ -463,9 +463,9 @@ function RouteComponent() {
 						<Checkbox
 							id="payment-bank"
 							label="Bank Transfer"
-							checked={listing.bankTransferPayment}
+							checked={formState.bankTransferPayment}
 							onChange={() => {
-								setListing((prev) => ({
+								setFormState((prev) => ({
 									...prev,
 									bankTransferPayment: !prev.bankTransferPayment,
 								}));
@@ -476,9 +476,9 @@ function RouteComponent() {
 						<Checkbox
 							id="payment-bitcoin"
 							label="Bitcoin"
-							checked={listing.bitcoinPayment}
+							checked={formState.bitcoinPayment}
 							onChange={() => {
-								setListing((prev) => ({
+								setFormState((prev) => ({
 									...prev,
 									bitcoinPayment: !prev.bitcoinPayment,
 								}));
@@ -504,9 +504,9 @@ function RouteComponent() {
 						name="pick-up"
 						value="true"
 						label="Yes"
-						checked={listing.pickUp === true}
+						checked={formState.pickUp === true}
 						onChange={() =>
-							setListing((prev) => ({
+							setFormState((prev) => ({
 								...prev,
 								pickUp: true,
 							}))
@@ -519,9 +519,9 @@ function RouteComponent() {
 						name="pick-up"
 						value="false"
 						label="No"
-						checked={listing.pickUp === false}
+						checked={formState.pickUp === false}
 						onChange={() =>
-							setListing((prev) => ({
+							setFormState((prev) => ({
 								...prev,
 								pickUp: false,
 							}))
@@ -547,9 +547,9 @@ function RouteComponent() {
 						name="shipping-option"
 						value="courier"
 						label="Courier"
-						checked={listing.shippingOption === "courier"}
+						checked={formState.shippingOption === "courier"}
 						onChange={() =>
-							setListing((prev) => ({
+							setFormState((prev) => ({
 								...prev,
 								shippingOption: "courier",
 							}))
@@ -562,9 +562,9 @@ function RouteComponent() {
 						name="shipping-option"
 						value="post"
 						label="Post"
-						checked={listing.shippingOption === "post"}
+						checked={formState.shippingOption === "post"}
 						onChange={() =>
-							setListing((prev) => ({
+							setFormState((prev) => ({
 								...prev,
 								shippingOption: "post",
 							}))

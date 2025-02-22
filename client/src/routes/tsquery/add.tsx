@@ -2,13 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { addDays, format } from "date-fns";
 import { useState } from "react";
-import type {
-	ItemDetails,
-	PricePayment,
-	Shipping,
-	TitleCategory,
-	Listing,
-} from "~/models";
+import type { Listing, ListingSchema } from "~/models";
 import { listingSchema } from "~/models";
 import Loader from "~/components/loader";
 import api from "~/api";
@@ -40,16 +34,7 @@ function RouteComponent() {
 		from: Route.fullPath,
 	});
 
-	const [titleCategory, setTitleCategory] = useState(
-		listingSchema.titleCategory as TitleCategory,
-	);
-	const [itemDetails, setItemDetails] = useState(
-		listingSchema.itemDetails as ItemDetails,
-	);
-	const [pricePayment, setPricePayment] = useState(
-		listingSchema.pricePayment as PricePayment,
-	);
-	const [shipping, setShipping] = useState(listingSchema.shipping as Shipping);
+	const [formState, setFormState] = useState(listingSchema);
 
 	const {
 		data: parentCatData,
@@ -70,10 +55,10 @@ function RouteComponent() {
 		isLoading: loadingSubCategory,
 		error: subCatError,
 	} = useQuery({
-		queryKey: ["subCategories", titleCategory.categoryId],
+		queryKey: ["subCategories", formState.categoryId],
 		queryFn: async () => {
-			if (!titleCategory.categoryId) return [];
-			const response = await api.getCategories(titleCategory.categoryId);
+			if (!formState.categoryId) return [];
+			const response = await api.getCategories(formState.categoryId);
 			if (!response.ok) throw new Error("Error retrieving sub-categories");
 			return await response.json();
 		},
@@ -88,20 +73,21 @@ function RouteComponent() {
 	};
 
 	const queryClient = useQueryClient();
-	const mutation = useMutation({
-		mutationFn: async ({
-			listingWrapper,
-		}: {
-			listingWrapper: { listing: Listing };
-		}) => {
+	const mutation = useMutation<
+		{ message: string } | number,
+		Error,
+		{ listing: Listing }
+	>({
+		mutationFn: async ({ listing }) => {
 			// Always add a new listing
-			const response = await api.addListing(listingWrapper);
+			const response = await api.addListing(listing);
 			if (!response.ok) throw new Error("Error adding listing");
 			return await response.json();
 		},
 		onSuccess: (data) => {
 			if (data === 1) return navListings();
-			alert(`${JSON.stringify(data.message)}`);
+			// If data is an object, display its message property
+			alert(`${JSON.stringify((data as { message: string }).message)}`);
 			queryClient.invalidateQueries({
 				queryKey: ["listingData", listingId],
 			});
@@ -113,15 +99,9 @@ function RouteComponent() {
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		if (pricePayment.reservePrice === "") pricePayment.reservePrice = "0.00";
-		const listing: Listing = {
-			titleCategory: titleCategory,
-			itemDetails: itemDetails,
-			pricePayment: pricePayment,
-			shipping: shipping,
-		};
-		const listingWrapper = { listing };
-		mutation.mutate({ listingWrapper });
+		// if (formState.reservePrice === "") formState.reservePrice = "0.00";
+
+		mutation.mutate({ listing: formState });
 	};
 
 	const navListings = () => {
@@ -143,13 +123,13 @@ function RouteComponent() {
 					label="Listing title"
 					id="listing-title"
 					placeholder="e.g. iPhone 5c, Red t-shirt"
-					value={titleCategory.title}
+					value={formState.title}
 					onChange={(e) => {
 						const value = e.target.value ?? "";
-						setTitleCategory({
-							...titleCategory,
+						setFormState((prev) => ({
+							...prev,
 							title: value,
-						});
+						}));
 					}}
 					onBlur={changeData}
 					required={true}
@@ -170,13 +150,13 @@ function RouteComponent() {
 					label="Subtitle (optional)"
 					id="category-sub"
 					placeholder="e.g. iPhone 5c, Red t-shirt"
-					value={titleCategory.subTitle}
+					value={formState.title}
 					onChange={(e) => {
 						const value = e.target.value ?? "";
-						setTitleCategory({
-							...titleCategory,
-							subTitle: value,
-						});
+						setFormState((prev) => ({
+							...prev,
+							title: value,
+						}));
 					}}
 					onBlur={changeData}
 					required={false}
@@ -197,16 +177,16 @@ function RouteComponent() {
 						label="Category"
 						labelClassName="block text-sm font-medium text-gray-700"
 						id="category"
-						selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${titleCategory.categoryId === 0 ? " italic text-gray-400" : ""}`}
+						selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${formState.categoryId === 0 ? " italic text-gray-400" : ""}`}
 						onChange={(e) => {
 							const value = Number.parseInt(e.target.value) || 0;
-							setTitleCategory({
-								...titleCategory,
+							setFormState((prev) => ({
+								...prev,
 								categoryId: value,
 								subCategoryId: 0, // reset subcategory
-							});
+							}));
 						}}
-						value={titleCategory.categoryId}
+						value={formState.categoryId}
 						onBlur={changeData}
 						required={true}
 					>
@@ -229,15 +209,15 @@ function RouteComponent() {
 					label="Sub Category"
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="category-sub"
-					selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${titleCategory.subCategoryId === 0 ? " italic text-gray-400" : ""}`}
+					selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${formState.subCategoryId === 0 ? " italic text-gray-400" : ""}`}
 					onChange={(e) => {
 						const value = Number.parseInt(e.target.value) || 0;
-						setTitleCategory({
-							...titleCategory,
+						setFormState((prev) => ({
+							...prev,
 							subCategoryId: value,
-						});
+						}));
 					}}
-					value={titleCategory.subCategoryId}
+					value={formState.subCategoryId}
 					onBlur={changeData}
 					required={true}
 					disabled={!subCatData}
@@ -259,13 +239,14 @@ function RouteComponent() {
 					label="End date"
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="end-date"
-					value={titleCategory.endDate}
-					onChange={(e) =>
-						setTitleCategory({
-							...titleCategory,
-							endDate: e.target.value,
-						})
-					}
+					value={formState.endDate}
+					onChange={(e) => {
+						const value = e.target.value ?? tomorrow;
+						setFormState((prev) => ({
+							...prev,
+							endDate: value,
+						}));
+					}}
 					onBlur={changeData}
 					required
 					pattern="\d{4}-\d{2}-\d{2}"
@@ -283,10 +264,13 @@ function RouteComponent() {
 					label="Description"
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="listing-description"
-					value={itemDetails.description}
+					value={formState.description}
 					onChange={(e) => {
 						const value = e.target.value ?? "";
-						setItemDetails({ ...itemDetails, description: value });
+						setFormState((prev) => ({
+							...prev,
+							description: value,
+						}));
 					}}
 					onBlur={changeData}
 					required={true}
@@ -312,9 +296,12 @@ function RouteComponent() {
 						name="condition"
 						value="false"
 						label="Used"
-						checked={itemDetails.condition === false}
+						checked={formState.condition === false}
 						onChange={() =>
-							setItemDetails({ ...itemDetails, condition: false })
+							setFormState((prev) => ({
+								...prev,
+								condition: false,
+							}))
 						}
 						onBlur={changeData}
 						labelClassName="ml-2 text-sm text-gray-700"
@@ -325,8 +312,13 @@ function RouteComponent() {
 						name="condition"
 						value="true"
 						label="New"
-						checked={itemDetails.condition === true}
-						onChange={() => setItemDetails({ ...itemDetails, condition: true })}
+						checked={formState.condition === true}
+						onChange={() =>
+							setFormState((prev) => ({
+								...prev,
+								condition: true,
+							}))
+						}
 						onBlur={changeData}
 						labelClassName="ml-2 text-sm text-gray-700"
 						containerClassName="flex mt-3"
@@ -341,13 +333,13 @@ function RouteComponent() {
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="listing-price"
 					placeholder="$10.00"
-					value={pricePayment.listingPrice}
+					value={formState.listingPrice}
 					onChange={(e) => {
 						checkValue(Number(e.target.value));
-						setPricePayment({
-							...pricePayment,
-							listingPrice: e.target.value,
-						});
+						setFormState((prev) => ({
+							...prev,
+							listingPrice: Number(e.target.value),
+						}));
 					}}
 					onBlur={changeData}
 					required={true}
@@ -361,12 +353,12 @@ function RouteComponent() {
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="listing-reserve"
 					placeholder="$20.00"
-					value={pricePayment.reservePrice}
+					value={formState.reservePrice}
 					onChange={(e) => {
-						setPricePayment({
-							...pricePayment,
-							reservePrice: e.target.value,
-						});
+						setFormState((prev) => ({
+							...prev,
+							reservePrice: Number(e.target.value),
+						}));
 					}}
 					onBlur={changeData}
 				/>
@@ -384,12 +376,12 @@ function RouteComponent() {
 						<Checkbox
 							id="payment-credit"
 							label="Credit card"
-							checked={pricePayment.creditCardPayment}
+							checked={formState.creditCardPayment}
 							onChange={() =>
-								setPricePayment({
-									...pricePayment,
-									creditCardPayment: !pricePayment.creditCardPayment,
-								})
+								setFormState((prev) => ({
+									...prev,
+									creditCardPayment: !prev.creditCardPayment,
+								}))
 							}
 							onBlur={changeData}
 						/>
@@ -398,12 +390,12 @@ function RouteComponent() {
 						<Checkbox
 							id="payment-bank"
 							label="Bank Transfer"
-							checked={pricePayment.bankTransferPayment}
+							checked={formState.bankTransferPayment}
 							onChange={() =>
-								setPricePayment({
-									...pricePayment,
-									bankTransferPayment: !pricePayment.bankTransferPayment,
-								})
+								setFormState((prev) => ({
+									...prev,
+									bankTransferPayment: !prev.bankTransferPayment,
+								}))
 							}
 							onBlur={changeData}
 						/>
@@ -412,12 +404,12 @@ function RouteComponent() {
 						<Checkbox
 							id="payment-bitcoin"
 							label="Bitcoin"
-							checked={pricePayment.bitcoinPayment}
+							checked={formState.bitcoinPayment}
 							onChange={() =>
-								setPricePayment({
-									...pricePayment,
-									bitcoinPayment: !pricePayment.bitcoinPayment,
-								})
+								setFormState((prev) => ({
+									...prev,
+									bitcoinPayment: !prev.bitcoinPayment,
+								}))
 							}
 							onBlur={changeData}
 						/>
@@ -440,8 +432,13 @@ function RouteComponent() {
 						name="pick-up"
 						value="true"
 						label="Yes"
-						checked={shipping.pickUp === true}
-						onChange={() => setShipping({ ...shipping, pickUp: true })}
+						checked={formState.pickUp === true}
+						onChange={() =>
+							setFormState((prev) => ({
+								...prev,
+								pickUp: true,
+							}))
+						}
 						onBlur={changeData}
 						containerClassName="flex mt-3"
 						labelClassName="ml-2 text-sm text-gray-700"
@@ -451,8 +448,13 @@ function RouteComponent() {
 						name="pick-up"
 						value="false"
 						label="No"
-						checked={shipping.pickUp === false}
-						onChange={() => setShipping({ ...shipping, pickUp: false })}
+						checked={formState.pickUp === false}
+						onChange={() =>
+							setFormState((prev) => ({
+								...prev,
+								pickUp: false,
+							}))
+						}
 						onBlur={changeData}
 						containerClassName="flex mt-3"
 						labelClassName="ml-2 text-sm text-gray-700"
