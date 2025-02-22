@@ -3,8 +3,10 @@ import {
 	useParams,
 	useNavigate,
 } from "@tanstack/react-router";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { addDays, format } from "date-fns";
+import type { RootState } from "~/store";
 
 import {
 	useGetListingQuery,
@@ -30,37 +32,37 @@ export const Route = createFileRoute("/redux/$listingId")({
 
 // Add initial state types and values
 const initialState: Listing = {
-	titleCategory: {
-		id: 0,
-		title: "",
-		subTitle: "",
-		categoryId: 0,
-		subCategoryId: 0,
-		endDate: "",
-	},
-	itemDetails: {
-		condition: false,
-		description: "",
-	},
-	pricePayment: {
-		listingPrice: "",
-		reservePrice: "",
-		creditCardPayment: false,
-		bankTransferPayment: false,
-		bitcoinPayment: false,
-	},
-	shipping: {
-		pickUp: false,
-		shippingOption: "",
-	},
+	id: 0,
+	title: "",
+	subTitle: "",
+	categoryId: 0,
+	subCategoryId: 0,
+	endDate: "",
+	condition: false,
+	description: "",
+	listingPrice: "",
+	reservePrice: "",
+	creditCardPayment: false,
+	bankTransferPayment: false,
+	bitcoinPayment: false,
+	pickUp: false,
+	shippingOption: "",
 };
 
 function RouteComponent() {
+	const dispatch = useDispatch();
 	const navigate = useNavigate({ from: Route.fullPath });
 	const { listingId } = useParams({ from: Route.id });
 
+	const [updateListing] = useUpdateListingMutation();
+
+	// Get initial state from Redux
+	const reduxListing = useSelector((state: RootState) =>
+		state.listing ? state.listing : initialState,
+	);
+
 	// Local state for form
-	const [formState, setFormState] = useState<Listing>(initialState);
+	const [formState, setFormState] = useState<Listing>(reduxListing);
 
 	const today = new Date();
 	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
@@ -71,54 +73,26 @@ function RouteComponent() {
 		isLoading: loadingListing,
 		isError: loadingError,
 	} = useGetListingQuery(listingId);
-	const { titleCategory, itemDetails, pricePayment, shipping } =
-		listingData || initialState;
 
-	const { data: parentCatData, isLoading: loadingCategory } =
-		useGetParentCategoriesQuery();
-	const { data: subCatData, isLoading: loadingSubCategory } =
-		useGetSubCategoriesQuery(titleCategory.categoryId || 0);
+	// const { data: parentCatData, isLoading: loadingCategory } =
+	// 	useGetParentCategoriesQuery();
+	// const { data: subCatData, isLoading: loadingSubCategory } =
+	// 	useGetSubCategoriesQuery(titleCategory.categoryId || 0);
 
 	useEffect(() => {
 		if (listingData) {
-			setFormState({
-				titleCategory: {
-					id: listingData.id,
-					title: listingData.title,
-					subTitle: listingData.subTitle,
-					categoryId: listingData.categoryId,
-					subCategoryId: listingData.subCategoryId,
-					endDate: listingData.endDate,
-				},
-				itemDetails: {
-					condition: listingData.condition,
-					description: listingData.description,
-				},
-				pricePayment: {
-					listingPrice: listingData.listingPrice,
-					reservePrice: listingData.reservePrice || "0.00",
-					creditCardPayment: listingData.creditCardPayment || false,
-					bankTransferPayment: listingData.bankTransferPayment || false,
-					bitcoinPayment: listingData.bitcoinPayment || false,
-				},
-				shipping: {
-					pickUp: listingData.pickUp || false,
-					shippingOption: listingData.shippingOption || "",
-				},
-			});
+			setFormState(listingData);
 		}
 	}, [listingData]);
 
-	const [updateListing] = useUpdateListingMutation();
-
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+
 		try {
 			const result = await updateListing({
 				id: listingId,
-				listing: formState
+				listing: formState,
 			}).unwrap();
-			
 			if (result === 1) {
 				navigate({ to: "/redux" });
 			}
@@ -141,13 +115,13 @@ function RouteComponent() {
 					label="Listing title"
 					id="listing-title"
 					placeholder="e.g. iPhone 5c, Red t-shirt"
-					value={formState.titleCategory.title}
+					value={formState.title}
 					onChange={(e) => {
 						const value = e.target.value ?? "";
 						console.log(value);
 						setFormState((prev) => ({
 							...prev,
-							titleCategory: { ...prev.titleCategory, title: value },
+							title: value,
 						}));
 					}}
 					required={true}
