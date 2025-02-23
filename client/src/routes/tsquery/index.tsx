@@ -4,6 +4,7 @@ import api from "~/api";
 import ListingTile from "~/components/listingTile";
 import type { Listing, RawListing } from "~/models";
 import Skeleton from "~/components/skeleton";
+import ErrorMessage from "~/components/errorMessage";
 
 export const Route = createFileRoute("/tsquery/")({
 	component: RouteComponent,
@@ -44,7 +45,7 @@ function RouteComponent() {
 		},
 	});
 
-	if (error) return <p>Error: {error.message}</p>;
+	if (error) return <ErrorMessage message={error?.message} />;
 	return (
 		<>
 			<div className="my-4">

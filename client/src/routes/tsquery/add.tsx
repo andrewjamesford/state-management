@@ -129,7 +129,6 @@ function RouteComponent() {
 							title: value,
 						}));
 					}}
-					onBlur={changeData}
 					required={true}
 					maxLength={80}
 					minLength={3}
@@ -156,7 +155,6 @@ function RouteComponent() {
 							title: value,
 						}));
 					}}
-					onBlur={changeData}
 					required={false}
 					maxLength={50}
 					className="block w-full px-3 py-2 mt-1 border rounded-md placeholder:italic peer"
@@ -185,7 +183,6 @@ function RouteComponent() {
 							}));
 						}}
 						value={formState.categoryId}
-						onBlur={changeData}
 						required={true}
 					>
 						<option value={0} className="text-muted-foreground italic">
@@ -216,7 +213,6 @@ function RouteComponent() {
 						}));
 					}}
 					value={formState.subCategoryId}
-					onBlur={changeData}
 					required={true}
 					disabled={!subCatData}
 				>
@@ -245,7 +241,6 @@ function RouteComponent() {
 							endDate: value,
 						}));
 					}}
-					onBlur={changeData}
 					required
 					pattern="\d{4}-\d{2}-\d{2}"
 					min={tomorrow}
@@ -270,7 +265,6 @@ function RouteComponent() {
 							description: value,
 						}));
 					}}
-					onBlur={changeData}
 					required={true}
 					maxLength={500}
 					minLength={10}
@@ -301,7 +295,6 @@ function RouteComponent() {
 								condition: false,
 							}))
 						}
-						onBlur={changeData}
 						labelClassName="ml-2 text-sm text-gray-700"
 						containerClassName="flex mt-3"
 					/>
@@ -317,7 +310,6 @@ function RouteComponent() {
 								condition: true,
 							}))
 						}
-						onBlur={changeData}
 						labelClassName="ml-2 text-sm text-gray-700"
 						containerClassName="flex mt-3"
 					/>
@@ -339,7 +331,6 @@ function RouteComponent() {
 							listingPrice: Number(e.target.value),
 						}));
 					}}
-					onBlur={changeData}
 					required={true}
 					errorMessage="Price must be less than $10"
 					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
@@ -358,7 +349,6 @@ function RouteComponent() {
 							reservePrice: Number(e.target.value),
 						}));
 					}}
-					onBlur={changeData}
 				/>
 			</div>
 			<fieldset>
@@ -381,7 +371,6 @@ function RouteComponent() {
 									creditCardPayment: !prev.creditCardPayment,
 								}))
 							}
-							onBlur={changeData}
 						/>
 					</div>
 					<div className="flex mt-3">
@@ -395,7 +384,6 @@ function RouteComponent() {
 									bankTransferPayment: !prev.bankTransferPayment,
 								}))
 							}
-							onBlur={changeData}
 						/>
 					</div>
 					<div className="flex mt-3">
@@ -409,7 +397,6 @@ function RouteComponent() {
 									bitcoinPayment: !prev.bitcoinPayment,
 								}))
 							}
-							onBlur={changeData}
 						/>
 					</div>
 				</div>
@@ -437,7 +424,6 @@ function RouteComponent() {
 								pickUp: true,
 							}))
 						}
-						onBlur={changeData}
 						containerClassName="flex mt-3"
 						labelClassName="ml-2 text-sm text-gray-700"
 					/>
@@ -453,7 +439,6 @@ function RouteComponent() {
 								pickUp: false,
 							}))
 						}
-						onBlur={changeData}
 						containerClassName="flex mt-3"
 						labelClassName="ml-2 text-sm text-gray-700"
 					/>

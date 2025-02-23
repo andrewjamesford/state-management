@@ -6,10 +6,9 @@ import {
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { addDays, format, isWithinInterval } from "date-fns";
 import { useEffect, useState } from "react";
-import type { Listing } from "~/models";
-import { listingSchema } from "~/models";
-import Loader from "~/components/loader";
+import { type Listing, type Category, listingSchema } from "~/models";
 import api from "~/api";
+import Loader from "~/components/loader";
 import RadioButton from "~/components/radioButton";
 import DateInput from "~/components/dateInput";
 import TextInput from "~/components/textInput";
@@ -17,18 +16,15 @@ import Select from "~/components/select";
 import Textarea from "~/components/textarea";
 import MoneyTextInput from "~/components/moneyTextInput";
 import Checkbox from "~/components/Checkbox";
+import ErrorMessage from "~/components/errorMessage";
 import SubmitButton from "~/components/submitButton";
 
 export const Route = createFileRoute("/tsquery/$listingId")({
 	component: RouteComponent,
 });
 
-interface Category {
-	id: number;
-	category_name: string;
-}
-
 /**
+ * @fileoverview
  * A React component for editing listing details.
  * Uses TanStack Router for routing and TanStack Query for data management.
  *
@@ -39,12 +35,6 @@ interface Category {
  * - Validates dates within allowed range
  * - Supports multiple payment methods
  * - Handles shipping and pickup options
- *
- * @component
- * @example
- * ```tsx
- * <RouteComponent />
- * ```
  *
  * @remarks
  * The component uses several custom form components:
@@ -58,8 +48,23 @@ interface Category {
  *
  * Form data is validated and submitted via mutation to update the formState.
  * On successful update, user is redirected to listings page.
+ * @module RouteComponent
  */
 
+/**
+ * React component that renders a form to update listing details.
+ *
+ * @returns {JSX.Element} The rendered listing update form.
+ *
+ * @example
+ * // Usage within a routed component:
+ * <RouteComponent />
+ *
+ * @remarks
+ * - The form dynamically fetches and displays listing, category, and sub-category data.
+ * - Uses local state to manage form inputs in sync with external API data.
+ * - On submission, the updateListing mutation is invoked and the user is navigated on successful update.
+ */
 function RouteComponent() {
 	const today = new Date();
 	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
@@ -69,10 +74,10 @@ function RouteComponent() {
 		from: Route.fullPath,
 	});
 
+	// Local state for form
 	const [formState, setFormState] = useState(listingSchema);
 
 	const { listingId } = useParams({ from: Route.id });
-	const prevDate = format(tomorrow, "yyyy-MM-dd");
 
 	const {
 		data: listingData,
@@ -186,9 +191,9 @@ function RouteComponent() {
 		return navigate({ to: "/tsquery" });
 	};
 
-	if (parentError) return <p>Error: {parentError.message}</p>;
-	if (subCatError) return <p>Error: {subCatError.message}</p>;
-	if (listingError) return <p>Error: {listingError.message}</p>;
+	if (parentError) return <ErrorMessage message={parentError.message} />;
+	if (subCatError) return <ErrorMessage message={subCatError.message} />;
+	if (listingError) return <ErrorMessage message={listingError.message} />;
 	if (loadingListing) return <Loader height={50} width={50} />;
 
 	return (
@@ -321,7 +326,7 @@ function RouteComponent() {
 					label="End date"
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="end-date"
-					value={formState.endDate}
+					value={format(formState.endDate, "yyyy-MM-dd")}
 					onChange={(e) =>
 						setFormState((prev) => ({
 							...prev,
@@ -416,7 +421,7 @@ function RouteComponent() {
 					onChange={(e) => {
 						setFormState((prev) => ({
 							...prev,
-							listingPrice: Number(e.target.value),
+							listingPrice: Number.parseFloat(e.target.value),
 						}));
 					}}
 				/>
@@ -432,7 +437,7 @@ function RouteComponent() {
 					onChange={(e) => {
 						setFormState((prev) => ({
 							...prev,
-							reservePrice: Number(e.target.value),
+							reservePrice: Number.parseFloat(e.target.value),
 						}));
 					}}
 				/>

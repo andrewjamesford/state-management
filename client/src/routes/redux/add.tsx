@@ -19,6 +19,7 @@ import Select from "~/components/select";
 import Textarea from "~/components/textarea";
 import MoneyTextInput from "~/components/moneyTextInput";
 import Checkbox from "~/components/Checkbox";
+import ErrorMessage from "~/components/errorMessage";
 
 export const Route = createFileRoute("/redux/add")({
 	component: RouteComponent,
@@ -55,10 +56,16 @@ function RouteComponent() {
 
 	const [addListing] = useAddListingMutation();
 
-	const { data: parentCatData, isLoading: loadingCategory = false } =
-		useGetParentCategoriesQuery();
-	const { data: subCatData, isLoading: loadingSubCategory = false } =
-		useGetSubCategoriesQuery(formState.categoryId || 0);
+	const {
+		data: parentCatData,
+		isLoading: loadingCategory,
+		isError: parentError,
+	} = useGetParentCategoriesQuery();
+	const {
+		data: subCatData,
+		isLoading: loadingSubCategory,
+		isError: subCatError,
+	} = useGetSubCategoriesQuery(formState.categoryId || 0);
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -79,8 +86,11 @@ function RouteComponent() {
 		}
 	};
 
-	// ... Rest of the component remains similar but using Redux dispatch instead of setState
-	// Here's a sample of the changes:
+	if (parentError)
+		return <ErrorMessage message="Error: Error loading Categories" />;
+	if (subCatError)
+		return <ErrorMessage message="Error: Error loading Sub-Categories" />;
+	if (loadingCategory) return <Loader height={50} width={50} />;
 
 	return (
 		<form onSubmit={handleSubmit} noValidate className="group">

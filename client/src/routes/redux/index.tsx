@@ -3,6 +3,7 @@ import { useGetListingsQuery } from "~/store/listingApi";
 import ListingTile from "~/components/listingTile";
 import type { Listing } from "~/models";
 import Skeleton from "~/components/skeleton";
+import ErrorMessage from "~/components/errorMessage";
 
 export const Route = createFileRoute("/redux/")({
 	component: RouteComponent,
@@ -30,7 +31,7 @@ export const Route = createFileRoute("/redux/")({
 function RouteComponent() {
 	const { data: auctions = [], isLoading, error } = useGetListingsQuery();
 
-	if (error) return <p>Error: {error.toString()}</p>;
+	if (error) return <ErrorMessage message={error?.toString()} />;
 	return (
 		<>
 			<div className="my-4">
