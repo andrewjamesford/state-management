@@ -1,6 +1,6 @@
 // import { useActionState } from "react";
 
-import type { Listing, Category, ListingSchema } from "~/models";
+import type { Category, ListingSchema } from "~/models";
 import RadioButton from "~/components/radioButton";
 import DateInput from "~/components/dateInput";
 import TextInput from "~/components/textInput";
@@ -94,7 +94,7 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 				{/* Category */}
 				{loadingCategory && <Loader width={20} height={20} />}
 
-				{!loadingCategory && (
+				{!loadingCategory && categoryData && (
 					<Select
 						label="Category"
 						labelClassName="block text-sm font-medium text-gray-700"
@@ -128,8 +128,7 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 			<div className="mt-6">
 				{/* Sub Category */}
 				{loadingSubCategory && <Loader width={20} height={20} />}
-
-				{!loadingSubCategory && (
+				{!loadingCategory && !loadingSubCategory && subCategoryData && (
 					<Select
 						label="Sub Category"
 						labelClassName="block text-sm font-medium text-gray-700"
@@ -139,7 +138,7 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 							const value = Number.parseInt(e.target.value) || 0;
 							setFormState((prev) => ({
 								...prev,
-								titleCategory: { ...prev, subCategoryId: value },
+								subCategoryId: value,
 							}));
 						}}
 						value={formState.subCategoryId}
@@ -259,12 +258,13 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 					label="Start price"
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="listing-price"
-					placeholder="$10.00"
+					placeholder="10.00"
 					value={formState.listingPrice}
 					onChange={(e) => {
+						const value = e.target.value ?? "0";
 						setFormState((prev) => ({
 							...prev,
-							listingPrice: Number.parseFloat(e.target.value),
+							listingPrice: Number(value) || 0,
 						}));
 					}}
 				/>
@@ -278,9 +278,10 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 					placeholder="$20.00"
 					value={formState.reservePrice}
 					onChange={(e) => {
+						const value = e.target.value ?? "0";
 						setFormState((prev) => ({
 							...prev,
-							reservePrice: Number.parseFloat(e.target.value),
+							reservePrice: Number(value) || 0,
 						}));
 					}}
 				/>
