@@ -10,7 +10,7 @@ import {
 	useGetParentCategoriesQuery,
 	useGetSubCategoriesQuery,
 } from "~/store/listingApi";
-import type { Listing } from "~/models";
+import type { Listing, Category } from "~/models";
 import Loader from "~/components/loader";
 import ErrorMessage from "~/components/errorMessage";
 import ListingForm from "~/forms/listingForm";
@@ -51,12 +51,12 @@ function RouteComponent() {
 	const [addListing] = useAddListingMutation();
 
 	const {
-		data: categoryData,
+		data: categoryData = [] as Category[],
 		isLoading: loadingCategory,
 		isError: parentError,
 	} = useGetParentCategoriesQuery();
 	const {
-		data: subCategoryData,
+		data: subCategoryData = [] as Category[],
 		isLoading: loadingSubCategory,
 		isError: subCatError,
 	} = useGetSubCategoriesQuery(formState.categoryId || 0);
@@ -70,13 +70,14 @@ function RouteComponent() {
 		}
 
 		try {
-			const result = await addListing({ listing: formState }).unwrap();
-			if (result === 1) {
+			const response = await addListing({ listing: formState }).unwrap();
+			if (response === 1) {
 				dispatch(resetState());
 				navigate({ to: "/redux" });
 			}
-		} catch (error) {
-			alert(error instanceof Error ? error.message : "An error occurred");
+		} catch (err: unknown) {
+			const error = err as { data?: { message: string }; message: string };
+			alert(error.data?.message || error.message || "An error occurred");
 		}
 	};
 
@@ -92,7 +93,6 @@ function RouteComponent() {
 				listingId={0}
 				formState={formState}
 				setFormState={setFormState}
-				today={today}
 				tomorrow={tomorrow}
 				fortnight={fortnight}
 				loadingCategory={loadingCategory}

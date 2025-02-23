@@ -46,7 +46,7 @@ export interface ListingSchema {
 	subTitle: string;
 	categoryId: number;
 	subCategoryId: number;
-	endDate: string;
+	endDate: Date;
 	description: string;
 	condition: boolean;
 	listingPrice: number;
@@ -64,7 +64,7 @@ export const listingSchema: ListingSchema = {
 	categoryId: 0,
 	subCategoryId: 0,
 	subTitle: "",
-	endDate: endDate,
+	endDate: new Date(),
 	description: "",
 	condition: false,
 	listingPrice: 0,

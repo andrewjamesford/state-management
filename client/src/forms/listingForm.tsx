@@ -1,6 +1,6 @@
 // import { useActionState } from "react";
 
-import type { Listing, Category, listingSchema } from "~/models";
+import type { Listing, Category, ListingSchema } from "~/models";
 import RadioButton from "~/components/radioButton";
 import DateInput from "~/components/dateInput";
 import TextInput from "~/components/textInput";
@@ -14,9 +14,8 @@ import { format } from "date-fns/format";
 
 interface ListingFormProps {
 	listingId?: number;
-	formState: listingSchema;
-	setFormState: (state: FormState | ((prev: FormState) => FormState)) => void;
-	today: string;
+	formState: ListingSchema;
+	setFormState: React.Dispatch<React.SetStateAction<ListingSchema>>;
 	tomorrow: string;
 	fortnight: string;
 	loadingCategory: boolean;
@@ -30,7 +29,6 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 		listingId = 0,
 		formState,
 		setFormState,
-		today,
 		tomorrow,
 		fortnight,
 		loadingCategory,
@@ -168,13 +166,16 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 					label="End date"
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="end-date"
-					value={format(formState.endDate, "yyyy-MM-dd")}
-					onChange={(e) =>
+					value={
+						formState.endDate ? format(formState.endDate, "yyyy-MM-dd") : ""
+					}
+					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+						const endDate = new Date(e.target.value);
 						setFormState((prev) => ({
 							...prev,
-							endDate: e.target.value,
-						}))
-					}
+							endDate,
+						}));
+					}}
 					required
 					pattern="\d{4}-\d{2}-\d{2}"
 					min={tomorrow}
@@ -300,7 +301,7 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 							label="Credit card"
 							checked={formState.creditCardPayment}
 							onChange={() => {
-								setFormState((prev) => ({
+								setFormState((prev: ListingSchema) => ({
 									...prev,
 									creditCardPayment: !prev.creditCardPayment,
 								}));
@@ -313,7 +314,7 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 							label="Bank Transfer"
 							checked={formState.bankTransferPayment}
 							onChange={() => {
-								setFormState((prev) => ({
+								setFormState((prev: ListingSchema) => ({
 									...prev,
 									bankTransferPayment: !prev.bankTransferPayment,
 								}));
@@ -326,7 +327,7 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 							label="Bitcoin"
 							checked={formState.bitcoinPayment}
 							onChange={() => {
-								setFormState((prev) => ({
+								setFormState((prev: ListingSchema) => ({
 									...prev,
 									bitcoinPayment: !prev.bitcoinPayment,
 								}));
