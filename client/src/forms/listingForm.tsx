@@ -1,29 +1,43 @@
 // import { useActionState } from "react";
 
-import { type Listing, type Category, listingSchema } from "~/models";
+import type { Listing, Category, listingSchema } from "~/models";
 import RadioButton from "~/components/radioButton";
 import DateInput from "~/components/dateInput";
 import TextInput from "~/components/textInput";
 import Select from "~/components/select";
 import Textarea from "~/components/textarea";
 import MoneyTextInput from "~/components/moneyTextInput";
-import Checkbox from "~/components/Checkbox";
+import Checkbox from "~/components/checkbox";
 import SubmitButton from "~/components/submitButton";
 import Loader from "~/components/loader";
 import { format } from "date-fns/format";
 
-export default function ListingForm({
-	listingId: number,
-	formState,
-	setFormState,
-	today,
-	tomorrow,
-	fortnight,
-	loadingCategory,
-	loadingSubCategory,
-	categoryData,
-	subCategoryData,
-}) {
+interface ListingFormProps {
+	listingId?: number;
+	formState: listingSchema;
+	setFormState: (state: FormState | ((prev: FormState) => FormState)) => void;
+	today: string;
+	tomorrow: string;
+	fortnight: string;
+	loadingCategory: boolean;
+	loadingSubCategory: boolean;
+	categoryData: Category[] | null;
+	subCategoryData: Category[] | null;
+}
+
+export default function ListingForm(listingFormProps: ListingFormProps) {
+	const {
+		listingId = 0,
+		formState,
+		setFormState,
+		today,
+		tomorrow,
+		fortnight,
+		loadingCategory,
+		loadingSubCategory,
+		categoryData,
+		subCategoryData,
+	} = listingFormProps;
 	return (
 		<>
 			<h1 className="mt-4 text-2xl font-bold">What are you listing?</h1>
