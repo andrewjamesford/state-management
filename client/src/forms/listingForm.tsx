@@ -1,5 +1,3 @@
-// import { useActionState } from "react";
-
 import type { Category, ListingSchema } from "~/models";
 import RadioButton from "~/components/radioButton";
 import DateInput from "~/components/dateInput";
@@ -10,7 +8,7 @@ import MoneyTextInput from "~/components/moneyTextInput";
 import Checkbox from "~/components/checkbox";
 import SubmitButton from "~/components/submitButton";
 import Loader from "~/components/loader";
-import { format } from "date-fns/format";
+import { format } from "date-fns";
 
 interface ListingFormProps {
 	listingId?: number;

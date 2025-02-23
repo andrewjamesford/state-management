@@ -3,8 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import api from "~/api";
 import ListingTile from "~/components/listingTile";
 import type { Listing, RawListing } from "~/models";
-import Skeleton from "~/components/skeleton";
 import ErrorMessage from "~/components/errorMessage";
+import Skeleton from "~/components/skeleton";
 
 export const Route = createFileRoute("/tsquery/")({
 	component: RouteComponent,

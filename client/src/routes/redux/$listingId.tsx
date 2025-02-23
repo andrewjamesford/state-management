@@ -4,7 +4,7 @@ import {
 	useNavigate,
 } from "@tanstack/react-router";
 import { useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { addDays, format } from "date-fns";
 import type { RootState } from "~/store";
 import {
@@ -13,9 +13,8 @@ import {
 	useGetParentCategoriesQuery,
 	useGetSubCategoriesQuery,
 } from "~/store/listingApi";
-import { type Listing, type Category, listingSchema } from "~/models";
+import { listingSchema, type ListingSchema, type Listing } from "~/models";
 import Loader from "~/components/loader";
-
 import ErrorMessage from "~/components/errorMessage";
 import ListingForm from "~/forms/listingForm";
 
@@ -69,7 +68,12 @@ function RouteComponent() {
 	);
 
 	// Local state for form
-	const [formState, setFormState] = useState(reduxListing);
+	const [formState, setFormState] = useState<ListingSchema>(() => ({
+		...reduxListing,
+		endDate: new Date(reduxListing.endDate),
+		listingPrice: Number(reduxListing.listingPrice),
+		reservePrice: Number(reduxListing.reservePrice)
+	}));
 
 	const { listingId } = useParams({ from: Route.id });
 
@@ -95,7 +99,12 @@ function RouteComponent() {
 
 	useEffect(() => {
 		if (listingData) {
-			setFormState(listingData);
+			setFormState({
+				...listingData,
+				endDate: new Date(listingData.endDate),
+				listingPrice: Number(listingData.listingPrice),
+				reservePrice: Number(listingData.reservePrice)
+			});
 		}
 	}, [listingData]);
 
@@ -103,13 +112,17 @@ function RouteComponent() {
 		e.preventDefault();
 
 		try {
+			const updatedListing: Listing = {
+				...formState,
+				endDate: format(formState.endDate, 'yyyy-MM-dd'),
+				listingPrice: String(formState.listingPrice),
+				reservePrice: String(formState.reservePrice)
+			};
 			const result = await updateListing({
 				id: listingId,
-				listing: formState,
+				listing: updatedListing,
 			}).unwrap();
-			if (result?.message) {
-				alert(result?.message);
-			}
+			
 			if (result === 1) {
 				navigate({ to: "/redux" });
 			}
@@ -128,16 +141,15 @@ function RouteComponent() {
 	return (
 		<form onSubmit={handleSubmit} noValidate className="group">
 			<ListingForm
-				listingId={0}
+				listingId={Number(listingId)}
 				formState={formState}
 				setFormState={setFormState}
-				today={today}
 				tomorrow={tomorrow}
 				fortnight={fortnight}
 				loadingCategory={loadingCategory}
 				loadingSubCategory={loadingSubCategory}
-				categoryData={categoryData}
-				subCategoryData={subCategoryData}
+				categoryData={categoryData ?? null}
+				subCategoryData={subCategoryData ?? null}
 			/>
 		</form>
 	);

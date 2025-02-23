@@ -5,11 +5,10 @@ import {
 } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { addDays, format, isWithinInterval } from "date-fns";
-import { useEffect, useState } from "react";
-import { type Listing, type Category, listingSchema } from "~/models";
+import { useState, useEffect } from "react";
+import { type Listing, type ListingSchema, listingSchema } from "~/models";
 import api from "~/api";
 import Loader from "~/components/loader";
-
 import ErrorMessage from "~/components/errorMessage";
 import ListingForm from "~/forms/listingForm";
 
@@ -119,28 +118,25 @@ function RouteComponent() {
 
 	useEffect(() => {
 		if (listingData) {
-			const isValidDate: boolean = isWithinInterval(
-				new Date(listingData.enddate),
-				{
-					start: tomorrow,
-					end: fortnight,
-				},
-			);
-			const newEndDate = isValidDate
-				? format(listingData.enddate, "yyyy-MM-dd")
-				: format(tomorrow, "yyyy-MM-dd");
+			const newEndDate = new Date(listingData.enddate);
+			const isValidDate = isWithinInterval(newEndDate, {
+				start: new Date(tomorrow),
+				end: new Date(fortnight),
+			});
+			
+			const endDate = isValidDate ? newEndDate : new Date(tomorrow);
 
 			setFormState((prev) => ({
 				...prev,
 				title: listingData.title,
 				subTitle: listingData.subtitle,
-				endDate: newEndDate,
+				endDate,
 				categoryId: listingData?.categoryid,
 				subCategoryId: listingData?.subcategoryid,
 				description: listingData.listingdescription,
 				condition: listingData.condition,
 				listingPrice: listingData.listingprice,
-				reservePrice: listingData.reserveprice,
+				reservePrice: listingData.reserveprice || 0,
 				creditCardPayment: listingData.creditcardpayment,
 				bankTransferPayment: listingData.banktransferpayment,
 				bitcoinPayment: listingData.bitcoinpayment,
@@ -148,13 +144,18 @@ function RouteComponent() {
 				shippingOption: listingData.shippingoption,
 			}));
 		}
-	}, [loadingListing, listingData]);
+	}, [listingData, tomorrow, fortnight]);
 
 	// Add mutation hook for updating the listing
 	const updateListingMutation = useMutation({
-		mutationFn: async (listing: Listing) => {
-			if (formState.reservePrice === "") formState.reservePrice = "0.00";
-			const response = await api.updateListing(listingId, listing);
+		mutationFn: async (listing: ListingSchema) => {
+			const updatedListing: Listing = {
+				...listing,
+				endDate: format(listing.endDate, 'yyyy-MM-dd'),
+				listingPrice: String(listing.listingPrice),
+				reservePrice: String(listing.reservePrice)
+			};
+			const response = await api.updateListing(listingId, updatedListing);
 			if (!response.ok) {
 				throw new Error("Error updating listing");
 			}
@@ -197,7 +198,6 @@ function RouteComponent() {
 				listingId={0}
 				formState={formState}
 				setFormState={setFormState}
-				today={today}
 				tomorrow={tomorrow}
 				fortnight={fortnight}
 				loadingCategory={loadingCategory}

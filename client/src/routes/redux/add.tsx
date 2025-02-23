@@ -1,16 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
-
+import { useDispatch } from "react-redux";
+import { useState } from "react";
 import { addDays, format } from "date-fns";
-import type { RootState } from "~/store";
-import { setListing, resetState } from "~/store/listingSlice";
+import { resetState } from "~/store/listingSlice";
 import {
 	useAddListingMutation,
 	useGetParentCategoriesQuery,
 	useGetSubCategoriesQuery,
 } from "~/store/listingApi";
-import type { Listing, Category } from "~/models";
+import type { Listing, Category, ListingSchema } from "~/models";
 import Loader from "~/components/loader";
 import ErrorMessage from "~/components/errorMessage";
 import ListingForm from "~/forms/listingForm";
@@ -20,17 +18,17 @@ export const Route = createFileRoute("/redux/add")({
 });
 
 // Add initial state types and values
-const initialState: Listing = {
+const initialState: ListingSchema = {
 	id: 0,
 	title: "",
 	subTitle: "",
 	categoryId: 0,
 	subCategoryId: 0,
-	endDate: "",
+	endDate: new Date(),
 	condition: false,
 	description: "",
-	listingPrice: "",
-	reservePrice: "",
+	listingPrice: 0,
+	reservePrice: 0,
 	creditCardPayment: false,
 	bankTransferPayment: false,
 	bitcoinPayment: false,
@@ -42,11 +40,14 @@ function RouteComponent() {
 	const dispatch = useDispatch();
 	const navigate = useNavigate({ from: Route.fullPath });
 
-	const [formState, setFormState] = useState<Listing>(initialState);
-
 	const today = new Date();
 	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
 	const fortnight = format(addDays(today, 14), "yyyy-MM-dd");
+
+	const [formState, setFormState] = useState<ListingSchema>({
+		...initialState,
+		endDate: new Date(tomorrow)
+	});
 
 	const [addListing] = useAddListingMutation();
 
@@ -70,7 +71,13 @@ function RouteComponent() {
 		}
 
 		try {
-			const response = await addListing({ listing: formState }).unwrap();
+			const listingToAdd: Listing = {
+				...formState,
+				endDate: format(formState.endDate, 'yyyy-MM-dd'),
+				listingPrice: String(formState.listingPrice),
+				reservePrice: String(formState.reservePrice)
+			};
+			const response = await addListing({ listing: listingToAdd }).unwrap();
 			if (response === 1) {
 				dispatch(resetState());
 				navigate({ to: "/redux" });
