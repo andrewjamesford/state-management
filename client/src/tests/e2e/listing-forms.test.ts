@@ -94,11 +94,41 @@ test.describe('Listing Forms', () => {
         // Check for validation messages
         await expect(page.locator('text="Please enter a listing title of 3-80 characters"')).toBeVisible();
         await expect(page.locator('text="Please enter a description of 10-500 characters"')).toBeVisible();
+        await expect(page.locator('#category')).toHaveAttribute('required', '');
+        await expect(page.locator('#end-date')).toHaveAttribute('required', '');
         
         // Fill just the title and verify other validations still show
         await page.fill('#listing-title', 'Test');
         await page.click('button[type="submit"]');
         await expect(page.locator('text="Please enter a description of 10-500 characters"')).toBeVisible();
+      });
+
+      test('should handle date validation', async ({ page }) => {
+        await page.goto(`${BASE_URL}/${stateManager}/add`);
+        
+        // Try setting past date
+        const yesterday = format(addDays(new Date(), -1), 'yyyy-MM-dd');
+        await page.fill('#end-date', yesterday);
+        await page.click('button[type="submit"]');
+        
+        // Verify error for past date
+        await expect(page.locator('text="Please select a future date between tomorrow and two weeks from now"')).toBeVisible();
+        
+        // Try setting date too far in future
+        const tooFar = format(addDays(new Date(), 15), 'yyyy-MM-dd');
+        await page.fill('#end-date', tooFar);
+        await page.click('button[type="submit"]');
+        
+        // Verify error for date too far in future
+        await expect(page.locator('text="Please select a future date between tomorrow and two weeks from now"')).toBeVisible();
+        
+        // Set valid date
+        const validDate = format(addDays(new Date(), 7), 'yyyy-MM-dd');
+        await page.fill('#end-date', validDate);
+        await page.click('button[type="submit"]');
+        
+        // Verify date error is gone
+        await expect(page.locator('text="Please select a future date between tomorrow and two weeks from now"')).not.toBeVisible();
       });
 
       test('should handle payment option validation', async ({ page }) => {
@@ -119,6 +149,35 @@ test.describe('Listing Forms', () => {
         
         // Verify error message
         await expect(page.locator('text="At least one of the payment methods must be selected"')).toBeVisible();
+        
+        // Select one payment option
+        await page.check('#payment-credit');
+        await page.click('button[type="submit"]');
+        
+        // Verify payment error is gone
+        await expect(page.locator('text="At least one of the payment methods must be selected"')).not.toBeVisible();
+      });
+
+      test('should handle shipping options', async ({ page }) => {
+        await page.goto(`${BASE_URL}/${stateManager}/add`);
+        
+        // Check pickup options toggle correctly
+        await page.check('#pick-up-true');
+        await expect(page.locator('#pick-up-true')).toBeChecked();
+        await expect(page.locator('#pick-up-false')).not.toBeChecked();
+        
+        await page.check('#pick-up-false');
+        await expect(page.locator('#pick-up-false')).toBeChecked();
+        await expect(page.locator('#pick-up-true')).not.toBeChecked();
+        
+        // Check shipping options toggle correctly
+        await page.check('#shipping-option-courier');
+        await expect(page.locator('#shipping-option-courier')).toBeChecked();
+        await expect(page.locator('#shipping-option-post')).not.toBeChecked();
+        
+        await page.check('#shipping-option-post');
+        await expect(page.locator('#shipping-option-post')).toBeChecked();
+        await expect(page.locator('#shipping-option-courier')).not.toBeChecked();
       });
     });
   }
