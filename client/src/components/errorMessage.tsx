@@ -6,13 +6,13 @@
  * @returns {JSX.Element} The rendered error message component.
  */
 interface ErrorMessageProps {
-	message: string;
+	message?: string;
 }
 
-export default function ErrorMessage({ message }: ErrorMessageProps) {
+export default function ErrorMessage({ message = "An error occurred" }: ErrorMessageProps) {
 	return (
 		<div
-			className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4"
+			className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 text-red-500"
 			role="alert"
 		>
 			<p className="font-bold">Error</p>
