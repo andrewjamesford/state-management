@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { format } from 'date-fns';
-import type { Listing, ListingSchema, Category } from '~/models';
+import type { Listing, ListingSchema, Category, RawListing } from '~/models';
 import api from '~/api';
 
 interface ListingStore {
@@ -25,7 +25,7 @@ const initialListing: Listing = {
   subTitle: "",
   categoryId: 0,
   subCategoryId: 0,
-  endDate: new Date(),
+  endDate: format(new Date(), 'yyyy-MM-dd'),
   condition: false,
   description: "",
   listingPrice: "0",
@@ -52,7 +52,24 @@ export const useListingStore = create<ListingStore>((set) => ({
     try {
       const response = await api.getListing(id);
       if (!response.ok) throw new Error('Failed to fetch listing');
-      const data = await response.json();
+      const rawData: RawListing = await response.json();
+      const data: Listing = {
+        id: rawData.id,
+        title: rawData.title,
+        subTitle: rawData.subtitle,
+        categoryId: rawData.categoryid,
+        subCategoryId: rawData.subcategoryid,
+        endDate: rawData.enddate,
+        description: rawData.listingdescription,
+        condition: rawData.condition,
+        listingPrice: rawData.listingprice,
+        reservePrice: rawData.reserveprice,
+        creditCardPayment: rawData.creditcardpayment,
+        bankTransferPayment: rawData.banktransferpayment,
+        bitcoinPayment: rawData.bitcoinpayment,
+        pickUp: rawData.pickup,
+        shippingOption: rawData.shippingoption,
+      };
       set({ listing: data, isLoading: false });
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'An error occurred', isLoading: false });
@@ -64,7 +81,24 @@ export const useListingStore = create<ListingStore>((set) => ({
     try {
       const response = await api.getListings();
       if (!response.ok) throw new Error('Failed to fetch listings');
-      const data = await response.json();
+      const rawData: RawListing[] = await response.json();
+      const data: Listing[] = rawData.map(raw => ({
+        id: raw.id,
+        title: raw.title,
+        subTitle: raw.subtitle,
+        categoryId: raw.categoryid,
+        subCategoryId: raw.subcategoryid,
+        endDate: raw.enddate,
+        description: raw.listingdescription,
+        condition: raw.condition,
+        listingPrice: raw.listingprice,
+        reservePrice: raw.reserveprice,
+        creditCardPayment: raw.creditcardpayment,
+        bankTransferPayment: raw.banktransferpayment,
+        bitcoinPayment: raw.bitcoinpayment,
+        pickUp: raw.pickup,
+        shippingOption: raw.shippingoption,
+      }));
       set({ listings: data, isLoading: false });
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'An error occurred', isLoading: false });
@@ -97,6 +131,7 @@ export const useListingStore = create<ListingStore>((set) => ({
   updateListing: async (id, listing) => {
     set({ isLoading: true, error: null });
     try {
+
       const listingToUpdate = {
         ...listing,
         endDate: listing.endDate ? format(listing.endDate, 'yyyy-MM-dd') : '',

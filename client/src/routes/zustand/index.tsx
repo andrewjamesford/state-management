@@ -20,12 +20,11 @@ function RouteComponent() {
   if (isLoading) return <Loader height={50} width={50} />;
 
   return (
-    <div className="container mx-auto px-4">
-      <div className="flex justify-end my-4">
+    <>
+      <div className="my-4">
         <Link
-          to="/zustand/$listingId"
-          params={{ listingId: "new" }}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          to="/zustand/add"
+          className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
         >
           Add Listing
         </Link>
@@ -40,6 +39,6 @@ function RouteComponent() {
           />
         ))}
       </div>
-    </div>
+    </>
   );
 }
