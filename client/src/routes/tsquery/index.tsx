@@ -16,16 +16,13 @@ function RouteComponent() {
 		data: auctions = [],
 		isLoading,
 		error,
-	} = useQuery({
+	} = useQuery<Listing[]>({
 		queryKey: ["listings"],
 		queryFn: async () => {
 			const response = await api.getListings();
-
 			if (!response.ok) throw new Error("Error retrieving listings");
-
-			const listings = await response.json();
-			// Transform the raw listings into a more usable format
-			const arrayListings: Listing[] = listings.map((listing: RawListing) => ({
+			const listings: RawListing[] = await response.json();
+			return listings.map((listing) => ({
 				id: listing.id,
 				title: listing.title,
 				categoryId: listing.categoryid,
@@ -40,12 +37,11 @@ function RouteComponent() {
 				bitcoinPayment: listing.bitcoinpayment,
 				pickUp: listing.pickup,
 				shippingOption: listing.shippingoption,
-			}));
-			return arrayListings;
+				}));
 		},
 	});
 
-	if (error) return <ErrorMessage message={error?.message} />;
+	if (error) return <ErrorMessage message={(error as Error)?.message} />;
 	return (
 		<>
 			<div className="my-4">

@@ -56,7 +56,7 @@ async function getDraftListing(userId: string): Promise<Response> {
  * @param {Listing} listing - The listing data to be added.
  * @returns {Promise<Response>} The fetch response promise.
  */
-async function addListing(listing: any): Promise<Response> {
+async function addListing(listing: Listing): Promise<Response> {
 	return await fetch(`${import.meta.env.VITE_API_URL}/listings`, {
 		method: "POST",
 		headers,
@@ -70,7 +70,7 @@ async function addListing(listing: any): Promise<Response> {
  * @param {Listing} listing - The updated listing data.
  * @returns {Promise<Response>} The fetch response promise.
  */
-async function updateListing(id: string, listing: any): Promise<Response> {
+async function updateListing(id: string, listing: Listing): Promise<Response> {
 	return await fetch(`${import.meta.env.VITE_API_URL}/listings/${id}`, {
 		method: "PUT",
 		headers,

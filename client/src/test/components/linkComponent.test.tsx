@@ -2,9 +2,18 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { LinkComponent } from '~/components/linkComponent';
 
+interface LinkProps {
+  children: React.ReactNode;
+  to: string;
+  className?: string;
+  activeProps?: {
+    className?: string;
+  };
+}
+
 // Mock the router Link component
 vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children, to, className, activeProps }: any) => (
+  Link: ({ children, to, className, activeProps }: LinkProps) => (
     <a href={to} className={className} data-active-props={JSON.stringify(activeProps)}>
       {children}
     </a>

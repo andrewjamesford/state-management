@@ -18,6 +18,13 @@ import Loader from "~/components/loader";
 import ErrorMessage from "~/components/errorMessage";
 import ListingForm from "~/forms/listingForm";
 
+// RTK Query error type
+interface ApiError {
+	data?: { message: string };
+	status?: number;
+	message: string;
+}
+
 export const Route = createFileRoute("/redux/$listingId")({
 	component: RouteComponent,
 });
@@ -82,19 +89,19 @@ function RouteComponent() {
 	const {
 		data: listingData,
 		isLoading: loadingListing,
-		isError: listingError,
+		error: listingError,
 	} = useGetListingQuery(listingId);
 
 	const {
 		data: categoryData,
 		isLoading: loadingCategory,
-		isError: categoryError,
+		error: categoryError,
 	} = useGetParentCategoriesQuery();
 
 	const {
 		data: subCategoryData,
 		isLoading: loadingSubCategory,
-		isError: subCategoryError,
+		error: subCategoryError,
 	} = useGetSubCategoriesQuery(formState.categoryId || 0);
 
 	useEffect(() => {
@@ -126,16 +133,18 @@ function RouteComponent() {
 			if (result === 1) {
 				navigate({ to: "/redux" });
 			}
-		} catch (error) {
-			alert(error instanceof Error ? error.message : "An error occurred");
+		} catch (err) {
+			const error = err as ApiError;
+			alert(error.data?.message || error.message || "An error occurred");
 		}
 	};
 
 	if (categoryError)
-		return <ErrorMessage message="Error: Error loading Categories" />;
+		return <ErrorMessage message={(categoryError as ApiError).data?.message || "Error loading categories"} />;
 	if (subCategoryError)
-		return <ErrorMessage message="Error: Error loading Sub-Categories" />;
-	if (listingError) return <ErrorMessage message="Failed to load listing" />;
+		return <ErrorMessage message={(subCategoryError as ApiError).data?.message || "Error loading sub-categories"} />;
+	if (listingError)
+		return <ErrorMessage message={(listingError as ApiError).data?.message || "Failed to load listing"} />;
 	if (loadingListing) return <Loader height={50} width={50} />;
 
 	return (

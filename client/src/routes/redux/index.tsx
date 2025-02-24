@@ -29,9 +29,20 @@ export const Route = createFileRoute("/redux/")({
  * that prevents layout shift and improves perceived performance.
  */
 function RouteComponent() {
-	const { data: auctions = [], isLoading, error } = useGetListingsQuery();
+	const { 
+		data: auctions = [], 
+		isLoading, 
+		error 
+	} = useGetListingsQuery(undefined, {
+		// Type the error to match RTK Query error shape
+		selectFromResult: ({ data, isLoading, error }) => ({
+			data,
+			isLoading,
+			error: error as { status: number; data: { message: string } },
+		}),
+	});
 
-	if (error) return <ErrorMessage message={error?.toString()} />;
+	if (error) return <ErrorMessage message={error.data?.message ?? 'Failed to fetch listings'} />;
 	return (
 		<>
 			<div className="my-4">

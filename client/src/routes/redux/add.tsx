@@ -13,6 +13,13 @@ import Loader from "~/components/loader";
 import ErrorMessage from "~/components/errorMessage";
 import ListingForm from "~/forms/listingForm";
 
+// RTK Query error type
+interface ApiError {
+	data?: { message: string };
+	status?: number;
+	message: string;
+}
+
 export const Route = createFileRoute("/redux/add")({
 	component: RouteComponent,
 });
@@ -54,12 +61,13 @@ function RouteComponent() {
 	const {
 		data: categoryData = [] as Category[],
 		isLoading: loadingCategory,
-		isError: parentError,
+		error: parentError,
 	} = useGetParentCategoriesQuery();
+
 	const {
 		data: subCategoryData = [] as Category[],
 		isLoading: loadingSubCategory,
-		isError: subCatError,
+		error: subCatError,
 	} = useGetSubCategoriesQuery(formState.categoryId || 0);
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -82,16 +90,16 @@ function RouteComponent() {
 				dispatch(resetState());
 				navigate({ to: "/redux" });
 			}
-		} catch (err: unknown) {
-			const error = err as { data?: { message: string }; message: string };
+		} catch (err) {
+			const error = err as ApiError;
 			alert(error.data?.message || error.message || "An error occurred");
 		}
 	};
 
 	if (parentError)
-		return <ErrorMessage message="Error: Error loading Categories" />;
+		return <ErrorMessage message={(parentError as ApiError).data?.message || "Error loading categories"} />;
 	if (subCatError)
-		return <ErrorMessage message="Error: Error loading Sub-Categories" />;
+		return <ErrorMessage message={(subCatError as ApiError).data?.message || "Error loading sub-categories"} />;
 	if (loadingCategory) return <Loader height={50} width={50} />;
 
 	return (
