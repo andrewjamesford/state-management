@@ -8,7 +8,7 @@ import MoneyTextInput from "~/components/moneyTextInput";
 import Checkbox from "~/components/checkbox";
 import SubmitButton from "~/components/submitButton";
 import Loader from "~/components/loader";
-import { format } from "date-fns";
+import { format, isDate } from "date-fns";
 
 interface ListingFormProps {
 	listingId?: number;
@@ -164,7 +164,7 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="end-date"
 					value={
-						formState.endDate ? format(formState.endDate, "yyyy-MM-dd") : ""
+						isDate(formState.endDate) ? format(formState.endDate, 'yyyy-MM-dd') : tomorrow
 					}
 					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 						const endDate = new Date(e.target.value);
