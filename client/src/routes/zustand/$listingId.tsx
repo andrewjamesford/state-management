@@ -52,15 +52,14 @@ function RouteComponent() {
 
   useEffect(() => {
     if (listing && listingId !== 'new') {
-      console.log(listing);
       setFormState({
         ...listing,
-        endDate: new Date(listing.enddate),
+        endDate: listing.endDate ? new Date(listing.endDate) : new Date(tomorrow),
         listingPrice: Number(listing.listingPrice),
         reservePrice: Number(listing.reservePrice)
       });
     }
-  }, [listing, listingId]);
+  }, [listing, listingId, tomorrow]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -80,7 +79,6 @@ function RouteComponent() {
   if (error) return <ErrorMessage message={error} />;
   if (isLoading) return <Loader height={50} width={50} />;
 
-  console.log(">>", formState.endDate, formState.enddate);
   return (
     <form onSubmit={handleSubmit} className="max-w-4xl mx-auto px-4 py-5">
       <ListingForm

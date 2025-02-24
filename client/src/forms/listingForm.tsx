@@ -164,13 +164,15 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="end-date"
 					value={
-						isDate(formState.endDate) ? format(formState.endDate, 'yyyy-MM-dd') : tomorrow
+						isDate(formState.endDate) && Number.isFinite(formState.endDate.getTime()) 
+							? format(formState.endDate, 'yyyy-MM-dd') 
+							: tomorrow
 					}
 					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-						const endDate = new Date(e.target.value);
+						const endDate = e.target.value ? new Date(e.target.value) : new Date(tomorrow);
 						setFormState((prev) => ({
 							...prev,
-							endDate,
+							endDate: Number.isFinite(endDate.getTime()) ? endDate : new Date(tomorrow),
 						}));
 					}}
 					required
