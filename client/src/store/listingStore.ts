@@ -118,11 +118,10 @@ export const useListingStore = create<ListingStore>((set) => ({
 
   fetchSubCategories: async (categoryId) => {
     try {
-      const response = await api.getCategories();
+      const response = await api.getCategories(categoryId);
       if (!response.ok) throw new Error('Failed to fetch subcategories');
       const data: Category[] = await response.json();
-      const subCategories = data.filter((cat) => cat.parent_id === categoryId);
-      set({ subCategories });
+      set({ subCategories: data });
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'An error occurred' });
     }

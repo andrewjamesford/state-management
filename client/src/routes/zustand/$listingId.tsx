@@ -56,10 +56,16 @@ function RouteComponent() {
         ...listing,
         endDate: listing.endDate ? new Date(listing.endDate) : new Date(tomorrow),
         listingPrice: Number(listing.listingPrice),
-        reservePrice: Number(listing.reservePrice)
+        reservePrice: Number(listing.reservePrice),
+        categoryId: listing.categoryId,
+        subCategoryId: listing.subCategoryId
       });
+      // Fetch subcategories when listing is loaded
+      if (listing.categoryId) {
+        fetchSubCategories(listing.categoryId);
+      }
     }
-  }, [listing, listingId, tomorrow]);
+  }, [listing, listingId, tomorrow, fetchSubCategories]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

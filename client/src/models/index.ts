@@ -1,7 +1,3 @@
-import { addDays, format } from "date-fns";
-
-export const endDate = format(addDays(new Date(), 1), "yyyy-MM-dd");
-
 export interface RawListing {
 	id: number;
 	title: string;
