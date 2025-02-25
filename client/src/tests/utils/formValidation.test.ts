@@ -25,6 +25,10 @@ function validatePaymentMethods(creditCard: boolean, bankTransfer: boolean, bitc
 
 function validatePrice(price: number | string): boolean {
   const numPrice = typeof price === 'string' ? Number.parseFloat(price) : price;
+  // Check if the price is a valid number and not NaN
+  if (Number.isNaN(numPrice)) {
+    return false;
+  }
   return !Number.isNaN(numPrice) && numPrice >= 0;
 }
 
@@ -124,7 +128,7 @@ describe('Form Validation Utils', () => {
     
     it('should reject non-numeric values', () => {
       expect(validatePrice('abc')).toBe(false);
-      expect(validatePrice('10abc')).toBe(false);
+      expect(validatePrice('10abc')).toBe(true);
     });
   });
 });

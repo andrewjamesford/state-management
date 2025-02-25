@@ -61,6 +61,7 @@ describe('Error handling', () => {
         <div>
           <div data-testid="error-message">{error.message}</div>
           <button 
+            type="button"
             data-testid="reset-button" 
             onClick={() => {
               handleReset();
