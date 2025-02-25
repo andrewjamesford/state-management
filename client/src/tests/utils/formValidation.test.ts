@@ -24,8 +24,8 @@ function validatePaymentMethods(creditCard: boolean, bankTransfer: boolean, bitc
 }
 
 function validatePrice(price: number | string): boolean {
-  const numPrice = typeof price === 'string' ? parseFloat(price) : price;
-  return !isNaN(numPrice) && numPrice >= 0;
+  const numPrice = typeof price === 'string' ? Number.parseFloat(price) : price;
+  return !Number.isNaN(numPrice) && numPrice >= 0;
 }
 
 describe('Form Validation Utils', () => {

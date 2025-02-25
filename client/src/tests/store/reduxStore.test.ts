@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { configureStore } from '@reduxjs/toolkit';
 import { listingApi } from '~/store/listingApi';
 import listingReducer, { setListing } from '~/store/listingSlice';
-import type { RootState } from '~/store';
 
 // Mock fetch to avoid actual API calls
 vi.stubGlobal('fetch', vi.fn(() => 

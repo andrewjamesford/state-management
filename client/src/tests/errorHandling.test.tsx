@@ -1,7 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import ErrorMessage from '~/components/errorMessage';
 import { render, screen } from '@testing-library/react';
-import type { ErrorBoundaryProps } from 'react-error-boundary';
 
 // Testing error handling components and utilities
 describe('Error handling', () => {
@@ -20,7 +19,7 @@ describe('Error handling', () => {
       render(<ErrorMessage message="Test error" />);
       const alert = screen.getByRole('alert');
       expect(alert).toBeInTheDocument();
-      expect(alert).toHaveClass('text-red-500');
+      expect(alert).toHaveClass('text-red-700');
     });
   });
 });

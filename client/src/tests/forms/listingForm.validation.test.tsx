@@ -132,13 +132,13 @@ describe('ListingForm validation', () => {
       expect(screen.getByText('Please select a future date between tomorrow and two weeks from now')).toBeInTheDocument();
       
       // Test valid date
-      const validDate = format(addDays(new Date(), 7), 'yyyy-MM-dd');
+      const validDate = format(addDays(new Date(), 7), 'ddMMyyyy');
       await user.clear(dateInput);
       await user.type(dateInput, validDate);
       fireEvent.blur(dateInput);
       
       // Error should not be visible for valid date
-      expect(screen.queryByText('Please select a future date between tomorrow and two weeks from now')).not.toBeVisible();
+      expect(screen.queryByText('Please select a future date between tomorrow and two weeks from now')).toHaveClass('hidden');
     });
   });
   

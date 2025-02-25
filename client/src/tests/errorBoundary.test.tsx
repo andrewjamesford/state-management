@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterAll } from 'vitest';
 import { render, waitFor } from '@testing-library/react';
 import { ErrorBoundary } from 'react-error-boundary';
-import type { ErrorBoundaryProps } from 'react-error-boundary';
+import React from 'react';
 
 // Component that simulates an error
 const ErrorComponent = ({ shouldError = true }: { shouldError?: boolean }) => {

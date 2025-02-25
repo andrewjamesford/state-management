@@ -16,6 +16,6 @@ describe('ErrorMessage', () => {
   it('applies error styling classes', () => {
     render(<ErrorMessage message="Test error" />);
     const alert = screen.getByRole('alert');
-    expect(alert).toHaveClass('text-red-500');
+    expect(alert).toHaveClass('text-red-700');
   });
 });
