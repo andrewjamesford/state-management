@@ -193,7 +193,7 @@ function RouteComponent() {
 	if (loadingListing) return <Loader height={50} width={50} />;
 
 	return (
-		<form onSubmit={handleSubmit} noValidate className="group">
+		<form onSubmit={handleSubmit} className="group max-w-4xl mx-auto px-4 py-5">
 			<ListingForm
 				listingId={0}
 				formState={formState}

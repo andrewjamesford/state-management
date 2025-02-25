@@ -43,7 +43,7 @@ function RouteComponent() {
 
 	if (error) return <ErrorMessage message={(error as Error)?.message} />;
 	return (
-		<>
+		<div className="max-w-4xl mx-auto px-4 py-5">
 			<div className="my-4">
 				<Link
 					to="/tsquery/add"
@@ -62,6 +62,6 @@ function RouteComponent() {
 					/>
 				))}
 			</div>
-		</>
+		</div>
 	);
 }

@@ -86,7 +86,7 @@ function RouteComponent() {
   if (isLoading) return <Loader height={50} width={50} />;
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-4xl mx-auto px-4 py-5">
+    <form onSubmit={handleSubmit} className="group max-w-4xl mx-auto px-4 py-5">
       <ListingForm
         listingId={Number(listingId)}
         formState={formState}

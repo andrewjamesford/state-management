@@ -44,7 +44,7 @@ function RouteComponent() {
 
 	if (error) return <ErrorMessage message={error.data?.message ?? 'Failed to fetch listings'} />;
 	return (
-		<>
+		<div className="max-w-4xl mx-auto px-4 py-5">
 			<div className="my-4">
 				<Link
 					to="/redux/add"
@@ -63,6 +63,6 @@ function RouteComponent() {
 					/>
 				))}
 			</div>
-		</>
+		</div>
 	);
 }

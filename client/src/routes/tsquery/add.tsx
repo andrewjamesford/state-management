@@ -107,7 +107,7 @@ function RouteComponent() {
 		return <ErrorMessage message="Error: Error loading Sub-Categories" />;
 
 	return (
-		<form onSubmit={handleSubmit} noValidate className="group">
+		<form onSubmit={handleSubmit} className="group max-w-4xl mx-auto px-4 py-5">
 			<ListingForm
 				listingId={0}
 				formState={formState}

@@ -20,7 +20,7 @@ function RouteComponent() {
   if (isLoading) return <Loader height={50} width={50} />;
 
   return (
-    <>
+    <div className="max-w-4xl mx-auto px-4 py-5">
       <div className="my-4">
         <Link
           to="/zustand/add"
@@ -39,6 +39,6 @@ function RouteComponent() {
           />
         ))}
       </div>
-    </>
+    </div>
   );
 }
