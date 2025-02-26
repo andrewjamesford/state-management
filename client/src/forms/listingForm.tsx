@@ -92,7 +92,7 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 				{/* Category */}
 				{loadingCategory && <Loader width={20} height={20} />}
 
-				{!loadingCategory && categoryData && (
+				{(categoryData || loadingCategory) && (
 					<Select
 						label="Category"
 						labelClassName="block text-sm font-medium text-gray-700"
@@ -108,11 +108,14 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 						}}
 						value={formState.categoryId}
 						required={true}
+						disabled={loadingCategory}
+						aria-busy={loadingCategory}
 						options={[
 							{
 								value: 0,
-								label: "Select a category...",
+								label: loadingCategory ? "Loading categories..." : "Select a category...",
 								className: "text-muted-foreground italic",
+								disabled: loadingCategory,
 							},
 							...(categoryData ?? []).map((category: Category) => ({
 								value: category.id,
@@ -126,7 +129,7 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 			<div className="mt-6">
 				{/* Sub Category */}
 				{loadingSubCategory && <Loader width={20} height={20} />}
-				{!loadingCategory && !loadingSubCategory && subCategoryData && (
+				{(subCategoryData || loadingSubCategory) && (
 					<Select
 						label="Sub Category"
 						labelClassName="block text-sm font-medium text-gray-700"
@@ -141,12 +144,18 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 						}}
 						value={formState.subCategoryId}
 						required={true}
-						disabled={!subCategoryData}
+						disabled={!subCategoryData || loadingSubCategory || formState.categoryId === 0}
+						aria-busy={loadingSubCategory}
 						options={[
 							{
 								value: 0,
-								label: "Select a sub category...",
+								label: loadingSubCategory 
+									? "Loading sub categories..." 
+									: formState.categoryId === 0 
+										? "Select a category first" 
+										: "Select a sub category...",
 								className: "text-muted-foreground italic",
+								disabled: loadingSubCategory || formState.categoryId === 0,
 							},
 							...(subCategoryData ?? []).map((category: Category) => ({
 								value: category.id,
