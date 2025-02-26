@@ -12,8 +12,14 @@ import {
 
 // Mock the router hooks
 vi.mock('@tanstack/react-router', () => ({
-  useNavigate: vi.fn(() => ({ to: vi.fn() })),
-  createFileRoute: () => ({ component: (Component: any) => Component })
+  useParams: vi.fn(),
+  useNavigate: vi.fn(() => () => {}),
+  Link: ({ children, to, className }: any) => (
+    <a href={to} className={className}>{children}</a>
+  ),
+  createFileRoute: vi.fn((path: string) => ({
+    component: ({ component }) => component
+  }))
 }));
 
 // Mock the Redux hooks
