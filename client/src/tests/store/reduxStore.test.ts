@@ -55,9 +55,12 @@ describe('Redux Store Configuration', () => {
   });
   
   describe('RTK Query middleware', () => {
+    let mockedFetch: jest.Mock;
+
     beforeEach(() => {
       // Mock fetch for API calls
-      vi.mocked(fetch).mockImplementation(() => 
+      mockedFetch = vi.mocked(fetch, true);
+      mockedFetch.mockImplementation(() => 
         Promise.resolve({
           ok: true,
           json: () => Promise.resolve([
@@ -70,13 +73,7 @@ describe('Redux Store Configuration', () => {
               enddate: '2023-12-31',
               listingdescription: 'Test description',
               condition: true,
-              listingprice: '100.00',
-              reserveprice: '80.00',
-              creditcardpayment: true,
-              banktransferpayment: false,
-              bitcoinpayment: false,
-              pickup: true,
-              shippingoption: 'post'
+              listingprice: '100.00'
             }
           ])
         } as Response)
@@ -88,7 +85,7 @@ describe('Redux Store Configuration', () => {
       const result = await store.dispatch(listingApi.endpoints.getListings.initiate());
       
       // Verify that fetch was called with correct URL
-      expect(fetch).toHaveBeenCalledWith(
+      expect(mockedFetch).toHaveBeenCalledWith(
         expect.stringContaining('/listings'), 
         expect.anything()
       );
@@ -111,13 +108,13 @@ describe('Redux Store Configuration', () => {
       await store.dispatch(listingApi.endpoints.getListings.initiate());
       
       // Reset fetch mock to track second call
-      vi.mocked(fetch).mockClear();
+      mockedFetch.mockClear();
       
       // Second request should use cached data
-      await store.dispatch(listingApi.endpoints.getListings.initiate());
+      await store.dispatch(listingApi.endpoints getListings.initiate());
       
       // Fetch should not be called again for the same request
-      expect(fetch).not.toHaveBeenCalled();
+      expect(mockedFetch).not.toHaveBeenCalled();
     });
   });
 });
