@@ -1,7 +1,7 @@
-import { getLocalStorageItem, setLocalStorageItem } from "~/utils/localStorage";
 import { useState } from "react";
 import MenuLoggedIn from "~/components/menuLoggedIn";
 import MenuLoggedOut from "~/components/menuLoggedOut";
+import { getLocalStorageItem, setLocalStorageItem } from "~/utils/localStorage";
 
 /**
  * Header component that displays a navigation header with login/logout functionality.

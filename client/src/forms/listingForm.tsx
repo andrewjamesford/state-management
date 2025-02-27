@@ -1,14 +1,14 @@
-import type { Category, ListingSchema } from "~/models";
-import RadioButton from "~/components/radioButton";
-import DateInput from "~/components/dateInput";
-import TextInput from "~/components/textInput";
-import Select from "~/components/select";
-import Textarea from "~/components/textarea";
-import MoneyTextInput from "~/components/moneyTextInput";
-import Checkbox from "~/components/checkbox";
-import SubmitButton from "~/components/submitButton";
-import Loader from "~/components/loader";
 import { format, isDate } from "date-fns";
+import Checkbox from "~/components/checkbox";
+import DateInput from "~/components/dateInput";
+import Loader from "~/components/loader";
+import MoneyTextInput from "~/components/moneyTextInput";
+import RadioButton from "~/components/radioButton";
+import Select from "~/components/select";
+import SubmitButton from "~/components/submitButton";
+import TextInput from "~/components/textInput";
+import Textarea from "~/components/textarea";
+import type { Category, ListingSchema } from "~/models";
 
 interface ListingFormProps {
 	listingId?: number;
@@ -113,7 +113,9 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 						options={[
 							{
 								value: 0,
-								label: loadingCategory ? "Loading categories..." : "Select a category...",
+								label: loadingCategory
+									? "Loading categories..."
+									: "Select a category...",
 								className: "text-muted-foreground italic",
 								disabled: loadingCategory,
 							},
@@ -144,15 +146,19 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 						}}
 						value={formState.subCategoryId}
 						required={true}
-						disabled={!subCategoryData || loadingSubCategory || formState.categoryId === 0}
+						disabled={
+							!subCategoryData ||
+							loadingSubCategory ||
+							formState.categoryId === 0
+						}
 						aria-busy={loadingSubCategory}
 						options={[
 							{
 								value: 0,
-								label: loadingSubCategory 
-									? "Loading sub categories..." 
-									: formState.categoryId === 0 
-										? "Select a category first" 
+								label: loadingSubCategory
+									? "Loading sub categories..."
+									: formState.categoryId === 0
+										? "Select a category first"
 										: "Select a sub category...",
 								className: "text-muted-foreground italic",
 								disabled: loadingSubCategory || formState.categoryId === 0,
@@ -173,15 +179,20 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="end-date"
 					value={
-						isDate(formState.endDate) && Number.isFinite(formState.endDate.getTime()) 
-							? format(formState.endDate, 'yyyy-MM-dd') 
+						isDate(formState.endDate) &&
+						Number.isFinite(formState.endDate.getTime())
+							? format(formState.endDate, "yyyy-MM-dd")
 							: tomorrow
 					}
 					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-						const endDate = e.target.value ? new Date(e.target.value) : new Date(tomorrow);
+						const endDate = e.target.value
+							? new Date(e.target.value)
+							: new Date(tomorrow);
 						setFormState((prev) => ({
 							...prev,
-							endDate: Number.isFinite(endDate.getTime()) ? endDate : new Date(tomorrow),
+							endDate: Number.isFinite(endDate.getTime())
+								? endDate
+								: new Date(tomorrow),
 						}));
 					}}
 					required

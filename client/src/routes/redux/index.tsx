@@ -1,9 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useGetListingsQuery } from "~/store/listingApi";
-import ListingTile from "~/components/listingTile";
-import type { Listing } from "~/models";
-import Skeleton from "~/components/skeleton";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import ErrorMessage from "~/components/errorMessage";
+import ListingTile from "~/components/listingTile";
+import Skeleton from "~/components/skeleton";
+import type { Listing } from "~/models";
+import { useGetListingsQuery } from "~/store/listingApi";
 
 export const Route = createFileRoute("/redux/")({
 	component: RouteComponent,
@@ -29,10 +29,10 @@ export const Route = createFileRoute("/redux/")({
  * that prevents layout shift and improves perceived performance.
  */
 function RouteComponent() {
-	const { 
-		data: auctions = [], 
-		isLoading, 
-		error 
+	const {
+		data: auctions = [],
+		isLoading,
+		error,
 	} = useGetListingsQuery(undefined, {
 		// Type the error to match RTK Query error shape
 		selectFromResult: ({ data, isLoading, error }) => ({
@@ -42,7 +42,12 @@ function RouteComponent() {
 		}),
 	});
 
-	if (error) return <ErrorMessage message={error.data?.message ?? 'Failed to fetch listings'} />;
+	if (error)
+		return (
+			<ErrorMessage
+				message={error.data?.message ?? "Failed to fetch listings"}
+			/>
+		);
 	return (
 		<div className="max-w-4xl mx-auto px-4 py-5">
 			<div className="my-4">

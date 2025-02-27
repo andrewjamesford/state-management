@@ -1,22 +1,22 @@
 import {
 	createFileRoute,
-	useParams,
 	useNavigate,
+	useParams,
 } from "@tanstack/react-router";
-import { useSelector } from "react-redux";
-import { useState, useEffect } from "react";
 import { addDays, format } from "date-fns";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import ErrorMessage from "~/components/errorMessage";
+import Loader from "~/components/loader";
+import ListingForm from "~/forms/listingForm";
+import { type Listing, type ListingSchema, listingSchema } from "~/models";
 import type { RootState } from "~/store";
 import {
 	useGetListingQuery,
-	useUpdateListingMutation,
 	useGetParentCategoriesQuery,
 	useGetSubCategoriesQuery,
+	useUpdateListingMutation,
 } from "~/store/listingApi";
-import { listingSchema, type ListingSchema, type Listing } from "~/models";
-import Loader from "~/components/loader";
-import ErrorMessage from "~/components/errorMessage";
-import ListingForm from "~/forms/listingForm";
 
 // RTK Query error type
 interface ApiError {
@@ -79,7 +79,7 @@ function RouteComponent() {
 		...reduxListing,
 		endDate: new Date(reduxListing.endDate),
 		listingPrice: Number(reduxListing.listingPrice),
-		reservePrice: Number(reduxListing.reservePrice)
+		reservePrice: Number(reduxListing.reservePrice),
 	}));
 
 	const { listingId } = useParams({ from: Route.id });
@@ -110,7 +110,7 @@ function RouteComponent() {
 				...listingData,
 				endDate: new Date(listingData.endDate),
 				listingPrice: Number(listingData.listingPrice),
-				reservePrice: Number(listingData.reservePrice)
+				reservePrice: Number(listingData.reservePrice),
 			});
 		}
 	}, [listingData]);
@@ -121,15 +121,15 @@ function RouteComponent() {
 		try {
 			const updatedListing: Listing = {
 				...formState,
-				endDate: format(formState.endDate, 'yyyy-MM-dd'),
+				endDate: format(formState.endDate, "yyyy-MM-dd"),
 				listingPrice: String(formState.listingPrice),
-				reservePrice: String(formState.reservePrice)
+				reservePrice: String(formState.reservePrice),
 			};
 			const result = await updateListing({
 				id: listingId,
 				listing: updatedListing,
 			}).unwrap();
-			
+
 			if (result === 1) {
 				navigate({ to: "/redux" });
 			}
@@ -140,11 +140,31 @@ function RouteComponent() {
 	};
 
 	if (categoryError)
-		return <ErrorMessage message={(categoryError as ApiError).data?.message || "Error loading categories"} />;
+		return (
+			<ErrorMessage
+				message={
+					(categoryError as ApiError).data?.message ||
+					"Error loading categories"
+				}
+			/>
+		);
 	if (subCategoryError)
-		return <ErrorMessage message={(subCategoryError as ApiError).data?.message || "Error loading sub-categories"} />;
+		return (
+			<ErrorMessage
+				message={
+					(subCategoryError as ApiError).data?.message ||
+					"Error loading sub-categories"
+				}
+			/>
+		);
 	if (listingError)
-		return <ErrorMessage message={(listingError as ApiError).data?.message || "Failed to load listing"} />;
+		return (
+			<ErrorMessage
+				message={
+					(listingError as ApiError).data?.message || "Failed to load listing"
+				}
+			/>
+		);
 	if (loadingListing) return <Loader height={50} width={50} />;
 
 	return (

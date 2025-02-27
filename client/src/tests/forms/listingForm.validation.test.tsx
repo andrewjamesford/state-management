@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { addDays, format } from "date-fns";
+import { describe, expect, it, vi } from "vitest";
 import ListingForm from "~/forms/listingForm";
-import { format, addDays } from "date-fns";
 import type { Category, ListingSchema } from "~/models";
 
 describe("ListingForm validation", () => {

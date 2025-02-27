@@ -1,17 +1,17 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useDispatch } from "react-redux";
-import { useState } from "react";
 import { addDays, format } from "date-fns";
-import { resetState } from "~/store/listingSlice";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import ErrorMessage from "~/components/errorMessage";
+import Loader from "~/components/loader";
+import ListingForm from "~/forms/listingForm";
+import type { Category, Listing, ListingSchema } from "~/models";
 import {
 	useAddListingMutation,
 	useGetParentCategoriesQuery,
 	useGetSubCategoriesQuery,
 } from "~/store/listingApi";
-import type { Listing, Category, ListingSchema } from "~/models";
-import Loader from "~/components/loader";
-import ErrorMessage from "~/components/errorMessage";
-import ListingForm from "~/forms/listingForm";
+import { resetState } from "~/store/listingSlice";
 
 // RTK Query error type
 interface ApiError {
@@ -53,7 +53,7 @@ function RouteComponent() {
 
 	const [formState, setFormState] = useState<ListingSchema>({
 		...initialState,
-		endDate: new Date(tomorrow)
+		endDate: new Date(tomorrow),
 	});
 
 	const [addListing] = useAddListingMutation();
@@ -81,9 +81,9 @@ function RouteComponent() {
 		try {
 			const listingToAdd: Listing = {
 				...formState,
-				endDate: format(formState.endDate, 'yyyy-MM-dd'),
+				endDate: format(formState.endDate, "yyyy-MM-dd"),
 				listingPrice: String(formState.listingPrice),
-				reservePrice: String(formState.reservePrice)
+				reservePrice: String(formState.reservePrice),
 			};
 			const response = await addListing({ listing: listingToAdd }).unwrap();
 			if (response === 1) {
@@ -97,9 +97,22 @@ function RouteComponent() {
 	};
 
 	if (parentError)
-		return <ErrorMessage message={(parentError as ApiError).data?.message || "Error loading categories"} />;
+		return (
+			<ErrorMessage
+				message={
+					(parentError as ApiError).data?.message || "Error loading categories"
+				}
+			/>
+		);
 	if (subCatError)
-		return <ErrorMessage message={(subCatError as ApiError).data?.message || "Error loading sub-categories"} />;
+		return (
+			<ErrorMessage
+				message={
+					(subCatError as ApiError).data?.message ||
+					"Error loading sub-categories"
+				}
+			/>
+		);
 	if (loadingCategory) return <Loader height={50} width={50} />;
 
 	return (

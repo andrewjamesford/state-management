@@ -21,7 +21,12 @@ export default function Skeleton({ layoutType, repeat = 1 }: SkeletonProps) {
 	const renderSkeleton = () => {
 		if (layoutType === "card") {
 			return (
-				<div aria-live="polite" role="status" className="animate-pulse max-w-sm rounded-lg bg-gray-200 dark:bg-gray-500">
+				<div
+					aria-live="polite"
+					// biome-ignore lint/a11y/useSemanticElements: React.Fragment is not a semantic element
+					role="status"
+					className="animate-pulse max-w-sm rounded-lg bg-gray-200 dark:bg-gray-500"
+				>
 					<div className="h-60 w-full rounded-t-lg bg-gray-200 dark:bg-gray-700" />
 					<div className="p-4 h-40">
 						<div className="h-4 w-1/2 mb-2 rounded-full bg-gray-200 dark:bg-gray-700" />
@@ -36,7 +41,12 @@ export default function Skeleton({ layoutType, repeat = 1 }: SkeletonProps) {
 
 		if (layoutType === "list") {
 			return (
-					<div aria-live="polite" role="status" className="animate-pulse max-w-sm rounded-lg bg-gray-200 dark:bg-gray-700">
+				<div
+					aria-live="polite"
+					// biome-ignore lint/a11y/useSemanticElements: React.Fragment is not a semantic element
+					role="status"
+					className="animate-pulse max-w-sm rounded-lg bg-gray-200 dark:bg-gray-700"
+				>
 					<div className="p-4">
 						<div className="h-4 w-1/2 mb-2 rounded-full bg-gray-200 dark:bg-gray-700" />
 						<div className="h-4 w-full mb-2 rounded-full bg-gray-200 dark:bg-gray-700" />
@@ -49,7 +59,8 @@ export default function Skeleton({ layoutType, repeat = 1 }: SkeletonProps) {
 		}
 
 		return (
-				<div aria-live="polite" role="status" className="animate-pulse">
+			// biome-ignore lint/a11y/useSemanticElements: <explanation>
+			<div role="status" aria-live="polite" className="animate-pulse block">
 				<div className="mb-4 h-10 w-48 rounded-md bg-gray-200 dark:bg-gray-700" />
 				<span className="sr-only">Loading...</span>
 			</div>
@@ -59,7 +70,9 @@ export default function Skeleton({ layoutType, repeat = 1 }: SkeletonProps) {
 	return (
 		<>
 			{Array.from({ length: repeat }, (_, index) => (
-				<div key={index}>{renderSkeleton()}</div>
+				<div key={`skeleton-${index}-${layoutType || "default"}`}>
+					{renderSkeleton()}
+				</div>
 			))}
 		</>
 	);

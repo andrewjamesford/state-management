@@ -1,9 +1,8 @@
+import { RouterProvider, createRouter } from "@tanstack/react-router";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
-// biome-ignore lint: import-styles
 import "~/index.css";
 
 // Import the generated route tree

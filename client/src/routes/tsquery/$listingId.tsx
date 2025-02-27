@@ -1,16 +1,16 @@
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
 	createFileRoute,
-	useParams,
 	useNavigate,
+	useParams,
 } from "@tanstack/react-router";
-import { useQuery, useMutation } from "@tanstack/react-query";
 import { addDays, format, isWithinInterval } from "date-fns";
-import { useState, useEffect } from "react";
-import { type Listing, type ListingSchema, listingSchema } from "~/models";
+import { useEffect, useState } from "react";
 import api from "~/api";
-import Loader from "~/components/loader";
 import ErrorMessage from "~/components/errorMessage";
+import Loader from "~/components/loader";
 import ListingForm from "~/forms/listingForm";
+import { type Listing, type ListingSchema, listingSchema } from "~/models";
 
 export const Route = createFileRoute("/tsquery/$listingId")({
 	component: RouteComponent,
@@ -123,7 +123,7 @@ function RouteComponent() {
 				start: new Date(tomorrow),
 				end: new Date(fortnight),
 			});
-			
+
 			const endDate = isValidDate ? newEndDate : new Date(tomorrow);
 
 			setFormState((prev) => ({
@@ -151,9 +151,9 @@ function RouteComponent() {
 		mutationFn: async (listing: ListingSchema) => {
 			const updatedListing: Listing = {
 				...listing,
-				endDate: format(listing.endDate, 'yyyy-MM-dd'),
+				endDate: format(listing.endDate, "yyyy-MM-dd"),
 				listingPrice: String(listing.listingPrice),
-				reservePrice: String(listing.reservePrice)
+				reservePrice: String(listing.reservePrice),
 			};
 			const response = await api.updateListing(listingId, updatedListing);
 			if (!response.ok) {

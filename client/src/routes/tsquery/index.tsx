@@ -1,10 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import api from "~/api";
-import ListingTile from "~/components/listingTile";
-import type { Listing, RawListing } from "~/models";
 import ErrorMessage from "~/components/errorMessage";
+import ListingTile from "~/components/listingTile";
 import Skeleton from "~/components/skeleton";
+import type { Listing, RawListing } from "~/models";
 
 export const Route = createFileRoute("/tsquery/")({
 	component: RouteComponent,
@@ -37,7 +37,7 @@ function RouteComponent() {
 				bitcoinPayment: listing.bitcoinpayment,
 				pickUp: listing.pickup,
 				shippingOption: listing.shippingoption,
-				}));
+			}));
 		},
 	});
 
