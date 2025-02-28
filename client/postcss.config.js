@@ -12,6 +12,4 @@ export default {
 }
 ```
 
-8. Let's enhance `api.ts` with error handling:
-
-client/src/api.ts
+biome.json
