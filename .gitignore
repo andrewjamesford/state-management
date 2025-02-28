@@ -1,5 +1,17 @@
-.aider*
+public/**/*
+dist/**/*
+node_modules/**/*
+build/**/*
 .env
-package-lock.json
-client/playwright-report/index.html
-client/test-results/.last-run.json
+*.swp
+*.swo
+.vscode/settings.json
+.vscode/extensions
+.idea
+.DS_Store
+Thumbs.db
+```
+
+2. Let's enhance `CLAUDE.md` with more detailed information:
+
+client/CLAUDE.md
