@@ -27,6 +27,7 @@ export async function getListings() {
 			c.category_name AS category 
 			FROM listings l
 			INNER JOIN categories c ON c.id = l.category_id
+			ORDER BY l.id DESC;
       `,
 		);
 		return result.rows ?? [];
