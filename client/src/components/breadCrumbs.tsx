@@ -44,7 +44,7 @@ interface BreadCrumbsProps {
 
 export default function BreadCrumbs({ currentStep }: BreadCrumbsProps) {
 	const location = useLocation();
-	const pathname = location.pathname;
+	const pathname = location.pathname || "";
 	const pathParts = pathname.split("/").filter(Boolean);
 	const page = pathParts[0] || "redux";
 	const step = currentStep.toString();

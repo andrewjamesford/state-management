@@ -31,8 +31,3 @@ Checkbox.propTypes = {
 };
 
 export default Checkbox;
-```
-
-10. Let's enhance `breadCrumbs.tsx` with better path handling:
-
-client/src/components/breadCrumbs.tsx

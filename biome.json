@@ -50,8 +50,3 @@
     }
   }
 }
-```
-
-6. Let's enhance `playwright.config.ts`:
-
-client/playwright.config.ts

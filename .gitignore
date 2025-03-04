@@ -10,8 +10,5 @@ build/**/*
 .idea
 .DS_Store
 Thumbs.db
-```
-
-2. Let's enhance `CLAUDE.md` with more detailed information:
-
-client/CLAUDE.md
+CLAUDE.md
+.aider*
