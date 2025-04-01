@@ -14,9 +14,10 @@ const queryParamValidationMiddleware =
 			const queryParams = { ...req.query };
 			
 			// Handle date conversion if needed
-			if (queryParams.endDate && typeof queryParams.endDate === 'string') {
+			if (queryParams && queryParams.endDate && typeof queryParams.endDate === 'string') {
 				try {
 					// Attempt to convert string to Date object
+					// @ts-ignore
 					queryParams.endDate = new Date(queryParams.endDate);
 				} catch (dateError) {
 					// If conversion fails, let Zod handle the validation error
