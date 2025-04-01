@@ -57,7 +57,10 @@
 			"reserveprice",
 			"shippingoption",
 			"subcategoryid"
-		]
+		],
+		"[jsonc]": {
+			"editor.defaultFormatter": "vscode.json-language-features"
+		}
 	},
 	"extensions": {
 		"recommendations": [
@@ -69,19 +72,5 @@
 			"bradlc.vscode-tailwindcss",
 			"anweber.vscode-httpyac"
 		]
-	},
-	"mcp": {
-		"servers": {
-			"db": {
-				"command": "docker",
-				"args": [
-					"run",
-					"-i",
-					"--rm",
-					"mcp/postgres",
-					"postgresql://postgres:postgres@postgres.example.com:5432/statemanagement"
-				]
-			}
-		}
 	}
 }

@@ -18,6 +18,7 @@
 - Format: `cd server && npm run format`
 - Lint: `cd server && npm run check`
 - Test: `cd server && npm test`
+- Test HTTP endpoints: `cd server && npm run httptest`
 
 ## Code Style Guidelines
 
@@ -29,3 +30,9 @@
 - **Naming**: PascalCase for components, camelCase for variables/functions, ALL_CAPS for constants
 - **State Management**: Multiple approaches used - Redux, Zustand, TanStack Query
 - **Testing**: Component tests with React Testing Library, unit tests with Vitest
+- Use arrow functions for callbacks.
+- Use async/await for asynchronous code.
+- Use const for constants and let for variables that will be reassigned.
+- Use destructuring for objects and arrays.
+- Use template literals for strings that contain variables.
+- Use the latest JavaScript features (ES6+) where possible.

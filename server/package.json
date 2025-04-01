@@ -1,7 +1,7 @@
 {
 	"name": "state-management-server",
 	"version": "1.0.0",
-	"description": "",
+	"description": "Server for the state management application",
 	"main": "index.ts",
 	"scripts": {
 		"dev": "tsx watch --inspect=0.0.0.0:9229 ./index.ts",
@@ -36,7 +36,7 @@
 		"supertest": "^7.0.0",
 		"tsx": "^4.19.2",
 		"typescript": "~5.6.2",
-		"vitest": "^2.0.5"
+		"vitest": "^3.1.1"
 	},
 	"engines": {
 		"node": ">=22.0.0"
