@@ -1,28 +1,32 @@
-import Joi from "joi";
+import { z } from "zod";
 
 // Schema for adding/updating a listing
-export const listingSchema = Joi.object({
-	id: Joi.number().optional(),
-	title: Joi.string().required(),
-	subTitle: Joi.string().optional(),
-	categoryId: Joi.number().greater(0).required(),
-	subCategoryId: Joi.number().optional(),
-	endDate: Joi.date().greater("now").required(),
-	description: Joi.string().required(),
-	condition: Joi.boolean().required(),
-	listingPrice: Joi.string().required(),
-	reservePrice: Joi.string().optional(),
-	creditCardPayment: Joi.boolean().required(),
-	bankTransferPayment: Joi.boolean().required(),
-	bitcoinPayment: Joi.boolean().required(),
-	pickUp: Joi.boolean().required(),
-	shippingOption: Joi.string().required(),
-}).custom((value) => {
-	if (
-		value.creditCardPayment === false &&
-		value.bankTransferPayment === false &&
-		value.bitcoinPayment === false
-	) {
-		throw new Error("At least one of the payment methods must be selected");
+export const listingSchema = z.object({
+	id: z.number().optional(),
+	title: z.string(),
+	subTitle: z.string().optional(),
+	categoryId: z.number().gt(0),
+	subCategoryId: z.number().optional(),
+	endDate: z.date().refine(date => date > new Date(), {
+		message: "End date must be in the future"
+	}),
+	description: z.string(),
+	condition: z.boolean(),
+	listingPrice: z.string(),
+	reservePrice: z.string().optional(),
+	creditCardPayment: z.boolean(),
+	bankTransferPayment: z.boolean(),
+	bitcoinPayment: z.boolean(),
+	pickUp: z.boolean(),
+	shippingOption: z.string(),
+}).refine(
+	(data) => {
+		return data.creditCardPayment === true || 
+			   data.bankTransferPayment === true || 
+			   data.bitcoinPayment === true;
+	},
+	{
+		message: "At least one of the payment methods must be selected",
+		path: ["creditCardPayment"]
 	}
-});
+);
