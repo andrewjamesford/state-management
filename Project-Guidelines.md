@@ -3,6 +3,7 @@
 ## Build, Lint, Test Commands
 
 ### Client
+
 - Build: `cd client && npm run build`
 - Dev: `cd client && npm run dev`
 - Format: `cd client && npm run format`
@@ -13,6 +14,7 @@
 - Test with coverage: `cd client && npm run test:coverage`
 
 ### Server
+
 - Build: `cd server && npm run build`
 - Dev: `cd server && npm run dev`
 - Format: `cd server && npm run format`
