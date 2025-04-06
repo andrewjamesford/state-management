@@ -70,7 +70,8 @@
 			"mtxr.sqltools",
 			"biomejs.biome",
 			"bradlc.vscode-tailwindcss",
-			"anweber.vscode-httpyac"
+			"anweber.vscode-httpyac",
+			"dbcode.dbcode"
 		]
 	}
 }
