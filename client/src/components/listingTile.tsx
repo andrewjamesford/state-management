@@ -16,9 +16,9 @@ export default function ListingTile({ listing, basePath }: ListingTileProps) {
 			className="border border-gray-300 rounded-lg overflow-hidden flex flex-col min-h-[300px]"
 		>
 			<img
-				src={"https://placehold.co/150"}
+				src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
 				alt={listing.title}
-				className="w-full"
+				className="w-full imagePlaceholder"
 			/>
 			<div className="p-4 flex flex-col h-full">
 				<h2 className="text-xl font-bold">{listing.title}</h2>
