@@ -1,9 +1,9 @@
 import type React from "react";
-import PropTypes from 'prop-types';
 
 interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
 	label?: string;
 	labelClassName?: string;
+	id: string;
 }
 
 const Checkbox: React.FC<CheckboxProps> = ({
@@ -24,10 +24,6 @@ const Checkbox: React.FC<CheckboxProps> = ({
 	);
 };
 
-Checkbox.propTypes = {
-	label: PropTypes.string,
-	labelClassName: PropTypes.string,
-	id: PropTypes.string.isRequired
-};
+
 
 export default Checkbox;
