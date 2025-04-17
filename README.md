@@ -54,3 +54,65 @@ Or alternatively you can run each project individually with:
 - Run db in docker with `cd db  && docker-compose db up`
 
 Recommended to install the NPM packages regardless if you are using Docker to get intellisense for TailwindCSS and other libraries etc.
+
+
+## Overview
+
+Here’s a high‑level tour of the project and how the pieces fit together:
+
+1. Purpose
+    - A hands‑on, “compare‑and‑contrast” demo of three popular approaches for managing client‑side state (Redux Toolkit Query, TanStack/React Query, and Zustand) in a simple auction‑style listing app.
+    - Backed by a Node/Express + PostgreSQL API (with Zod validation) and containerized via Docker.
+2. Top‑level structure
+    db/
+    - Dockerfile + SQL scripts to spin up a Postgres instance, create the `categories` and `listings` tables, and seed them with sample data.
+    server/
+    - Express app in TypeScript exposing two REST resources:
+        – GET /api/categories (with optional `parentId`)
+        – GET|POST|PUT /api/listings
+    - Uses `pg` for DB access, Zod for request validation, and Vitest + Supertest for unit/integration tests.
+        - `npm run dev` (or via Docker) boots on port 5002.
+    client/
+    - Vite + React + TypeScript + TailwindCSS UI.
+    - Central routing via TanStack Router and a shared layout (header, footer, skeleton loader).
+    - Three parallel “flavors” of the same feature set under `src/routes/`:
+
+        – **reduxrtk/** — uses Redux Toolkit’s `createApi` (RTK Query) + React‑Redux hooks
+
+        – **tsquery/** — hand‑rolled use of TanStack/React Query’s `useQuery` + mutations
+
+        – **zustand/** — everything in a single Zustand store with custom fetch/update methods
+
+    - Shared UI components (`src/components/`), form (`src/forms/listingForm.tsx`), type definitions, and a thin `src/api.ts` wrapper over `fetch`.
+    - Tests with Vitest + React Testing Library for unit/component tests, and Playwright for end‑to‑end scenarios.
+    - `npm run dev` (or via Docker) serves on port 4002.
+        docker-compose.yml
+    - Brings up the three services together: client, server, and Postgres.
+        state‑management.code‑workspace
+    - VS Code workspace config to open client + server projects side by side.
+3. How to run locally
+    - Copy/rename `env.example` → `.env` in both `server/` and `client/`, fill in your API URLs or DB creds.
+    - From the repo root:
+        
+        `docker compose up`
+    - Or spin up each piece manually:
+
+        `cd db && docker-compose up`
+
+        `cd server && npm install && npm run dev`
+
+        `cd client && npm install && npm run dev`
+4. What you’ll see in the UI
+    - A simple listings dashboard: list all auctions, view a single auction, add/edit a listing.
+    - Three navigation tabs/routes—one for each state‑management approach—so you can compare code and behavior side by side.
+5. Tech stack at a glance
+
+    – Frontend: React, TypeScript, Vite, TanStack Router, Redux Toolkit Query, TanStack Query, Zustand, TailwindCSS
+
+    – Backend: Node.js, Express, TypeScript, Zod, pg (PostgreSQL), Supertest, Vitest
+
+    – DB: PostgreSQL (Dockerized), SQL schema + seed scripts
+
+    – Testing: Vitest, React Testing Library, Supertest, Playwright
+    
+    – Lint/format: BiomeJS
