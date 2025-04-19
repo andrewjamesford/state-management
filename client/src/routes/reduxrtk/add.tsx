@@ -88,7 +88,7 @@ function RouteComponent() {
       const response = await addListing({ listing: listingToAdd }).unwrap()
       if (response === 1) {
         dispatch(resetState())
-        navigate({ to: '/redux' })
+        navigate({ to: '/reduxrtk' })
       }
     } catch (err) {
       const error = err as ApiError

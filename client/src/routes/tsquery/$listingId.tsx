@@ -186,24 +186,26 @@ function RouteComponent() {
 		return navigate({ to: "/tsquery" });
 	};
 
-	if (categoryError) return <ErrorMessage message={categoryError.message} />;
+	if (categoryError)
+		return <ErrorMessage message={categoryError?.message || 'An error occurred'} />;
 	if (subCategoryError)
-		return <ErrorMessage message={subCategoryError.message} />;
-	if (listingError) return <ErrorMessage message={listingError.message} />;
+		return <ErrorMessage message={subCategoryError?.message || 'An error occurred'} />;
+	if (listingError)
+		return <ErrorMessage message={listingError?.message || 'An error occurred'} />;
 	if (loadingListing) return <Loader height={50} width={50} />;
 
 	return (
 		<form onSubmit={handleSubmit} className="group max-w-4xl mx-auto px-4 py-5">
 			<ListingForm
-				listingId={0}
+				listingId={Number(listingId)}
 				formState={formState}
 				setFormState={setFormState}
 				tomorrow={tomorrow}
 				fortnight={fortnight}
 				loadingCategory={loadingCategory}
 				loadingSubCategory={loadingSubCategory}
-				categoryData={categoryData}
-				subCategoryData={subCategoryData}
+				categoryData={categoryData ?? null}
+				subCategoryData={subCategoryData ?? null}
 			/>
 		</form>
 	);

@@ -88,7 +88,8 @@ function RouteComponent() {
 		}
 	};
 
-	if (error) return <ErrorMessage message={error} />;
+	if (error)
+		return <ErrorMessage message={typeof error === 'string' ? error : (error as Error)?.message || 'An error occurred'} />;
 	if (isLoading) return <Loader height={50} width={50} />;
 
 	return (

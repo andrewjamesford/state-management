@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import BreadCrumbs from "~/components/breadCrumbs";
 import { useLocation } from "@tanstack/react-router";
 
@@ -12,8 +12,8 @@ describe("BreadCrumbs", () => {
   beforeEach(() => {
     // Setup default mock implementation
     vi.mocked(useLocation).mockReturnValue({
-      pathname: "/redux/2",
-    } as any);
+      pathname: "/reduxrtk/2",
+    } as ReturnType<typeof useLocation>);
   });
 
   afterEach(() => {
@@ -54,7 +54,7 @@ describe("BreadCrumbs", () => {
   it("generates correct href attributes based on path", () => {
     vi.mocked(useLocation).mockReturnValue({
       pathname: "/context/2",
-    } as any);
+    } as ReturnType<typeof useLocation>);
     
     render(<BreadCrumbs currentStep={2} />);
 

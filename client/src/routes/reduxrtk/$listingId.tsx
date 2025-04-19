@@ -127,7 +127,7 @@ function RouteComponent() {
       }).unwrap()
 
       if (result === 1) {
-        navigate({ to: '/redux' })
+        navigate({ to: '/reduxrtk' })
       }
     } catch (err) {
       const error = err as ApiError
@@ -139,8 +139,7 @@ function RouteComponent() {
     return (
       <ErrorMessage
         message={
-          (categoryError as ApiError).data?.message ||
-          'Error loading categories'
+          (categoryError as ApiError)?.data?.message || (categoryError as ApiError)?.message || 'An error occurred'
         }
       />
     )
@@ -148,8 +147,7 @@ function RouteComponent() {
     return (
       <ErrorMessage
         message={
-          (subCategoryError as ApiError).data?.message ||
-          'Error loading sub-categories'
+          (subCategoryError as ApiError)?.data?.message || (subCategoryError as ApiError)?.message || 'An error occurred'
         }
       />
     )
@@ -157,7 +155,7 @@ function RouteComponent() {
     return (
       <ErrorMessage
         message={
-          (listingError as ApiError).data?.message || 'Failed to load listing'
+          (listingError as ApiError)?.data?.message || (listingError as ApiError)?.message || 'An error occurred'
         }
       />
     )

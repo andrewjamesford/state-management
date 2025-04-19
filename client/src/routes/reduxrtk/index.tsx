@@ -52,7 +52,7 @@ function RouteComponent() {
     <div className="max-w-4xl mx-auto px-4 py-5">
       <div className="my-4">
         <Link
-          to="/redux/add"
+          to="/reduxrtk/add"
           className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
         >
           Add Listing
@@ -64,7 +64,7 @@ function RouteComponent() {
           <ListingTile
             key={auction?.id ? auction.id : counter}
             listing={auction}
-            basePath="/redux"
+            basePath="/reduxrtk"
           />
         ))}
       </div>
