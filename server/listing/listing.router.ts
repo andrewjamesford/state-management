@@ -9,7 +9,6 @@ import {
 	updateListing,
 } from "./listing.repository";
 
-import type { ListingDetails } from "./listing.repository";
 import { listingSchema } from "./listing.schema";
 
 router.use(express.json());
