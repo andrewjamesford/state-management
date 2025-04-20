@@ -128,21 +128,18 @@ function RouteComponent() {
 			await updateListing({
 				id: listingId,
 				listing: updatedListing,
-			}).then((res) => {
-				console.log("Response from updateListing:", res);
-				if ("data" in res) {
+			})
+				.then((res) => {
 					const result = res.data as number;
 					if (result === 1) {
 						navigate({ to: "/reduxrtk" });
 						return; // Exit after successful navigation
 					}
-				}
-				// Handle RTK Query error response
-				const apiError = res as unknown as ApiError;
-				throw new Error(
-					apiError.data?.message || apiError.message || "Update failed",
-				);
-			});
+				})
+				.catch((err) => {
+					console.log("here");
+					throw err;
+				});
 		} catch (err) {
 			const error = err as ApiError;
 			alert(error.data?.message || error.message || "An error occurred");
