@@ -3,7 +3,7 @@ import ErrorMessage from "~/components/errorMessage";
 import ListingTile from "~/components/listingTile";
 import Skeleton from "~/components/skeleton";
 import type { Listing } from "~/models";
-import { useGetListingsQuery } from "~/store/listingApi";
+import { useGetListingsQuery } from "~/store/reduxrtk/listingApi";
 
 export const Route = createFileRoute("/reduxrtk/")({
 	component: RouteComponent,

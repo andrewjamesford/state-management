@@ -9,7 +9,7 @@ import ErrorMessage from "~/components/errorMessage";
 import Loader from "~/components/loader";
 import ListingForm from "~/forms/listingForm";
 import { type ListingSchema, listingSchema } from "~/models";
-import { useListingStore } from "~/store/listingStore";
+import { useListingStore } from "~/store/zustand/listingStore";
 
 export const Route = createFileRoute("/zustand/$listingId")({
 	component: RouteComponent,

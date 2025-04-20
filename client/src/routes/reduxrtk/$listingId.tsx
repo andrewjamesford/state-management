@@ -10,13 +10,13 @@ import ErrorMessage from "~/components/errorMessage";
 import Loader from "~/components/loader";
 import ListingForm from "~/forms/listingForm";
 import { type Listing, type ListingSchema, listingSchema } from "~/models";
-import type { RootState } from "~/store";
+import type { RootState } from "~/store/reduxrtk";
 import {
 	useGetListingQuery,
 	useGetParentCategoriesQuery,
 	useGetSubCategoriesQuery,
 	useUpdateListingMutation,
-} from "~/store/listingApi";
+} from "~/store/reduxrtk/listingApi";
 
 // RTK Query error type
 interface ApiError {

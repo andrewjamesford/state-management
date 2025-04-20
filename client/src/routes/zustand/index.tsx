@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import ErrorMessage from "~/components/errorMessage";
 import ListingTile from "~/components/listingTile";
 import Loader from "~/components/loader";
-import { useListingStore } from "~/store/listingStore";
+import { useListingStore } from "~/store/zustand/listingStore";
 
 export const Route = createFileRoute("/zustand/")({
 	component: RouteComponent,

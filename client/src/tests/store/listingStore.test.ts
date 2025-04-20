@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import api from "~/api";
 import type { Listing, RawListing } from "~/models";
-import { useListingStore } from "~/store/listingStore";
+import { useListingStore } from "~/store/zustand/listingStore";
 
 // Mock the API module
 vi.mock("~/api", () => ({

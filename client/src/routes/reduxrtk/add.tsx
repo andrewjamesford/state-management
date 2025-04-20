@@ -10,8 +10,8 @@ import {
 	useAddListingMutation,
 	useGetParentCategoriesQuery,
 	useGetSubCategoriesQuery,
-} from "~/store/listingApi";
-import { resetState } from "~/store/listingSlice";
+} from "~/store/reduxrtk/listingApi";
+import { resetState } from "~/store/reduxrtk/listingSlice";
 
 // RTK Query error type
 interface ApiError {

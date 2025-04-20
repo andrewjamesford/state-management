@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { listingApi } from "~/store/listingApi";
-import listingReducer, { setListing } from "~/store/listingSlice";
+import { listingApi } from "~/store/reduxrtk/listingApi";
+import listingReducer, { setListing } from "~/store/reduxrtk/listingSlice";
 
 // Mock fetch to avoid actual API calls
 vi.stubGlobal(

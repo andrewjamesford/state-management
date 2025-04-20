@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Listing } from "~/models";
-import reducer, { setListing, resetState } from "~/store/listingSlice";
+import reducer, { setListing, resetState } from "~/store/reduxrtk/listingSlice";
 
 describe("listingSlice", () => {
 	const initialState: Listing = {
