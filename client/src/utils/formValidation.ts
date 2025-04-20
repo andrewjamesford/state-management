@@ -1,4 +1,4 @@
-import {  isWithinInterval } from "date-fns";
+import { isWithinInterval } from "date-fns";
 // Form validation utility functions
 function validateDateRange(
 	date: Date | string,
@@ -35,19 +35,19 @@ function validatePrice(price: number | string): boolean {
 	if (Number.isNaN(numPrice)) {
 		return false;
 	}
-    if (numPrice === 0) {
-        return false;
-    }
-    if (numPrice < 0) {
-        return false;
-    }
-	return !Number.isNaN(numPrice) && numPrice > 0;
+	if (numPrice === 0) {
+		return false;
+	}
+	if (numPrice < 0) {
+		return false;
+	}
+	return true;
 }
 
 export {
-    validateDateRange,
-    validateTitleLength,
-    validateDescriptionLength,
-    validatePaymentMethods,
-    validatePrice,
+	validateDateRange,
+	validateTitleLength,
+	validateDescriptionLength,
+	validatePaymentMethods,
+	validatePrice,
 };

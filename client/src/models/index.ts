@@ -26,8 +26,8 @@ export interface Listing {
 	endDate: string;
 	description: string;
 	condition: boolean;
-	listingPrice: string;
-	reservePrice: string;
+	listingPrice: number;
+	reservePrice: number;
 	creditCardPayment: boolean;
 	bankTransferPayment: boolean;
 	bitcoinPayment: boolean;

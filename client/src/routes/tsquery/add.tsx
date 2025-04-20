@@ -7,6 +7,7 @@ import ErrorMessage from "~/components/errorMessage";
 import ListingForm from "~/forms/listingForm";
 import type { Listing } from "~/models";
 import { listingSchema } from "~/models";
+import { validatePrice } from "~/utils/formValidation";
 
 export const Route = createFileRoute("/tsquery/add")({
 	component: RouteComponent,
@@ -54,9 +55,7 @@ function RouteComponent() {
 	});
 
 	const checkValue = (value: number) => {
-		if (value > 10) {
-			throw new Error("Price must be less than $10");
-		}
+		return validatePrice(value);
 	};
 
 	const queryClient = useQueryClient();
@@ -87,24 +86,21 @@ function RouteComponent() {
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		try {
-			checkValue(Number(formState.reservePrice));
-		} catch (error: unknown) {
-			if (error instanceof Error) {
-				alert(error.message);
-			} else {
-				alert("An unknown error occurred");
-			}
+		if (!checkValue(formState.reservePrice)) {
+			alert("Invalid reserve price");
+			return;
+		}
+		if (!checkValue(formState.listingPrice)) {
+			alert("Invalid listing price");
 			return;
 		}
 
-		// if (formState.reservePrice === "") formState.reservePrice = "0.00";
 		mutation.mutate({
 			listing: {
 				...formState,
 				endDate: formState.endDate.toISOString(),
-				listingPrice: formState.listingPrice.toString(),
-				reservePrice: formState.reservePrice.toString(),
+				listingPrice: formState.listingPrice.toPrecision(2),
+				reservePrice: formState.reservePrice.toPrecision(2),
 			},
 		});
 	};

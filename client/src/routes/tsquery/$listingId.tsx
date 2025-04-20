@@ -151,9 +151,9 @@ function RouteComponent() {
 		mutationFn: async (listing: ListingSchema) => {
 			const updatedListing: Listing = {
 				...listing,
-				endDate: format(listing.endDate, "yyyy-MM-dd"),
-				listingPrice: String(listing.listingPrice),
-				reservePrice: String(listing.reservePrice),
+				endDate: listing.endDate.toISOString(),
+				listingPrice: listing.listingPrice,
+				reservePrice: listing.reservePrice,
 			};
 			const response = await api.updateListing(listingId, updatedListing);
 			const result = await response.json();
@@ -165,6 +165,7 @@ function RouteComponent() {
 		e.preventDefault();
 		updateListingMutation.mutate(formState, {
 			onSuccess: (result) => {
+				console.log(result);
 				if (result === 1) {
 					navListings();
 					return;
