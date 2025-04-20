@@ -45,7 +45,7 @@ describe("ListingTile", () => {
 	it("formats price display correctly", () => {
 		render(<ListingTile listing={mockListing} basePath="/test" />);
 
-		expect(screen.getByText("US$100.00")).toBeInTheDocument();
+		expect(screen.getByText("$100.00")).toBeInTheDocument();
 	});
 
 	it("shows reserve status correctly when reserve is met", () => {
