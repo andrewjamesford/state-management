@@ -40,7 +40,7 @@ const initialState: ListingSchema = {
 	bankTransferPayment: false,
 	bitcoinPayment: false,
 	pickUp: false,
-	shippingOption: "",
+	shippingOption: "post",
 };
 
 function RouteComponent() {

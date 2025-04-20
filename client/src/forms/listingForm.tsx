@@ -370,12 +370,12 @@ const PriceAndPaymentSection = ({ formState, setFormState }: SectionProps) => (
 
 const ShippingSection = ({ formState, setFormState }: SectionProps) => (
 	<>
-		<h1 className="mt-4 text-2xl font-bold">Shipping & pick-up</h1>
+		<h1 className="my-4 text-2xl font-bold">Shipping & pick-up</h1>
 		<fieldset>
 			<legend className="block text-sm font-medium text-gray-700">
 				Pick up?
 			</legend>
-			<div className="mt-6">
+			<div className="mb-6 mt-4">
 				<RadioButton
 					id="pick-up-true"
 					name="pick-up"
@@ -413,7 +413,7 @@ const ShippingSection = ({ formState, setFormState }: SectionProps) => (
 			<legend className="block text-sm font-medium text-gray-700">
 				Shipping options
 			</legend>
-			<div className="mt-6">
+			<div className="mb-6 mt-4">
 				<RadioButton
 					id="shipping-option-courier"
 					name="shipping-option"
