@@ -171,7 +171,7 @@ function RouteComponent() {
 		e.preventDefault();
 		updateListingMutation.mutate(formState, {
 			onSuccess: (result) => {
-				alert(`${JSON.stringify(result)} listing updated`);
+				alert(`${JSON.stringify(result)}`);
 				if (result === 1) {
 					navListings();
 				}
