@@ -17,11 +17,7 @@ describe("SubmitButton", () => {
 
 		const button = screen.getByRole("button");
 		// only assert the core utility classes to avoid overly rigid tests
-		expect(button).toHaveClass(
-			"inline-flex",
-			"bg-blue-500",
-			"text-white",
-		);
+		expect(button).toHaveClass("inline-flex", "bg-blue-500", "text-white");
 	});
 
 	it("can be clicked", async () => {

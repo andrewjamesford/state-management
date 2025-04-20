@@ -187,11 +187,19 @@ function RouteComponent() {
 	};
 
 	if (categoryError)
-		return <ErrorMessage message={categoryError?.message || 'An error occurred'} />;
+		return (
+			<ErrorMessage message={categoryError?.message || "An error occurred"} />
+		);
 	if (subCategoryError)
-		return <ErrorMessage message={subCategoryError?.message || 'An error occurred'} />;
+		return (
+			<ErrorMessage
+				message={subCategoryError?.message || "An error occurred"}
+			/>
+		);
 	if (listingError)
-		return <ErrorMessage message={listingError?.message || 'An error occurred'} />;
+		return (
+			<ErrorMessage message={listingError?.message || "An error occurred"} />
+		);
 	if (loadingListing) return <Loader height={50} width={50} />;
 
 	return (

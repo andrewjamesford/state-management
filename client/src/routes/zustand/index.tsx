@@ -35,6 +35,15 @@ function RouteComponent() {
 					<ListingTile key={listing.id} listing={listing} basePath="/zustand" />
 				))}
 			</div>
+
+			<div className="my-4">
+				<Link
+					to="/reduxrtk/add"
+					className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+				>
+					Add Listing
+				</Link>
+			</div>
 		</div>
 	);
 }

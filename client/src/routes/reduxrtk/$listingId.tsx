@@ -1,29 +1,33 @@
-import { createFileRoute, useNavigate, useParams } from '@tanstack/react-router'
-import { addDays, format } from 'date-fns'
-import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import ErrorMessage from '~/components/errorMessage'
-import Loader from '~/components/loader'
-import ListingForm from '~/forms/listingForm'
-import { type Listing, type ListingSchema, listingSchema } from '~/models'
-import type { RootState } from '~/store'
 import {
-  useGetListingQuery,
-  useGetParentCategoriesQuery,
-  useGetSubCategoriesQuery,
-  useUpdateListingMutation,
-} from '~/store/listingApi'
+	createFileRoute,
+	useNavigate,
+	useParams,
+} from "@tanstack/react-router";
+import { addDays, format } from "date-fns";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import ErrorMessage from "~/components/errorMessage";
+import Loader from "~/components/loader";
+import ListingForm from "~/forms/listingForm";
+import { type Listing, type ListingSchema, listingSchema } from "~/models";
+import type { RootState } from "~/store";
+import {
+	useGetListingQuery,
+	useGetParentCategoriesQuery,
+	useGetSubCategoriesQuery,
+	useUpdateListingMutation,
+} from "~/store/listingApi";
 
 // RTK Query error type
 interface ApiError {
-  data?: { message: string }
-  status?: number
-  message: string
+	data?: { message: string };
+	status?: number;
+	message: string;
 }
 
-export const Route = createFileRoute('/reduxrtk/$listingId')({
-  component: RouteComponent,
-})
+export const Route = createFileRoute("/reduxrtk/$listingId")({
+	component: RouteComponent,
+});
 
 /**
  * @fileoverview
@@ -59,121 +63,127 @@ export const Route = createFileRoute('/reduxrtk/$listingId')({
  * - On submission, the updateListing mutation is invoked and the user is navigated on successful update.
  */
 function RouteComponent() {
-  const today = new Date()
-  const tomorrow = format(addDays(today, 1), 'yyyy-MM-dd')
-  const fortnight = format(addDays(today, 14), 'yyyy-MM-dd')
+	const today = new Date();
+	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
+	const fortnight = format(addDays(today, 14), "yyyy-MM-dd");
 
-  const navigate = useNavigate({ from: Route.fullPath })
+	const navigate = useNavigate({ from: Route.fullPath });
 
-  // Get initial state from Redux
-  const reduxListing = useSelector((state: RootState) =>
-    state.listing ? state.listing : listingSchema,
-  )
+	// Get initial state from Redux
+	const reduxListing = useSelector((state: RootState) =>
+		state.listing ? state.listing : listingSchema,
+	);
 
-  // Local state for form
-  const [formState, setFormState] = useState<ListingSchema>(() => ({
-    ...reduxListing,
-    endDate: new Date(reduxListing.endDate),
-    listingPrice: Number(reduxListing.listingPrice),
-    reservePrice: Number(reduxListing.reservePrice),
-  }))
+	// Local state for form
+	const [formState, setFormState] = useState<ListingSchema>(() => ({
+		...reduxListing,
+		endDate: new Date(reduxListing.endDate),
+		listingPrice: Number(reduxListing.listingPrice),
+		reservePrice: Number(reduxListing.reservePrice),
+	}));
 
-  const { listingId } = useParams({ from: Route.id })
+	const { listingId } = useParams({ from: Route.id });
 
-  const [updateListing] = useUpdateListingMutation()
+	const [updateListing] = useUpdateListingMutation();
 
-  const {
-    data: listingData,
-    isLoading: loadingListing,
-    error: listingError,
-  } = useGetListingQuery(listingId)
+	const {
+		data: listingData,
+		isLoading: loadingListing,
+		error: listingError,
+	} = useGetListingQuery(listingId);
 
-  const {
-    data: categoryData,
-    isLoading: loadingCategory,
-    error: categoryError,
-  } = useGetParentCategoriesQuery()
+	const {
+		data: categoryData,
+		isLoading: loadingCategory,
+		error: categoryError,
+	} = useGetParentCategoriesQuery();
 
-  const {
-    data: subCategoryData,
-    isLoading: loadingSubCategory,
-    error: subCategoryError,
-  } = useGetSubCategoriesQuery(formState.categoryId || 0)
+	const {
+		data: subCategoryData,
+		isLoading: loadingSubCategory,
+		error: subCategoryError,
+	} = useGetSubCategoriesQuery(formState.categoryId || 0);
 
-  useEffect(() => {
-    if (listingData) {
-      setFormState({
-        ...listingData,
-        endDate: new Date(listingData.endDate),
-        listingPrice: Number(listingData.listingPrice),
-        reservePrice: Number(listingData.reservePrice),
-      })
-    }
-  }, [listingData])
+	useEffect(() => {
+		if (listingData) {
+			setFormState({
+				...listingData,
+				endDate: new Date(listingData.endDate),
+				listingPrice: Number(listingData.listingPrice),
+				reservePrice: Number(listingData.reservePrice),
+			});
+		}
+	}, [listingData]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
 
-    try {
-      const updatedListing: Listing = {
-        ...formState,
-        endDate: format(formState.endDate, 'yyyy-MM-dd'),
-        listingPrice: String(formState.listingPrice),
-        reservePrice: String(formState.reservePrice),
-      }
-      const result = await updateListing({
-        id: listingId,
-        listing: updatedListing,
-      }).unwrap()
+		try {
+			const updatedListing: Listing = {
+				...formState,
+				endDate: format(formState.endDate, "yyyy-MM-dd"),
+				listingPrice: String(formState.listingPrice),
+				reservePrice: String(formState.reservePrice),
+			};
+			const result = await updateListing({
+				id: listingId,
+				listing: updatedListing,
+			}).unwrap();
 
-      if (result === 1) {
-        navigate({ to: '/reduxrtk' })
-      }
-    } catch (err) {
-      const error = err as ApiError
-      alert(error.data?.message || error.message || 'An error occurred')
-    }
-  }
+			if (result === 1) {
+				navigate({ to: "/reduxrtk" });
+			}
+		} catch (err) {
+			const error = err as ApiError;
+			alert(error.data?.message || error.message || "An error occurred");
+		}
+	};
 
-  if (categoryError)
-    return (
-      <ErrorMessage
-        message={
-          (categoryError as ApiError)?.data?.message || (categoryError as ApiError)?.message || 'An error occurred'
-        }
-      />
-    )
-  if (subCategoryError)
-    return (
-      <ErrorMessage
-        message={
-          (subCategoryError as ApiError)?.data?.message || (subCategoryError as ApiError)?.message || 'An error occurred'
-        }
-      />
-    )
-  if (listingError)
-    return (
-      <ErrorMessage
-        message={
-          (listingError as ApiError)?.data?.message || (listingError as ApiError)?.message || 'An error occurred'
-        }
-      />
-    )
-  if (loadingListing) return <Loader height={50} width={50} />
+	if (categoryError)
+		return (
+			<ErrorMessage
+				message={
+					(categoryError as ApiError)?.data?.message ||
+					(categoryError as ApiError)?.message ||
+					"An error occurred"
+				}
+			/>
+		);
+	if (subCategoryError)
+		return (
+			<ErrorMessage
+				message={
+					(subCategoryError as ApiError)?.data?.message ||
+					(subCategoryError as ApiError)?.message ||
+					"An error occurred"
+				}
+			/>
+		);
+	if (listingError)
+		return (
+			<ErrorMessage
+				message={
+					(listingError as ApiError)?.data?.message ||
+					(listingError as ApiError)?.message ||
+					"An error occurred"
+				}
+			/>
+		);
+	if (loadingListing) return <Loader height={50} width={50} />;
 
-  return (
-    <form onSubmit={handleSubmit} className="group max-w-4xl mx-auto px-4 py-5">
-      <ListingForm
-        listingId={Number(listingId)}
-        formState={formState}
-        setFormState={setFormState}
-        tomorrow={tomorrow}
-        fortnight={fortnight}
-        loadingCategory={loadingCategory}
-        loadingSubCategory={loadingSubCategory}
-        categoryData={categoryData ?? null}
-        subCategoryData={subCategoryData ?? null}
-      />
-    </form>
-  )
+	return (
+		<form onSubmit={handleSubmit} className="group max-w-4xl mx-auto px-4 py-5">
+			<ListingForm
+				listingId={Number(listingId)}
+				formState={formState}
+				setFormState={setFormState}
+				tomorrow={tomorrow}
+				fortnight={fortnight}
+				loadingCategory={loadingCategory}
+				loadingSubCategory={loadingSubCategory}
+				categoryData={categoryData ?? null}
+				subCategoryData={subCategoryData ?? null}
+			/>
+		</form>
+	);
 }

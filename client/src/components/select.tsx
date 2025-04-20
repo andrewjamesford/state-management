@@ -24,7 +24,6 @@ const Select: React.FC<SelectProps> = ({
 	options = [],
 	...props
 }) => {
-
 	const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		if (onChange) onChange(e);
 	};

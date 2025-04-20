@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
 import { useLocation } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 
 /**
  * NavItem component renders a navigation item with a link or a span based on its active state.
