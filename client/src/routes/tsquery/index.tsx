@@ -30,6 +30,7 @@ function RouteComponent() {
 				subTitle: listing.subtitle,
 				endDate: listing.enddate,
 				description: listing.listingdescription,
+				condition: listing.condition,
 				listingPrice: listing.listingprice,
 				reservePrice: listing.reserveprice,
 				creditCardPayment: listing.creditcardpayment,
