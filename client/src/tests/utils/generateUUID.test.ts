@@ -20,13 +20,19 @@ describe("generateUUID", () => {
 	it("should generate unique UUIDs on multiple calls", () => {
 		// Mock implementation to return different values on subsequent calls
 		const mockUUIDs = [
-			"123e4567-e89b-42d3-a456-556642440001",
-			"123e4567-e89b-42d3-a456-556642440002",
+			["123e4567","e89b","42d3","a456","556642440001"],
+			["123e4567","e89b","42d3","a456","556642440002"],
 		];
 
 		let callCount = 0;
 		vi.spyOn(crypto, "randomUUID").mockImplementation(() => {
-			return mockUUIDs[callCount++];
+			const uuidPart1 = mockUUIDs[callCount][0];
+			const uuidPart2 = mockUUIDs[callCount][1];
+			const uuidPart3 = mockUUIDs[callCount][2];
+			const uuidPart4 = mockUUIDs[callCount][3];
+			const uuidPart5 = mockUUIDs[callCount][4];
+			callCount++;
+			return `${uuidPart1}-${uuidPart2}-${uuidPart3}-${uuidPart4}-${uuidPart5}`;
 		});
 
 		const uuid1 = generateUUID();
