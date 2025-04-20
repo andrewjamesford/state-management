@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import api from "~/api";
-import type { Category, Listing, RawListing } from "~/models";
+import type { Listing, RawListing } from "~/models";
 import { useListingStore } from "~/store/listingStore";
 
 // Mock the API module
@@ -21,7 +21,6 @@ describe("listingStore (Zustand)", () => {
 		vi.resetAllMocks();
 
 		// Reset the store state
-		const store = useListingStore.getState();
 		useListingStore.setState({
 			listing: {
 				id: 0,
@@ -95,6 +94,7 @@ describe("listingStore (Zustand)", () => {
 				bitcoinpayment: false,
 				pickup: false,
 				shippingoption: "courier",
+				category: "API Category",
 			};
 
 			vi.mocked(api.getListing).mockResolvedValue({
@@ -151,7 +151,6 @@ describe("listingStore (Zustand)", () => {
 
 	describe("fetchListings", () => {
 		it("should fetch and update multiple listings", async () => {
-			// Mock API response with multiple listings
 			const mockRawListings: RawListing[] = [
 				{
 					id: 1,
@@ -169,6 +168,7 @@ describe("listingStore (Zustand)", () => {
 					bitcoinpayment: false,
 					pickup: true,
 					shippingoption: "post",
+					category: "Category One",
 				},
 				{
 					id: 2,
@@ -186,6 +186,7 @@ describe("listingStore (Zustand)", () => {
 					bitcoinpayment: false,
 					pickup: false,
 					shippingoption: "courier",
+					category: "Category Two",
 				},
 			];
 

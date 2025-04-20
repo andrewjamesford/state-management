@@ -1,5 +1,5 @@
 import { format, isDate } from "date-fns";
-import Checkbox from "~/components/Checkbox";
+import Checkbox from "~/components/checkbox";
 import DateInput from "~/components/dateInput";
 import Loader from "~/components/loader";
 import MoneyTextInput from "~/components/moneyTextInput";

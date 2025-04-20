@@ -22,7 +22,7 @@ describe("listingSlice", () => {
 	};
 
 	it("should return the initial state", () => {
-		expect(reducer(undefined, { type: undefined })).toEqual(initialState);
+		expect(reducer(undefined, { type: "" })).toEqual(initialState);
 	});
 
 	describe("setListing action", () => {
