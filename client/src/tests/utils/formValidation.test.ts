@@ -1,44 +1,12 @@
-import { addDays, format, isWithinInterval } from "date-fns";
+import { addDays, format } from "date-fns";
 import { describe, expect, it } from "vitest";
-
-// Form validation utility functions
-function validateDateRange(
-	date: Date | string,
-	tomorrow: string,
-	fortnight: string,
-): boolean {
-	// Parse dates if they are strings
-	const dateToCheck = typeof date === "string" ? new Date(date) : date;
-	const minDate = new Date(tomorrow);
-	const maxDate = new Date(fortnight);
-
-	return isWithinInterval(dateToCheck, { start: minDate, end: maxDate });
-}
-
-function validateTitleLength(title: string): boolean {
-	return title.length >= 3 && title.length <= 80;
-}
-
-function validateDescriptionLength(description: string): boolean {
-	return description.length >= 10 && description.length <= 500;
-}
-
-function validatePaymentMethods(
-	creditCard: boolean,
-	bankTransfer: boolean,
-	bitcoin: boolean,
-): boolean {
-	return creditCard || bankTransfer || bitcoin;
-}
-
-function validatePrice(price: number | string): boolean {
-	const numPrice = typeof price === "string" ? Number.parseFloat(price) : price;
-	// Check if the price is a valid number and not NaN
-	if (Number.isNaN(numPrice)) {
-		return false;
-	}
-	return !Number.isNaN(numPrice) && numPrice >= 0;
-}
+import {
+	validateDateRange,
+	validateDescriptionLength,
+	validatePaymentMethods,
+	validatePrice,
+	validateTitleLength,
+} from "~/utils/formValidation";
 
 describe("Form Validation Utils", () => {
 	describe("validateDateRange", () => {
@@ -136,7 +104,9 @@ describe("Form Validation Utils", () => {
 
 	describe("validatePrice", () => {
 		it("should accept valid prices", () => {
-			expect(validatePrice(0)).toBe(true);
+			expect(validatePrice(0)).toBe(false);
+			expect(validatePrice(1)).toBe(true);
+			expect(validatePrice(0.01)).toBe(true);
 			expect(validatePrice(10)).toBe(true);
 			expect(validatePrice(99.99)).toBe(true);
 			expect(validatePrice("50")).toBe(true);

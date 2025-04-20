@@ -73,6 +73,10 @@ export const listingApi = createApi({
 				method: "POST",
 				body: listing,
 			}),
+			transformErrorResponse: (response) => {
+				console.error("Error adding listings:", response);
+				return response;
+			},
 			invalidatesTags: ["Listing"],
 		}),
 		updateListing: builder.mutation<number, { id: string; listing: Listing }>({
@@ -81,6 +85,9 @@ export const listingApi = createApi({
 				method: "PUT",
 				body: listing,
 			}),
+			transformErrorResponse: (response) => {
+				return response.data;
+			},
 			invalidatesTags: ["Listing"],
 		}),
 		getParentCategories: builder.query<Category[], void>({
