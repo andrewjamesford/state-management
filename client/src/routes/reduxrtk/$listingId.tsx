@@ -137,7 +137,6 @@ function RouteComponent() {
 					}
 				})
 				.catch((err) => {
-					console.log("here");
 					throw err;
 				});
 		} catch (err) {
