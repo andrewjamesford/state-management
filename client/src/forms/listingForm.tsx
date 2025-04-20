@@ -10,7 +10,6 @@ import TextInput from "~/components/textInput";
 import Textarea from "~/components/textarea";
 import type { Category, ListingSchema } from "~/models";
 
-
 interface ListingFormProps {
 	listingId?: number;
 	formState: ListingSchema;
@@ -295,13 +294,11 @@ const PriceAndPaymentSection = ({ formState, setFormState }: SectionProps) => (
 					id="listing-price"
 					placeholder="10.00"
 					value={formState.listingPrice}
-					min={1}
-					
 					onChange={(e) => {
-						const value = e.target.value ?? "0";
+						const value = e.target.value ?? "";
 						setFormState((prev) => ({
 							...prev,
-							listingPrice: Number(value) || 1,
+							listingPrice: Number(value) || 0,
 						}));
 					}}
 				/>
@@ -317,7 +314,7 @@ const PriceAndPaymentSection = ({ formState, setFormState }: SectionProps) => (
 						const value = e.target.value ?? "0";
 						setFormState((prev) => ({
 							...prev,
-							reservePrice: Number(value) || 1,
+							reservePrice: Number(value) || 0,
 						}));
 					}}
 				/>

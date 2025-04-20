@@ -156,13 +156,7 @@ function RouteComponent() {
 				reservePrice: String(listing.reservePrice),
 			};
 			const response = await api.updateListing(listingId, updatedListing);
-			if (!response.ok) {
-				throw new Error("Error updating listing");
-			}
 			const result = await response.json();
-			if (result.error) {
-				throw new Error(result.error);
-			}
 			return result;
 		},
 	});
@@ -171,13 +165,11 @@ function RouteComponent() {
 		e.preventDefault();
 		updateListingMutation.mutate(formState, {
 			onSuccess: (result) => {
-				alert(`${JSON.stringify(result)}`);
 				if (result === 1) {
 					navListings();
+					return;
 				}
-			},
-			onError: (error: Error) => {
-				alert(error.message);
+				alert(`${JSON.stringify(result.message)}`);
 			},
 		});
 	};

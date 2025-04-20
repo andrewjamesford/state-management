@@ -22,6 +22,15 @@ const bodyValidationMiddleware = (schema: ZodSchema) => {
 					// If conversion fails, let Zod handle the validation error
 				}
 			}
+			// Handle listingPrice and reservePrice conversion
+			if (body.listingPrice && typeof body.listingPrice === "string") {
+				// Attempt to convert string to number
+				body.listingPrice = Number.parseFloat(body.listingPrice);
+			}
+			if (body.reservePrice && typeof body.reservePrice === "string") {
+				// Attempt to convert string to number
+				body.reservePrice = Number.parseFloat(body.reservePrice);
+			}
 
 			schema.parse(body);
 			next();
