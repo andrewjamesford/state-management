@@ -1,5 +1,4 @@
 import type React from "react";
-import { useState } from "react";
 
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 	selectClassName?: string;
@@ -25,14 +24,10 @@ const Select: React.FC<SelectProps> = ({
 	options = [],
 	...props
 }) => {
-	const [selectedText, setSelectedText] = useState("");
 
 	const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		const text = e.target.options[e.target.selectedIndex].text;
-		setSelectedText(text);
 		if (onChange) onChange(e);
 	};
-
 	return (
 		<>
 			{label && (

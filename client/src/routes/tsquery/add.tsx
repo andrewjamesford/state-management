@@ -13,10 +13,6 @@ export const Route = createFileRoute("/tsquery/add")({
 	component: RouteComponent,
 });
 
-interface Category {
-	id: number;
-	category_name: string;
-}
 
 function RouteComponent() {
 	// Hardcode listingId as "add"
@@ -90,12 +86,30 @@ function RouteComponent() {
 		},
 	});
 
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		// if (formState.reservePrice === "") formState.reservePrice = "0.00";
+const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+e.preventDefault();
 
-		mutation.mutate({ listing: formState });
-	};
+try {
+  checkValue(Number(formState.reservePrice));
+} catch (error: unknown) {
+  if (error instanceof Error) {
+    alert(error.message);
+  } else {
+    alert("An unknown error occurred");
+  }
+  return;
+}
+
+// if (formState.reservePrice === "") formState.reservePrice = "0.00";
+mutation.mutate({ 
+  listing: { 
+    ...formState, 
+    endDate: formState.endDate.toISOString(),
+    listingPrice: formState.listingPrice.toString(),
+    reservePrice: formState.reservePrice.toString()
+  } 
+});
+};
 
 	const navListings = () => {
 		return navigate({ to: "/tsquery" });
@@ -112,7 +126,6 @@ function RouteComponent() {
 				listingId={0}
 				formState={formState}
 				setFormState={setFormState}
-				today={today}
 				tomorrow={tomorrow}
 				fortnight={fortnight}
 				loadingCategory={loadingCategory}
