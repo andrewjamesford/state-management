@@ -3,6 +3,9 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import app from "../../app";
 import { pool } from "../../db";
 import { addListing, getListings } from "../../listing/listing.repository";
+import type { Listing } from "listing/listing.model";
+
+vi.mock("../../listing/listing.repository");
 
 describe("Listings API", () => {
 	beforeEach(() => {
@@ -13,34 +16,74 @@ describe("Listings API", () => {
 		vi.resetAllMocks();
 	});
 
-	const mockListings = [
+	const mockListings: Listing[] = [
 		{
 			id: 1,
 			title: "Listing 1",
+			subTitle: "SubTitle 1",
 			description: "Description 1",
-			price: 100,
+			listingPrice: 100,
 			categoryId: 1,
 			subCategoryId: 1,
+			endDate: "2023-10-01",
+			condition: true,
+			reservePrice: 50,
+			creditCardPayment: true,
+			bankTransferPayment: false,
+			bitcoinPayment: false,
+			pickUp: true,
+			shippingOption: "post",
 		},
 		{
 			id: 2,
 			title: "Listing 2",
+			subTitle: "SubTitle 2",
 			description: "Description 2",
-			price: 200,
+			listingPrice: 200,
 			categoryId: 2,
 			subCategoryId: 2,
+			endDate: "2023-10-02",
+			condition: false,
+			reservePrice: 100,
+			creditCardPayment: false,
+			bankTransferPayment: true,
+			bitcoinPayment: true,
+			pickUp: false,
+			shippingOption: "courier",
 		},
 	];
 
 	describe("Get listings", () => {
 		describe("GET /api/listings", () => {
-			it("should return 200 status code", async () => {
-				request(app).get("/api/listings/").expect(200);
+			it("should return 200 and all listings", async () => {
+				// Arrange: Mock the repository function
+				vi.mocked(getListings).mockResolvedValue(mockListings);
+
+				// Act
+				const response = await request(app).get("/api/listings/");
+
+				// Assert
+				expect(response.status).toBe(200);
+				expect(response.body).toEqual(mockListings);
+				expect(getListings).toHaveBeenCalledTimes(1);
 			});
 		});
 
+		it("should return 404 and empty array if no listings are found", async () => {
+			// Arrange
+			vi.mocked(getListings).mockResolvedValue([]);
+
+			// Act
+			const response = await request(app).get("/api/listings/");
+
+			// Assert
+			expect(response.status).toBe(404); // API returns 404 when empty
+			expect(response.body.text).toEqual({ message: "No listings found" });
+			expect(getListings).toHaveBeenCalledTimes(1);
+		});
+
 		it("should return 404 status code if no listings are found", async () => {
-			const mock = vi.fn().mockImplementation(getListings);
+			const mock = vi.fn().mockImplementation(() => getListings());
 			mock.mockImplementationOnce(() => []);
 
 			await request(app).get("/api/listings/");
@@ -48,7 +91,7 @@ describe("Listings API", () => {
 		});
 
 		it("should return all listings", async () => {
-			const mock = vi.fn().mockImplementation(getListings);
+			const mock = vi.fn().mockImplementation(() => getListings());
 			mock.mockImplementationOnce(() => mockListings);
 
 			expect(mock()).toEqual(mockListings);
@@ -56,23 +99,26 @@ describe("Listings API", () => {
 		});
 
 		it("should return empty array if no listings are available", async () => {
-			const mock = vi.fn().mockImplementation(getListings);
+			const mock = vi.fn().mockImplementation(() => getListings());
 			mock.mockImplementationOnce(() => []);
 
 			expect(mock()).toEqual([]);
 			expect(mock).toHaveBeenCalledTimes(1);
 		});
 
-		it("should throw an error if the database query fails", async () => {
-			const mock = vi.fn().mockImplementation(getListings);
-			const error = new Error("Database query failed");
+		it("should return 500 if the database query fails", async () => {
+			// Arrange
+			const dbError = new Error("Database query failed");
+			vi.mocked(getListings).mockRejectedValue(dbError);
 
-			mock.mockImplementationOnce(() => {
-				throw error;
-			});
+			// Act
+			const response = await request(app).get("/api/listings/");
 
-			expect(() => mock()).toThrow(error);
-			expect(mock).toHaveBeenCalled;
+			// Assert
+			expect(response.status).toBe(500);
+			// Optionally check the error message if your error handler sends one
+			// expect(response.body).toEqual({ message: 'Internal Server Error' });
+			expect(getListings).toHaveBeenCalledTimes(1);
 		});
 	});
 });
@@ -95,7 +141,7 @@ describe("addListing", () => {
 	});
 
 	it("should add a new listing to the database", async () => {
-		const mock = vi.fn().mockImplementation(addListing);
+		const mock = vi.fn().mockImplementation(() => addListing);
 		const newListing = {
 			title: "New Listing",
 			description: "New Description",
@@ -115,8 +161,20 @@ describe("addListing", () => {
 describe("Get listing by ID", () => {
 	describe("GET /api/listings/:id", () => {
 		it("should return 200 status code when listing exists", async () => {
-			// You'd typically mock the repository function here
-			await request(app).get("/api/listings/1").expect(200);
+			// Arrange: Mock the repository to return a specific listing
+			const targetListing = mockListings[0]; // e.g., Listing with ID 1
+			vi.mocked(getListingById).mockResolvedValue(targetListing);
+
+			// Act
+			const response = await request(app).get(
+				`/api/listings/${targetListing.id}`,
+			);
+
+			// Assert
+			expect(response.status).toBe(200);
+			expect(response.body).toEqual(targetListing); // Check if the correct data is returned
+			expect(getListingById).toHaveBeenCalledTimes(1);
+			expect(getListingById).toHaveBeenCalledWith(targetListing.id); // Verify it was called with the correct ID
 		});
 
 		it("should return 404 status code when listing doesn't exist", async () => {
