@@ -49,6 +49,9 @@ router.get(
 			const listingId = req.params.listingId;
 			if (listingId) {
 				const listing = await getListing(Number(listingId));
+				if (!listing) {
+					return res.status(404).json({ message: "Listing not found" });
+				}
 				return res.json(listing);
 			}
 			return res.json({ message: "Listing ID is required" });
@@ -100,6 +103,9 @@ router.put(
 			const listingId = Number(req.params.listingId);
 			const listing: ListingDetails = req.body;
 			const updateListingResponse = await updateListing(listingId, listing);
+			if (!updateListingResponse) {
+				return res.status(404).json({ message: "Listing not found" });
+			}
 			return res.json(updateListingResponse);
 		} catch (err) {
 			console.error(err);

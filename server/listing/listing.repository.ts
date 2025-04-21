@@ -168,6 +168,12 @@ export const updateListing = async (
 			shippingOption,
 		} = listingDetails;
 
+		// Check if listing exists
+		const existingListing = await getListing(id);
+		if (!existingListing) {
+			throw new Error(`Listing with ID ${id} not found`);
+		}
+
 		const result = await pool.query(
 			`UPDATE listings SET 
 			title=$1, category_id=$2, sub_title=$3, end_date=$4, 
