@@ -4,7 +4,7 @@ export interface Listing {
 	subTitle: string;
 	categoryId: number;
 	subCategoryId: number;
-	endDate: string;
+	endDate: Date;
 	description: string;
 	condition: boolean;
 	listingPrice: number;

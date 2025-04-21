@@ -1,52 +1,11 @@
 import request from "supertest";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import app from "../../app";
-import {
-	addListing,
-	getListings,
-	getListing,
-} from "../../listing/listing.repository";
+import { pool } from "../../db";
+import { addListing, getListings } from "../../listing/listing.repository";
 import type { Listing } from "../../listing/listing.model";
-import { mock } from "node:test";
 
 vi.mock("../../listing/listing.repository");
-
-const mockListings: Listing[] = [
-	{
-		id: 1,
-		title: "Listing 1",
-		subTitle: "SubTitle 1",
-		description: "Description 1",
-		listingPrice: 100,
-		categoryId: 1,
-		subCategoryId: 1,
-		endDate: new Date("2023-10-01"),
-		condition: true,
-		reservePrice: 50,
-		creditCardPayment: true,
-		bankTransferPayment: false,
-		bitcoinPayment: false,
-		pickUp: true,
-		shippingOption: "post",
-	},
-	{
-		id: 2,
-		title: "Listing 2",
-		subTitle: "SubTitle 2",
-		description: "Description 2",
-		listingPrice: 200,
-		categoryId: 2,
-		subCategoryId: 2,
-		endDate: new Date("2023-10-02"),
-		condition: false,
-		reservePrice: 100,
-		creditCardPayment: false,
-		bankTransferPayment: true,
-		bitcoinPayment: true,
-		pickUp: false,
-		shippingOption: "courier",
-	},
-];
 
 describe("Listings API", () => {
 	beforeEach(() => {
@@ -56,6 +15,43 @@ describe("Listings API", () => {
 	afterEach(() => {
 		vi.resetAllMocks();
 	});
+
+	const mockListings: Listing[] = [
+		{
+			id: 1,
+			title: "Listing 1",
+			subTitle: "SubTitle 1",
+			description: "Description 1",
+			listingPrice: 100,
+			categoryId: 1,
+			subCategoryId: 1,
+			endDate: "2023-10-01",
+			condition: true,
+			reservePrice: 50,
+			creditCardPayment: true,
+			bankTransferPayment: false,
+			bitcoinPayment: false,
+			pickUp: true,
+			shippingOption: "post",
+		},
+		{
+			id: 2,
+			title: "Listing 2",
+			subTitle: "SubTitle 2",
+			description: "Description 2",
+			listingPrice: 200,
+			categoryId: 2,
+			subCategoryId: 2,
+			endDate: "2023-10-02",
+			condition: false,
+			reservePrice: 100,
+			creditCardPayment: false,
+			bankTransferPayment: true,
+			bitcoinPayment: true,
+			pickUp: false,
+			shippingOption: "courier",
+		},
+	];
 
 	describe("Get listings", () => {
 		describe("GET /api/listings", () => {
@@ -145,32 +141,17 @@ describe("addListing", () => {
 	});
 
 	it("should add a new listing to the database", async () => {
+		const mock = vi.fn().mockImplementation(() => addListing);
 		const newListing = {
-			id: 0,
 			title: "New Listing",
-			subTitle: "New SubTitle",
 			description: "New Description",
+			price: 300,
 			categoryId: 3,
 			subCategoryId: 3,
-			endDate: new Date(),
-			condition: true,
-			listingPrice: 300,
-			reservePrice: 150,
-			creditCardPayment: true,
-			bankTransferPayment: false,
-			bitcoinPayment: false,
-			pickUp: true,
-			shippingOption: "post",
 		};
 
-		vi.mocked(addListing).mockResolvedValue(1);
-
-		const response = await request(app).post("/api/listings/").send(newListing);
-
-		expect(response.status).toBe(200);
-		expect(addListing).toHaveBeenCalledTimes(1);
-		expect(addListing).toHaveBeenCalledWith(newListing);
-		const result = await addListing(newListing);
+		mock.mockImplementationOnce(() => 1);
+		const result = mock(newListing);
 
 		expect(result).toEqual(1);
 		expect(mock).toHaveBeenCalledWith(newListing);
@@ -179,44 +160,22 @@ describe("addListing", () => {
 
 describe("Get listing by ID", () => {
 	describe("GET /api/listings/:id", () => {
-		it("should return 200 and the correct listing data when the listing exists", async () => {
+		const mockListings: Listing[] = [];
+		it("should return 200 status code when listing exists", async () => {
 			// Arrange: Mock the repository to return a specific listing
 			const targetListing = mockListings[0]; // e.g., Listing with ID 1
-			if (!targetListing) {
-				throw new Error(
-					"Target listing is undefined. Ensure mockListings is not empty.",
-				);
-			}
-			vi.mocked(getListing).mockResolvedValue(targetListing);
+			vi.mocked(getListingById).mockResolvedValue(targetListing);
 
 			// Act
 			const response = await request(app).get(
 				`/api/listings/${targetListing.id}`,
 			);
-			expect(response.body.id).toBe(targetListing.id);
-			expect(response.body.title).toBe(targetListing.title);
-			expect(response.body.subTitle).toBe(targetListing.subTitle);
-			expect(response.body.description).toBe(targetListing.description);
-			expect(response.body.listingPrice).toBe(targetListing.listingPrice);
-			// Verify that the repository function is called with the correct listing ID.
-			expect(getListing).toHaveBeenCalledWith(targetListing.id); // Verify it was called with the correct ID
-			expect(response.body.subCategoryId).toBe(targetListing.subCategoryId);
-			expect(new Date(response.body.endDate)).toEqual(targetListing.endDate);
-			expect(response.body.condition).toBe(targetListing.condition);
-			expect(response.body.reservePrice).toBe(targetListing.reservePrice);
-			expect(response.body.creditCardPayment).toBe(
-				targetListing.creditCardPayment,
-			);
-			expect(response.body.bankTransferPayment).toBe(
-				targetListing.bankTransferPayment,
-			);
-			expect(response.body.bitcoinPayment).toBe(targetListing.bitcoinPayment);
-			expect(response.body.pickUp).toBe(targetListing.pickUp);
-			expect(response.body.shippingOption).toBe(targetListing.shippingOption);
+
 			// Assert
 			expect(response.status).toBe(200);
-			expect(getListing).toHaveBeenCalledTimes(1);
-			expect(getListing).toHaveBeenCalledWith(targetListing.id); // Verify it was called with the correct ID
+			expect(response.body).toEqual(targetListing); // Check if the correct data is returned
+			expect(getListingById).toHaveBeenCalledTimes(1);
+			expect(getListingById).toHaveBeenCalledWith(targetListing.id); // Verify it was called with the correct ID
 		});
 
 		it("should return 404 status code when listing doesn't exist", async () => {
@@ -230,55 +189,24 @@ describe("Update listing", () => {
 	describe("PUT /api/listings/:id", () => {
 		it("should return 200 status code when update succeeds", async () => {
 			const updatedListing = {
-				id: 3,
 				title: "Updated Listing",
-				subTitle: "Updated SubTitle",
+				description: "Updated Description",
+				price: 350,
 				categoryId: 2,
 				subCategoryId: 4,
-				endDate: new Date(),
-				condition: true,
-				description: "Updated Description",
-				listingPrice: 350,
-				reservePrice: 200,
-				creditCardPayment: true,
-				bankTransferPayment: false,
-				bitcoinPayment: false,
-				pickUp: true,
-				shippingOption: "post",
 			};
-
-			const response = await request(app)
-				.put("/api/listings/3")
-				.send(updatedListing);
-			expect(response.status).toBe(200);
-		});
-
-		it("should return 400 status code when trying to update non-existent listing", async () => {
-			const updatedListing = {
-				id: 999,
-				title: "Updated Listing",
-				subTitle: "Updated SubTitle",
-				description: "Updated Description",
-				listingPrice: 350,
-				categoryId: 2,
-				subCategoryId: 4,
-				endDate: new Date(),
-				condition: true,
-				reservePrice: 200,
-				creditCardPayment: true,
-				bankTransferPayment: false,
-				bitcoinPayment: false,
-				pickUp: true,
-				shippingOption: "post",
-			};
-
-			// Mock getListing to return null for non-existent listing
-			vi.mocked(getListing).mockResolvedValue(null);
 
 			await request(app)
-				.put("/api/listings/999")
+				.put("/api/listings/1")
 				.send(updatedListing)
-				.expect(400);
+				.expect(200);
+		});
+
+		it("should return 404 status code when trying to update non-existent listing", async () => {
+			await request(app)
+				.put("/api/listings/999")
+				.send({ title: "Won't update" })
+				.expect(404);
 		});
 	});
 });

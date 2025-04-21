@@ -30,7 +30,7 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 		if (!getListingsResponse.length)
 			return res.status(404).json({ message: "No listings found" });
 
-		return res.json(getListingsResponse);
+		return res.status(200).json(getListingsResponse);
 	} catch (err) {
 		next(err);
 	}
