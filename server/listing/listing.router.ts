@@ -26,6 +26,8 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		// Call getListings() to retrieve all listings from the database
 		const getListingsResponse = await getListings();
+		if (!getListingsResponse.length)
+			return res.status(404).json({ message: "No listings found" });
 
 		return res.json(getListingsResponse);
 	} catch (err) {
@@ -46,15 +48,16 @@ router.get(
 	"/:listingId",
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const listingId = req.params.listingId;
-			if (listingId) {
-				const listing = await getListing(Number(listingId));
-				if (!listing) {
-					return res.status(404).json({ message: "Listing not found" });
-				}
-				return res.json(listing);
+			const listingId = Number(req.params.listingId);
+			if (Number.isNaN(listingId)) {
+				return res.status(404).json({ message: "Listing not found" });
 			}
-			return res.json({ message: "Listing ID is required" });
+
+			const listing = await getListing(Number(listingId));
+			if (!listing) {
+				return res.status(404).json({ message: "Listing not found" });
+			}
+			return res.json(listing);
 		} catch (err) {
 			next(err);
 		}
@@ -63,7 +66,6 @@ router.get(
 
 /**
  * Add a new Listing
- *
  * @name POST /listings
  * @function
  * @param {Object} req - The request object
