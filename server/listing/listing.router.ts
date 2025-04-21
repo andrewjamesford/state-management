@@ -10,6 +10,7 @@ import {
 } from "./listing.repository";
 
 import { listingSchema } from "./listing.schema";
+import type { Listing } from "./listing.model";
 
 router.use(express.json());
 
@@ -103,7 +104,7 @@ router.put(
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const listingId = Number(req.params.listingId);
-			const listing: ListingDetails = req.body;
+			const listing: Listing = req.body;
 			const updateListingResponse = await updateListing(listingId, listing);
 			if (!updateListingResponse) {
 				return res.status(404).json({ message: "Listing not found" });
