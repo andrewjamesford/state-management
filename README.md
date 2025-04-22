@@ -49,11 +49,11 @@ docker compose up
 
 Or alternatively you can run each project individually with:
 
-- `cd server && pnpm i && pnpm start`
-- `cd client && pnpm i && pnpm dev`
+- `cd server && npm i && npm start`
+- `cd client && npm i && npm dev`
 - Run db in docker with `cd db  && docker-compose db up`
 
-Recommended to install the PNPM packages regardless if you are using Docker to get intellisense for TailwindCSS and other libraries etc.
+Recommended to install the npm packages regardless if you are using Docker to get intellisense for TailwindCSS and other libraries etc.
 
 
 ## Educational Comparison of State Management Approaches
@@ -142,7 +142,7 @@ Notice how each approach handles these common scenarios differently:
         – GET /api/categories (with optional `parentId`)
         – GET|POST|PUT /api/listings
     - Uses `pg` for DB access, Zod for request validation, and Vitest + Supertest for unit/integration tests.
-        - `pnpm run dev` (or via Docker) boots on port 5002.
+        - `npm run dev` (or via Docker) boots on port 5002.
     client/
     - Vite + React + TypeScript + TailwindCSS UI.
     - Central routing via TanStack Router and a shared layout (header, footer, skeleton loader).
@@ -156,7 +156,7 @@ Notice how each approach handles these common scenarios differently:
 
     - Shared UI components (`src/components/`), form (`src/forms/listingForm.tsx`), type definitions, and a thin `src/api.ts` wrapper over `fetch`.
     - Tests with Vitest + React Testing Library for unit/component tests, and Playwright for end‑to‑end scenarios.
-    - `pnpm run dev` (or via Docker) serves on port 4002.
+    - `npm run dev` (or via Docker) serves on port 4002.
         docker-compose.yml
     - Brings up the three services together: client, server, and Postgres.
         state‑management.code‑workspace
@@ -170,9 +170,9 @@ Notice how each approach handles these common scenarios differently:
 
         `cd db && docker-compose up`
 
-        `cd server && pnpm install && pnpm run dev`
+        `cd server && npm install && npm run dev`
 
-        `cd client && pnpm install && pnpm run dev`
+        `cd client && npm install && npm run dev`
 4. What you’ll see in the UI
     - A simple listings dashboard: list all auctions, view a single auction, add/edit a listing.
     - Three navigation tabs/routes—one for each state‑management approach—so you can compare code and behavior side by side.

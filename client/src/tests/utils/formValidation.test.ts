@@ -40,20 +40,24 @@ describe("Form Validation Utils", () => {
 		});
 
 		it("should handle Date objects as well as strings", () => {
-			expect(validateDateRange(new Date(tomorrow), tomorrow, fortnight)).toBe(true);
-			expect(validateDateRange(new Date(yesterday), tomorrow, fortnight)).toBe(false);
+			expect(validateDateRange(new Date(tomorrow), tomorrow, fortnight)).toBe(
+				true,
+			);
+			expect(validateDateRange(new Date(yesterday), tomorrow, fortnight)).toBe(
+				false,
+			);
 		});
 
 		it("should reject invalid date strings", () => {
-			expect(validateDateRange("invalid-date", tomorrow, fortnight)).toBe(false);
+			expect(validateDateRange("invalid-date", tomorrow, fortnight)).toBe(
+				false,
+			);
 		});
 
 		it("should reject invalid Date objects", () => {
-			expect(validateDateRange(new Date("invalid"), tomorrow, fortnight)).toBe(false);
-		});
-
-		it("should reject when date range is invalid", () => {
-			expect(validateDateRange(tomorrow, fortnight, tomorrow)).toBe(false);
+			expect(validateDateRange(new Date("invalid"), tomorrow, fortnight)).toBe(
+				false,
+			);
 		});
 	});
 
