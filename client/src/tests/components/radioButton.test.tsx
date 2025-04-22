@@ -25,7 +25,7 @@ describe("RadioButton", () => {
 				name="test-group"
 				value="test"
 				label="Test Option"
-				checked={true}
+				defaultChecked={true}
 			/>,
 		);
 
@@ -77,14 +77,14 @@ describe("RadioButton", () => {
 					name="test-group"
 					value="1"
 					label="Option 1"
-					checked={true}
+					defaultChecked={true}
 				/>
 				<RadioButton
 					id="option2"
 					name="test-group"
 					value="2"
 					label="Option 2"
-					checked={false}
+					defaultChecked={false}
 				/>
 			</>,
 		);

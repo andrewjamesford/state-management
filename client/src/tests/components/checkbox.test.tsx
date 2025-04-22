@@ -13,7 +13,7 @@ describe("Checkbox", () => {
 
 	it("handles checked state", () => {
 		render(
-			<Checkbox id="test-checkbox" label="Test Checkbox" checked={true} />,
+			<Checkbox id="test-checkbox" label="Test Checkbox" defaultChecked={true} />,
 		);
 
 		expect(screen.getByRole("checkbox")).toBeChecked();
