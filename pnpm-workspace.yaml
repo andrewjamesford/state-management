@@ -1,7 +1,3 @@
 packages:
-  - 'client/*'
-  - 'server/*'
-onlyBuiltDependencies:
-  - '@biomejs/biome'
-  - esbuild
-  - protobufjs
+  - 'client'
+  - 'server'
