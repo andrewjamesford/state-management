@@ -7,8 +7,14 @@ describe("API module", () => {
 	const mockApiUrl = "http://test-api.example";
 
 	beforeEach(() => {
-		// Mock fetch
-		global.fetch = vi.fn();
+		// Mock fetch with proper response
+		global.fetch = vi.fn(() => 
+			Promise.resolve({
+				ok: true,
+				json: () => Promise.resolve({}),
+				status: 200,
+			} as Response)
+		);
 
 		// Mock VITE_API_URL environment variable
 		vi.stubEnv("VITE_API_URL", mockApiUrl);

@@ -1,4 +1,4 @@
-import { isWithinInterval, parseISO } from "date-fns";
+import { isWithinInterval, parseISO, isValid as isDate } from "date-fns";
 
 const MAX_TITLE_LENGTH = 80;
 const MIN_TITLE_LENGTH = 3;
