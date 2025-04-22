@@ -1,5 +1,5 @@
 import { addDays, format } from "date-fns";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import {
 	validateDateRange,
 	validateDescriptionLength,
@@ -9,6 +9,13 @@ import {
 } from "~/utils/formValidation";
 
 describe("Form Validation Utils", () => {
+  beforeEach(() => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 	describe("validateDateRange", () => {
 		const today = new Date();
 		const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
@@ -49,15 +56,15 @@ describe("Form Validation Utils", () => {
 		});
 
 		it("should reject invalid date strings", () => {
-			expect(validateDateRange("invalid-date", tomorrow, fortnight)).toBe(
-				false,
-			);
+			expect(validateDateRange("invalid-date", tomorrow, fortnight)).toBe(false);
+			expect(validateDateRange("2023-02-30", tomorrow, fortnight)).toBe(false);
+			expect(validateDateRange("", tomorrow, fortnight)).toBe(false);
 		});
 
 		it("should reject invalid Date objects", () => {
-			expect(validateDateRange(new Date("invalid"), tomorrow, fortnight)).toBe(
-				false,
-			);
+			expect(validateDateRange(new Date("invalid"), tomorrow, fortnight)).toBe(false);
+			expect(validateDateRange(new Date(""), tomorrow, fortnight)).toBe(false);
+			expect(validateDateRange(new Date("2023-02-30"), tomorrow, fortnight)).toBe(false);
 		});
 	});
 
