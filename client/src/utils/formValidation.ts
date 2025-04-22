@@ -76,9 +76,21 @@ function validatePaymentMethods(
  * @returns {boolean} - True if the price is a valid positive number, false otherwise.
  */
 function validatePrice(price: number | string): boolean {
-	const numPrice = typeof price === "string" ? Number.parseFloat(price) : price;
-	// Check if the price is a valid number (not NaN, not Infinity) and is greater than 0
-	return Number.isFinite(numPrice) && numPrice > 0;
+    if (price === null || price === undefined) {
+        console.error("Price cannot be null or undefined");
+        return false;
+    }
+    
+    const numPrice = typeof price === "string" ? Number.parseFloat(price) : price;
+    
+    // Check if the parsed number is valid
+    if (Number.isNaN(numPrice)) {
+        console.error("Invalid price value provided");
+        return false;
+    }
+    
+    // Check if the price is finite and positive
+    return Number.isFinite(numPrice) && numPrice > 0;
 }
 
 export {

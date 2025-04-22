@@ -141,5 +141,10 @@ describe("Form Validation Utils", () => {
 			expect(validatePrice("abc")).toBe(false);
 			expect(validatePrice("10abc")).toBe(true);
 		});
+
+		it("should handle null/undefined values", () => {
+			expect(validatePrice(null)).toBe(false);
+			expect(validatePrice(undefined)).toBe(false);
+		});
 	});
 });
