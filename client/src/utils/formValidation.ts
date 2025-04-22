@@ -1,4 +1,4 @@
-import { isWithinInterval } from "date-fns";
+import { isWithinInterval, parseISO } from "date-fns";
 
 const MAX_TITLE_LENGTH = 80;
 const MIN_TITLE_LENGTH = 3;
@@ -10,20 +10,27 @@ const MIN_DESCRIPTION_LENGTH = 10;
 /**
  * Validates if a given date is within the specified range.
  * @param {Date | string} date - The date to check.
- * @param {string} tomorrow - The start of the range (tomorrow).
- * @param {string} fortnight - The end of the range (two weeks from now).
+ * @param {string} tomorrow - The start of the range (tomorrow) in 'yyyy-MM-dd' format.
+ * @param {string} fortnight - The end of the range (two weeks from now) in 'yyyy-MM-dd' format.
  * @returns {boolean} - True if the date is within the range, false otherwise.
  */
 function validateDateRange(
 	date: Date | string,
-	tomorrow: string,
-	fortnight: string,
+	tomorrow: string, // Expected format 'yyyy-MM-dd'
+	fortnight: string, // Expected format 'yyyy-MM-dd'
 ): boolean {
-	// Parse dates if they are strings
-	const dateToCheck = typeof date === "string" ? new Date(date) : date;
-	const minDate = new Date(tomorrow);
-	const maxDate = new Date(fortnight);
+	// Parse dates using parseISO for reliable parsing of 'yyyy-MM-dd'
+	const dateToCheck = typeof date === "string" ? parseISO(date) : date;
+	const minDate = parseISO(tomorrow);
+	const maxDate = parseISO(fortnight);
 
+	// Check if parsed dates are valid before comparing
+	if (!isDate(dateToCheck) || !isDate(minDate) || !isDate(maxDate)) {
+		console.error("Invalid date provided to validateDateRange");
+		return false; // Cannot validate with invalid dates
+	}
+
+	// isWithinInterval is inclusive of start and end dates
 	return isWithinInterval(dateToCheck, { start: minDate, end: maxDate });
 }
 
@@ -64,23 +71,14 @@ function validatePaymentMethods(
 }
 
 /**
- * Validates if a price is a valid number and not zero or negative.
+ * Validates if a price is a valid number and positive (greater than zero).
  * @param {number | string} price - The price to validate.
- * @returns {boolean} - True if the price is valid, false otherwise.
+ * @returns {boolean} - True if the price is a valid positive number, false otherwise.
  */
 function validatePrice(price: number | string): boolean {
 	const numPrice = typeof price === "string" ? Number.parseFloat(price) : price;
-	// Check if the price is a valid number and not NaN
-	if (Number.isNaN(numPrice)) {
-		return false;
-	}
-	if (numPrice === 0) {
-		return false;
-	}
-	if (numPrice < 0) {
-		return false;
-	}
-	return true;
+	// Check if the price is a valid number (not NaN, not Infinity) and is greater than 0
+	return Number.isFinite(numPrice) && numPrice > 0;
 }
 
 export {

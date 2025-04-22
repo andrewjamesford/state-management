@@ -11,11 +11,12 @@ import Textarea from "~/components/textarea";
 import type { Category, ListingSchema } from "~/models";
 
 interface ListingFormProps {
+	// listingId is now number based on API changes
 	listingId?: number;
 	formState: ListingSchema;
 	setFormState: React.Dispatch<React.SetStateAction<ListingSchema>>;
-	tomorrow: string;
-	fortnight: string;
+	tomorrow: string; // Expected 'yyyy-MM-dd'
+	fortnight: string; // Expected 'yyyy-MM-dd'
 	loadingCategory: boolean;
 	loadingSubCategory: boolean;
 	categoryData: Category[] | null;
@@ -32,8 +33,8 @@ interface BasicInfoSectionProps extends SectionProps {
 	loadingSubCategory: boolean;
 	categoryData: Category[] | null;
 	subCategoryData: Category[] | null;
-	tomorrow: string;
-	fortnight: string;
+	tomorrow: string; // Expected 'yyyy-MM-dd'
+	fortnight: string; // Expected 'yyyy-MM-dd'
 }
 
 const handleTextChange =
@@ -92,7 +93,8 @@ const BasicInfoSection = ({
 					onChange={handleTextChange("subTitle", setFormState)}
 					maxLength={50}
 					className="block w-full px-3 py-2 mt-1 border rounded-md placeholder:italic peer"
-					errorMessage="Please enter a listing title of 3-80 characters"
+					// Note: Added basic validation classes/messages for subtitle too
+					errorMessage="Please enter a subtitle of up to 50 characters"
 					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
 					requirementsLabel="50 characters max"
 					requirementsClassName="mt-1 text-sm text-gray-500"
@@ -116,7 +118,7 @@ const BasicInfoSection = ({
 								setFormState((prev) => ({
 									...prev,
 									categoryId: value,
-									subCategoryId: 0,
+									subCategoryId: 0, // Reset subcategory when category changes
 								}));
 							}}
 							value={formState.categoryId}
@@ -160,11 +162,11 @@ const BasicInfoSection = ({
 								}));
 							}}
 							value={formState.subCategoryId}
-							required={true}
+							required={true} // Subcategory is required
 							disabled={
 								!subCategoryData ||
 								loadingSubCategory ||
-								formState.categoryId === 0
+								formState.categoryId === 0 // Disable if no parent category selected
 							}
 							aria-busy={loadingSubCategory}
 							options={[
@@ -192,25 +194,27 @@ const BasicInfoSection = ({
 					label="End date"
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="end-date"
+					// Format the Date object to 'yyyy-MM-dd' for the input value
 					value={
 						isDate(formState.endDate) &&
 						Number.isFinite(formState.endDate.getTime())
 							? format(formState.endDate, "yyyy-MM-dd")
-							: tomorrow
+							: tomorrow // Default to tomorrow if date is invalid
 					}
 					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-						const endDate = e.target.value
-							? new Date(e.target.value)
-							: new Date(tomorrow);
+						const dateValue = e.target.value;
+						// Parse the input string value into a Date object
+						const endDate = dateValue ? new Date(dateValue) : new Date(tomorrow);
 						setFormState((prev) => ({
 							...prev,
+							// Check if the parsed date is valid before setting state
 							endDate: Number.isFinite(endDate.getTime())
 								? endDate
-								: new Date(tomorrow),
+								: new Date(tomorrow), // Fallback to tomorrow if invalid
 						}));
 					}}
 					required
-					pattern="\d{4}-\d{2}-\d{2}"
+					pattern="\d{4}-\d{2}-\d{2}" // Basic pattern validation
 					min={tomorrow}
 					max={fortnight}
 					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:default):invalid]:block"
@@ -236,7 +240,7 @@ const ItemDetailsSection = ({ formState, setFormState }: SectionProps) => (
 					required={true}
 					maxLength={500}
 					minLength={10}
-					className="block w-full px-3 py-2 mt-1 border rounded-md placeholder:italic"
+					className="block w-full px-3 py-2 mt-1 border rounded-md placeholder:italic peer invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-600" // Added peer and invalid classes
 					placeholder="Describe your item"
 					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
 					errorMessage="Please enter a description of 10-500 characters"
@@ -295,12 +299,18 @@ const PriceAndPaymentSection = ({ formState, setFormState }: SectionProps) => (
 					placeholder="10.00"
 					value={formState.listingPrice}
 					onChange={(e) => {
-						const value = e.target.value ?? "";
+						// MoneyTextInput likely returns a number or string that needs parsing
+						const value = Number(e.target.value) || 0; // Ensure it's a number
 						setFormState((prev) => ({
 							...prev,
-							listingPrice: Number(value) || 0,
+							listingPrice: value,
 						}));
 					}}
+					required // Start price should likely be required and positive
+					// Add validation classes/messages for price
+					className="peer mt-1 block w-full rounded-md border px-3 py-2 placeholder:italic invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-600"
+					errorMessage="Please enter a valid price greater than 0"
+					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
 				/>
 			</div>
 			<div className="mt-6">
@@ -311,12 +321,17 @@ const PriceAndPaymentSection = ({ formState, setFormState }: SectionProps) => (
 					placeholder="$20.00"
 					value={formState.reservePrice}
 					onChange={(e) => {
-						const value = e.target.value ?? "0";
+						const value = Number(e.target.value) || 0; // Ensure it's a number
 						setFormState((prev) => ({
 							...prev,
-							reservePrice: Number(value) || 0,
+							reservePrice: value,
 						}));
 					}}
+					// Reserve price is optional, so no 'required' prop
+					// Add validation classes/messages for reserve price (optional but must be valid if entered)
+					className="peer mt-1 block w-full rounded-md border px-3 py-2 placeholder:italic invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-600"
+					errorMessage="Please enter a valid reserve price (or leave blank)" // Adjust message
+					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
 				/>
 			</div>
 
@@ -324,6 +339,7 @@ const PriceAndPaymentSection = ({ formState, setFormState }: SectionProps) => (
 				<legend className="block text-sm font-medium text-gray-700">
 					Payment options
 				</legend>
+				{/* Add a required attribute or handle validation manually for payment options */}
 				<div className="flex mt-3">
 					<Checkbox
 						id="payment-credit"
@@ -363,6 +379,7 @@ const PriceAndPaymentSection = ({ formState, setFormState }: SectionProps) => (
 						}}
 					/>
 				</div>
+				{/* Manual validation feedback for payment options would go here */}
 			</div>
 		</fieldset>
 	</>
@@ -451,7 +468,7 @@ const ShippingSection = ({ formState, setFormState }: SectionProps) => (
 
 export default function ListingForm(listingFormProps: ListingFormProps) {
 	const {
-		listingId = 0,
+		listingId = 0, // Default to 0 for new listings
 		formState,
 		setFormState,
 		tomorrow,
@@ -462,9 +479,13 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 		subCategoryData,
 	} = listingFormProps;
 
+	// Display loader if categories/subcategories are loading
 	if (loadingCategory || loadingSubCategory) {
 		return <Loader aria-label="Loading form data" />;
 	}
+
+	// Note: Form validation logic is still manual.
+	// A form library would typically handle submission and validation here.
 
 	return (
 		<>
@@ -488,9 +509,12 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 
 			<ShippingSection formState={formState} setFormState={setFormState} />
 
-			<input type="hidden" name="id" value={listingId} />
+			{/* Include listingId as a hidden input if needed for form submission */}
+			{/* Ensure the name attribute matches what your submission handler expects */}
+			{listingId > 0 && <input type="hidden" name="id" value={listingId} />}
 
 			<div className="mt-3">
+				{/* The SubmitButton component will handle the actual <button type="submit"> */}
 				<SubmitButton />
 			</div>
 		</>
