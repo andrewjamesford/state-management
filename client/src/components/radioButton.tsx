@@ -19,6 +19,20 @@ const RadioButton: React.FC<RadioButtonProps> = ({
 	labelClassName = "",
 	...props
 }) => {
+	// If checked is provided but onChange is not, use readOnly prop to avoid the warning
+	const inputProps =
+		checked !== undefined && !onChange
+			? {
+					checked,
+					readOnly: true,
+					...props,
+				}
+			: {
+					...props,
+					checked,
+					onChange,
+				};
+
 	return (
 		<div className={`${containerClassName}`}>
 			<input
@@ -26,10 +40,8 @@ const RadioButton: React.FC<RadioButtonProps> = ({
 				id={id}
 				name={name}
 				value={value}
-				checked={checked}
-				onChange={onChange}
 				onBlur={onBlur}
-				{...props}
+				{...inputProps}
 			/>
 			<label htmlFor={id} className={`${labelClassName}`}>
 				{label}
