@@ -4,7 +4,7 @@ import api from "~/api";
 import ErrorMessage from "~/components/errorMessage";
 import ListingTile from "~/components/listingTile";
 import Skeleton from "~/components/skeleton";
-import type { Listing, RawListing } from "~/models";
+import type { Listing } from "~/models";
 
 export const Route = createFileRoute("/tsquery/")({
 	component: RouteComponent,
@@ -19,26 +19,13 @@ function RouteComponent() {
 	} = useQuery<Listing[]>({
 		queryKey: ["listings"],
 		queryFn: async () => {
-			const response = await api.getListings();
-			if (!response.ok) throw new Error("Error retrieving listings");
-			const listings: RawListing[] = await response.json();
-			return listings.map((listing) => ({
-				id: listing.id,
-				title: listing.title,
-				categoryId: listing.categoryid,
-				subCategoryId: listing.subcategoryid,
-				subTitle: listing.subtitle,
-				endDate: listing.enddate,
-				description: listing.listingdescription,
-				condition: listing.condition,
-				listingPrice: listing.listingprice,
-				reservePrice: listing.reserveprice,
-				creditCardPayment: listing.creditcardpayment,
-				bankTransferPayment: listing.banktransferpayment,
-				bitcoinPayment: listing.bitcoinpayment,
-				pickUp: listing.pickup,
-				shippingOption: listing.shippingoption,
-			}));
+			try {
+				return await api.getListings();
+			} catch (error) {
+				throw new Error(
+					`Error retrieving listings: ${error instanceof Error ? error.message : String(error)}`,
+				);
+			}
 		},
 	});
 

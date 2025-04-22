@@ -2,28 +2,8 @@ export interface ApiError {
 	message: string;
 	status?: number;
 	// Add other potential error details if needed
-	details?: any;
+	details?: unknown;
 }
-
-// The server repository already returns camelCase, making RawListing redundant
-// export interface RawListing {
-// 	id: number;
-// 	title: string;
-// 	subtitle: string;
-// 	categoryid: number; // This seems to be the subcategory ID based on server queries
-// 	subcategoryid: number; // This seems redundant based on server queries
-// 	enddate: string;
-// 	listingdescription: string;
-// 	condition: boolean;
-// 	listingprice: string; // Server returns number/numeric, client expects number
-// 	reserveprice: string; // Server returns number/numeric, client expects number
-// 	creditcardpayment: boolean;
-// 	banktransferpayment: boolean;
-// 	bitcoinpayment: boolean;
-// 	pickup: boolean;
-// 	shippingoption: string;
-// 	category: string; // This is the subcategory name based on server queries
-// }
 
 // This interface reflects the camelCase structure returned by the server repository
 export interface Listing {
