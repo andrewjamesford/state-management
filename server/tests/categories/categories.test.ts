@@ -1,8 +1,8 @@
 import request from "supertest";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import app from "../../app";
-import { pool } from "../../db";
-import { getCategories } from "../../categories/categories.repository";
+import app from "../../app.js";
+import { pool } from "../../db.js";
+import { getCategories } from "../../categories/categories.repository.js";
 
 interface QueryResult<T = unknown> {
 	rows: T[];

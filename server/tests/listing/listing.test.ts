@@ -1,15 +1,15 @@
 import request from "supertest";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import app from "../../app";
+import app from "../../app.js";
 import {
 	addListing,
 	getListings,
 	getListing,
-} from "../../listing/listing.repository";
-import type { Listing } from "../../listing/listing.model";
+} from "../../listing/listing.repository.js";
+import type { Listing } from "../../listing/listing.model.js";
 import { mock } from "node:test";
 
-vi.mock("../../listing/listing.repository");
+vi.mock("../../listing/listing.repository.js");
 
 const mockListings: Listing[] = [
 	{

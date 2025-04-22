@@ -1,3 +1,5 @@
+import type { Request, Response, NextFunction } from "express";
+
 /**
  * Middleware function to handle errors in the application.
  *
@@ -10,13 +12,6 @@ interface Error {
 	status?: number;
 	message: string;
 }
-
-interface Response {
-	status: (code: number) => Response;
-	json: (body: unknown) => void;
-}
-
-type NextFunction = () => void;
 
 export default function errorHandlerMiddleware(
 	err: Error,

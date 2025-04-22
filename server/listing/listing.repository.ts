@@ -1,5 +1,5 @@
-import { pool } from "../db";
-import type { Listing } from "./listing.model";
+import { pool } from "../db.js";
+import type { Listing } from "./listing.model.js";
 
 /**
  * getListings - gets all listings from the database
@@ -35,7 +35,7 @@ export async function getListings(): Promise<Listing[]> {
 		);
 		// Ensure numeric types are correctly cast if necessary, although node-postgres often handles this.
 		// If issues arise, consider explicit casting in the query or post-processing.
-		return result.rows as Listing[] ?? [];
+		return (result.rows as Listing[]) ?? [];
 	} catch (error) {
 		console.error("Error fetching listings:", error);
 		throw new Error(error instanceof Error ? error.message : String(error));
@@ -77,7 +77,7 @@ export async function getListing(id: number): Promise<Listing | null> {
 			[id],
 		);
 		// Ensure numeric types are correctly cast if necessary
-		return result.rows[0] as Listing ?? null;
+		return (result.rows[0] as Listing) ?? null;
 	} catch (error) {
 		console.error(`Error fetching listing with ID ${id}:`, error);
 		throw new Error(error instanceof Error ? error.message : String(error));
@@ -222,7 +222,10 @@ export const updateListing = async (
 		return result.rowCount ?? 0;
 	} catch (error) {
 		if (error instanceof Error) {
-			console.error(`Error updating listing with ID ${id}: ${error.message}`, error);
+			console.error(
+				`Error updating listing with ID ${id}: ${error.message}`,
+				error,
+			);
 			throw new Error(`Error updating listing: ${error.message}`);
 		}
 		console.error(`Error updating listing with ID ${id}: Unknown error`, error);

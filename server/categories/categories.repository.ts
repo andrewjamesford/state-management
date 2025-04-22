@@ -1,4 +1,4 @@
-import { pool } from "../db";
+import { pool } from "../db.js";
 
 /**
  * Retrieves categories from the database based on the provided parent ID and active status.

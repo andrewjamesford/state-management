@@ -1,16 +1,16 @@
 import express from "express";
 import type { Request, Response, NextFunction } from "express";
 const router = express.Router();
-import bodyValidationMiddleware from "../middleware/bodyValidationMiddleware";
+import bodyValidationMiddleware from "../middleware/bodyValidationMiddleware.js";
 import {
 	addListing,
 	getListings,
 	getListing,
 	updateListing,
-} from "./listing.repository";
+} from "./listing.repository.js";
 
-import { listingSchema } from "./listing.schema";
-import type { Listing } from "./listing.model";
+import { listingSchema } from "./listing.schema.js";
+import type { Listing } from "./listing.model.js";
 
 router.use(express.json());
 

@@ -5,7 +5,7 @@
 	"main": "index.ts",
 	"type": "module",
 	"scripts": {
-		"dev": "tsx watch --inspect=0.0.0.0:9229 ./index.ts",
+		"dev": "tsx watch --inspect=0.0.0.0:9230 ./index.ts",
 		"start": "npm run build && node dist/index.js",
 		"build": "tsc",
 		"test": "vitest",
