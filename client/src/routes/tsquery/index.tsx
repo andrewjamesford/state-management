@@ -30,6 +30,7 @@ function RouteComponent() {
 	});
 
 	if (error) return <ErrorMessage message={(error as Error)?.message} />;
+
 	return (
 		<div className="max-w-4xl mx-auto px-4 py-5">
 			<div className="my-4">
@@ -52,7 +53,7 @@ function RouteComponent() {
 			</div>
 			<div className="my-4">
 				<Link
-					to="/reduxrtk/add"
+					to="/tsquery/add"
 					className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
 				>
 					Add Listing
