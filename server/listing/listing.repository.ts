@@ -12,13 +12,11 @@ export async function getListings(): Promise<Listing[]> {
 			l.id,
 			l.title,
 			l.sub_title as "subTitle",
-			-- Select parent_id from categories for the categoryId field
-			parent_cat.parent_id as "categoryId",
-			-- Select the actual category id (which is the subcategory) for subCategoryId
-			c.id as "subCategoryId",
+			c.parent_id as "categoryId",
+			l.category_id as "subCategoryId",
 			l.end_date as "endDate",
-			l.listing_description as description, -- Alias to 'description' to match Listing interface
-			l.condition_new as condition, -- Alias to 'condition' to match Listing interface
+			l.listing_description as description,
+			l.condition_new as condition, 
 			l.listing_price as "listingPrice",
 			l.reserve_price as "reservePrice",
 			l.credit_card_payment as "creditCardPayment",
@@ -26,10 +24,9 @@ export async function getListings(): Promise<Listing[]> {
 			l.bitcoin_payment as "bitcoinPayment",
 			l.pick_up as "pickUp",
 			l.shipping_option as "shippingOption",
-			c.category_name AS category -- This is the subcategory name
+			c.category_name AS category
 			FROM listings l
-			INNER JOIN categories c ON c.id = l.category_id -- Join on the subcategory ID stored in listings
-			LEFT JOIN categories parent_cat ON parent_cat.id = c.parent_id -- Join to get the parent category
+			INNER JOIN categories c ON c.id = l.category_id
 			ORDER BY l.id DESC;
       `,
 		);
@@ -55,13 +52,11 @@ export async function getListing(id: number): Promise<Listing | null> {
 			l.id,
 			l.title,
 			l.sub_title as "subTitle",
-			-- Select parent_id from categories for the categoryId field
-			parent_cat.parent_id as "categoryId",
-			-- Select the actual category id (which is the subcategory) for subCategoryId
-			c.id as "subCategoryId",
+			c.parent_id as "categoryId",
+			l.category_id as "subCategoryId",
 			l.end_date as "endDate",
-			l.listing_description as description, -- Alias to 'description' to match Listing interface
-			l.condition_new as condition, -- Alias to 'condition' to match Listing interface
+			l.listing_description as description,
+			l.condition_new as condition, 
 			l.listing_price as "listingPrice",
 			l.reserve_price as "reservePrice",
 			l.credit_card_payment as "creditCardPayment",
@@ -69,10 +64,9 @@ export async function getListing(id: number): Promise<Listing | null> {
 			l.bitcoin_payment as "bitcoinPayment",
 			l.pick_up as "pickUp",
 			l.shipping_option as "shippingOption",
-			c.category_name AS category -- This is the subcategory name
+			c.category_name AS category
 			FROM listings l
-			INNER JOIN categories c ON c.id = l.category_id -- Join on the subcategory ID stored in listings
-			LEFT JOIN categories parent_cat ON parent_cat.id = c.parent_id -- Join to get the parent category
+			INNER JOIN categories c ON c.id = l.category_id
 			WHERE l.id = $1
 			LIMIT 1`,
 			[id],

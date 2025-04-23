@@ -1,4 +1,4 @@
-import { format, isDate } from "date-fns";
+import { isDate } from "date-fns";
 import Checkbox from "~/components/checkbox";
 import DateInput from "~/components/dateInput";
 import Loader from "~/components/loader";
@@ -8,15 +8,14 @@ import Select from "~/components/select";
 import SubmitButton from "~/components/submitButton";
 import TextInput from "~/components/textInput";
 import Textarea from "~/components/textarea";
-import type { Category, ListingSchema } from "~/models";
+import type { Category, Listing } from "~/models";
 
 interface ListingFormProps {
-	// listingId is now number based on API changes
 	listingId?: number;
-	formState: ListingSchema;
-	setFormState: React.Dispatch<React.SetStateAction<ListingSchema>>;
-	tomorrow: string; // Expected 'yyyy-MM-dd'
-	fortnight: string; // Expected 'yyyy-MM-dd'
+	formState: Listing;
+	setFormState: React.Dispatch<React.SetStateAction<Listing>>;
+	tomorrow: Date;
+	fortnight: Date;
 	loadingCategory: boolean;
 	loadingSubCategory: boolean;
 	categoryData: Category[] | null;
@@ -24,8 +23,8 @@ interface ListingFormProps {
 }
 
 interface SectionProps {
-	formState: ListingSchema;
-	setFormState: React.Dispatch<React.SetStateAction<ListingSchema>>;
+	formState: Listing;
+	setFormState: React.Dispatch<React.SetStateAction<Listing>>;
 }
 
 interface BasicInfoSectionProps extends SectionProps {
@@ -33,14 +32,14 @@ interface BasicInfoSectionProps extends SectionProps {
 	loadingSubCategory: boolean;
 	categoryData: Category[] | null;
 	subCategoryData: Category[] | null;
-	tomorrow: string; // Expected 'yyyy-MM-dd'
-	fortnight: string; // Expected 'yyyy-MM-dd'
+	tomorrow: Date;
+	fortnight: Date;
 }
 
 const handleTextChange =
 	(
-		field: keyof ListingSchema,
-		setFormState: React.Dispatch<React.SetStateAction<ListingSchema>>,
+		field: keyof Listing,
+		setFormState: React.Dispatch<React.SetStateAction<Listing>>,
 	) =>
 	(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		const value = e.target.value ?? "";
@@ -196,15 +195,16 @@ const BasicInfoSection = ({
 					id="end-date"
 					// Format the Date object to 'yyyy-MM-dd' for the input value
 					value={
-						isDate(formState.endDate) &&
-						Number.isFinite(formState.endDate.getTime())
-							? format(formState.endDate, "yyyy-MM-dd")
-							: tomorrow // Default to tomorrow if date is invalid
+						isDate(formState.endDate)
+							? formState.endDate.toString()
+							: tomorrow.toString() // Default to tomorrow if date is invalid
 					}
 					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 						const dateValue = e.target.value;
 						// Parse the input string value into a Date object
-						const endDate = dateValue ? new Date(dateValue) : new Date(tomorrow);
+						const endDate = dateValue
+							? new Date(dateValue)
+							: new Date(tomorrow);
 						setFormState((prev) => ({
 							...prev,
 							// Check if the parsed date is valid before setting state
@@ -215,8 +215,8 @@ const BasicInfoSection = ({
 					}}
 					required
 					pattern="\d{4}-\d{2}-\d{2}" // Basic pattern validation
-					min={tomorrow}
-					max={fortnight}
+					min={tomorrow.toString()}
+					max={fortnight.toString()}
 					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:default):invalid]:block"
 					error="Please select a future date between tomorrow and two weeks from now"
 				/>
@@ -346,7 +346,7 @@ const PriceAndPaymentSection = ({ formState, setFormState }: SectionProps) => (
 						label="Credit card"
 						checked={formState.creditCardPayment}
 						onChange={() => {
-							setFormState((prev: ListingSchema) => ({
+							setFormState((prev: Listing) => ({
 								...prev,
 								creditCardPayment: !prev.creditCardPayment,
 							}));
@@ -359,7 +359,7 @@ const PriceAndPaymentSection = ({ formState, setFormState }: SectionProps) => (
 						label="Bank Transfer"
 						checked={formState.bankTransferPayment}
 						onChange={() => {
-							setFormState((prev: ListingSchema) => ({
+							setFormState((prev: Listing) => ({
 								...prev,
 								bankTransferPayment: !prev.bankTransferPayment,
 							}));
@@ -372,7 +372,7 @@ const PriceAndPaymentSection = ({ formState, setFormState }: SectionProps) => (
 						label="Bitcoin"
 						checked={formState.bitcoinPayment}
 						onChange={() => {
-							setFormState((prev: ListingSchema) => ({
+							setFormState((prev: Listing) => ({
 								...prev,
 								bitcoinPayment: !prev.bitcoinPayment,
 							}));
@@ -484,9 +484,6 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 		return <Loader aria-label="Loading form data" />;
 	}
 
-	// Note: Form validation logic is still manual.
-	// A form library would typically handle submission and validation here.
-
 	return (
 		<>
 			<BasicInfoSection
@@ -510,7 +507,6 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 			<ShippingSection formState={formState} setFormState={setFormState} />
 
 			{/* Include listingId as a hidden input if needed for form submission */}
-			{/* Ensure the name attribute matches what your submission handler expects */}
 			{listingId > 0 && <input type="hidden" name="id" value={listingId} />}
 
 			<div className="mt-3">

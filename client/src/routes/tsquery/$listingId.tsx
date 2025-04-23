@@ -101,7 +101,8 @@ function RouteComponent() {
 		queryFn: async () => {
 			const response = await api.getCategories();
 			if (!response) throw new Error("Error retrieving categories");
-			const result = await response;
+			const result = response;
+			if (!result) throw new Error("Error retrieving categories");
 			return result ?? [];
 		},
 	});
@@ -205,7 +206,8 @@ function RouteComponent() {
 		return (
 			<ErrorMessage message={listingError?.message || "An error occurred"} />
 		);
-	if (loadingListing) return <Loader height={50} width={50} />;
+	if (loadingListing || loadingSubCategory || loadingCategory)
+		return <Loader height={50} width={50} />;
 
 	return (
 		<form onSubmit={handleSubmit} className="group max-w-4xl mx-auto px-4 py-5">

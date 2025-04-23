@@ -64,8 +64,8 @@ export const Route = createFileRoute("/reduxrtk/$listingId")({
  */
 function RouteComponent() {
 	const today = new Date();
-	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
-	const fortnight = format(addDays(today, 14), "yyyy-MM-dd");
+	const tomorrow = addDays(today, 1);
+	const fortnight = addDays(today, 14);
 
 	const navigate = useNavigate({ from: Route.fullPath });
 
