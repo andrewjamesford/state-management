@@ -11,21 +11,21 @@ export async function getListings(): Promise<Listing[]> {
 			`SELECT
 			l.id,
 			l.title,
-			l.sub_title as subTitle,
+			l.sub_title as "subTitle",
 			-- Select parent_id from categories for the categoryId field
-			parent_cat.parent_id as categoryId,
+			parent_cat.parent_id as "categoryId",
 			-- Select the actual category id (which is the subcategory) for subCategoryId
-			c.id as subCategoryId,
-			l.end_date as endDate,
+			c.id as "subCategoryId",
+			l.end_date as "endDate",
 			l.listing_description as description, -- Alias to 'description' to match Listing interface
 			l.condition_new as condition, -- Alias to 'condition' to match Listing interface
-			l.listing_price as listingPrice,
-			l.reserve_price as reservePrice,
-			l.credit_card_payment as creditCardPayment,
-			l.bank_transfer_payment as bankTransferPayment,
-			l.bitcoin_payment as bitcoinPayment,
-			l.pick_up as pickUp,
-			l.shipping_option as shippingOption,
+			l.listing_price as "listingPrice",
+			l.reserve_price as "reservePrice",
+			l.credit_card_payment as "creditCardPayment",
+			l.bank_transfer_payment as "bankTransferPayment",
+			l.bitcoin_payment as "bitcoinPayment",
+			l.pick_up as "pickUp",
+			l.shipping_option as "shippingOption",
 			c.category_name AS category -- This is the subcategory name
 			FROM listings l
 			INNER JOIN categories c ON c.id = l.category_id -- Join on the subcategory ID stored in listings
@@ -33,6 +33,8 @@ export async function getListings(): Promise<Listing[]> {
 			ORDER BY l.id DESC;
       `,
 		);
+
+		console.log("getListings result:", result.rows);
 		// Ensure numeric types are correctly cast if necessary, although node-postgres often handles this.
 		// If issues arise, consider explicit casting in the query or post-processing.
 		return (result.rows as Listing[]) ?? [];
@@ -53,21 +55,21 @@ export async function getListing(id: number): Promise<Listing | null> {
 			`SELECT
 			l.id,
 			l.title,
-			l.sub_title as subTitle,
+			l.sub_title as "subTitle",
 			-- Select parent_id from categories for the categoryId field
-			parent_cat.parent_id as categoryId,
+			parent_cat.parent_id as "categoryId",
 			-- Select the actual category id (which is the subcategory) for subCategoryId
-			c.id as subCategoryId,
-			l.end_date as endDate,
+			c.id as "subCategoryId",
+			l.end_date as "endDate",
 			l.listing_description as description, -- Alias to 'description' to match Listing interface
 			l.condition_new as condition, -- Alias to 'condition' to match Listing interface
-			l.listing_price as listingPrice,
-			l.reserve_price as reservePrice,
-			l.credit_card_payment as creditCardPayment,
-			l.bank_transfer_payment as bankTransferPayment,
-			l.bitcoin_payment as bitcoinPayment,
-			l.pick_up as pickUp,
-			l.shipping_option as shippingOption,
+			l.listing_price as "listingPrice",
+			l.reserve_price as "reservePrice",
+			l.credit_card_payment as "creditCardPayment",
+			l.bank_transfer_payment as "bankTransferPayment",
+			l.bitcoin_payment as "bitcoinPayment",
+			l.pick_up as "pickUp",
+			l.shipping_option as "shippingOption",
 			c.category_name AS category -- This is the subcategory name
 			FROM listings l
 			INNER JOIN categories c ON c.id = l.category_id -- Join on the subcategory ID stored in listings
