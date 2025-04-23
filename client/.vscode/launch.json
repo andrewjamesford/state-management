@@ -31,7 +31,7 @@
 			"userDataDir": "${workspaceFolder}/.vscode/edge-debug-profile",
 			"port": 9222,
 			"runtimeArgs": [
-				"--auto-open-devtools-for-tabs"
+				// "--auto-open-devtools-for-tabs"
 			]
 		},
 		{
@@ -42,7 +42,7 @@
 			"webRoot": "${workspaceFolder}",
 			"userDataDir": "${workspaceFolder}/.vscode/edge-debug-profile",
 			"runtimeArgs": [
-				"--auto-open-devtools-for-tabs"
+				// "--auto-open-devtools-for-tabs"
 			]
 		},
 	]
