@@ -133,3 +133,5 @@ package-lock.json
 
 test-results
 playwright-report
+
+edge-debug-profile

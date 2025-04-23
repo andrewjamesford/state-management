@@ -27,10 +27,12 @@
 			"type": "msedge",
 			"url": "http://localhost:4002",
 			"webRoot": "${workspaceFolder}",
-			"sourceMaps": true,
 			"disableNetworkCache": true,
-			"userDataDir": false,
-			"port": 9222
+			"userDataDir": "${workspaceFolder}/.vscode/edge-debug-profile",
+			"port": 9222,
+			"runtimeArgs": [
+				"--auto-open-devtools-for-tabs"
+			]
 		},
 		{
 			"type": "msedge",
@@ -38,7 +40,10 @@
 			"name": "Attach to Edge",
 			"port": 9222,
 			"webRoot": "${workspaceFolder}",
-			"sourceMaps": true
+			"userDataDir": "${workspaceFolder}/.vscode/edge-debug-profile",
+			"runtimeArgs": [
+				"--auto-open-devtools-for-tabs"
+			]
 		},
 	]
 }
