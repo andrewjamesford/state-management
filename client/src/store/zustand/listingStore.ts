@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { create } from "zustand";
 import api from "~/api";
-import type { Category, Listing, ListingSchema, RawListing } from "~/models";
+import type { Category, Listing, ListingSchema } from "~/models";
 
 interface ListingStore {
 	listing: Listing;
@@ -28,8 +28,8 @@ const initialListing: Listing = {
 	endDate: format(new Date(), "yyyy-MM-dd"),
 	condition: false,
 	description: "",
-	listingPrice: "0",
-	reservePrice: "0",
+	listingPrice: 0,
+	reservePrice: 0,
 	creditCardPayment: false,
 	bankTransferPayment: false,
 	bitcoinPayment: false,
@@ -54,7 +54,7 @@ export const useListingStore = create<ListingStore>((set) => ({
 		try {
 			const response = await api.getListing(id);
 			if (!response.ok) throw new Error("Failed to fetch listing");
-			const rawData: RawListing = await response.json();
+			const rawData = await response.json();
 			const data: Listing = {
 				id: rawData.id,
 				title: rawData.title,
@@ -86,7 +86,7 @@ export const useListingStore = create<ListingStore>((set) => ({
 		try {
 			const response = await api.getListings();
 			if (!response.ok) throw new Error("Failed to fetch listings");
-			const rawData: RawListing[] = await response.json();
+			const rawData = await response.json();
 			const data: Listing[] = rawData.map((raw) => ({
 				id: raw.id,
 				title: raw.title,

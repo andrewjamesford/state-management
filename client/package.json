@@ -14,7 +14,8 @@
 		"test": "vitest",
 		"test:watch": "vitest watch",
 		"test:ui": "vitest --ui",
-		"test:coverage": "vitest run --coverage"
+		"test:coverage": "vitest run --coverage",
+		"clean": "rm -rf ./dist ./coverage ./node_modules ./playwright-report ./test-results"
 	},
 	"dependencies": {
 		"@reduxjs/toolkit": "^2.5.1",

@@ -8,6 +8,7 @@ interface ListingTileProps {
 
 export default function ListingTile({ listing, basePath }: ListingTileProps) {
 	if (listing == null) return null;
+	console.log("ListingTile", listing);
 	const lPrice = Number(listing.listingPrice);
 	const rPrice = Number(listing.reservePrice);
 	const formatCurrency = (amount: number) =>

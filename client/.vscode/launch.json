@@ -7,7 +7,7 @@
 		{
 			"type": "chrome",
 			"request": "launch",
-			"name": "Launch Chrome against localhost",
+			"name": "Launch Chrome Client",
 			"url": "http://localhost:4002",
 			"webRoot": "${workspaceFolder}",
 			"disableNetworkCache": true,
@@ -20,6 +20,25 @@
 			"name": "Attach to Chrome",
 			"port": 9222,
 			"webRoot": "${workspaceFolder}"
-		}
+		},
+		{
+			"name": "Launch Edge Client",
+			"request": "launch",
+			"type": "msedge",
+			"url": "http://localhost:4002",
+			"webRoot": "${workspaceFolder}",
+			"sourceMaps": true,
+			"disableNetworkCache": true,
+			"userDataDir": false,
+			"port": 9222
+		},
+		{
+			"type": "msedge",
+			"request": "attach",
+			"name": "Attach to Edge",
+			"port": 9222,
+			"webRoot": "${workspaceFolder}",
+			"sourceMaps": true
+		},
 	]
 }

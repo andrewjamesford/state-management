@@ -60,11 +60,14 @@
 		],
 		"[jsonc]": {
 			"editor.defaultFormatter": "vscode.json-language-features"
-		}
+		},
+		"postman.settings.dotenv-detection-notification-visibility": false
 	},
 	"extensions": {
 		"recommendations": [
 			"ms-azuretools.vscode-docker",
+			"ms-playwright.playwright",
+			"ms-edgedevtools.vscode-edge-devtools",
 			"orta.vscode-jest",
 			"ms-azuretools.vscode-docker",
 			"mtxr.sqltools",
@@ -73,5 +76,5 @@
 			"anweber.vscode-httpyac",
 			"dbcode.dbcode"
 		]
-	}
+	},
 }
