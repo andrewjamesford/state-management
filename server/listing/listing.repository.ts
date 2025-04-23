@@ -34,7 +34,6 @@ export async function getListings(): Promise<Listing[]> {
       `,
 		);
 
-		console.log("getListings result:", result.rows);
 		// Ensure numeric types are correctly cast if necessary, although node-postgres often handles this.
 		// If issues arise, consider explicit casting in the query or post-processing.
 		return (result.rows as Listing[]) ?? [];
