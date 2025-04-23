@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import ErrorMessage from "~/components/errorMessage";
 import Loader from "~/components/loader";
 import ListingForm from "~/forms/listingForm";
-import type { ListingSchema } from "~/models";
-import { listingSchema } from "~/models";
+import type { Listing } from "~/models";
+import { listingDefault } from "~/models";
 import { useListingStore } from "~/store/zustand/listingStore";
 
 export const Route = createFileRoute("/zustand/add")({
@@ -31,8 +31,8 @@ function RouteComponent() {
 		addListing,
 	} = useListingStore();
 
-	const [formState, setFormState] = useState<ListingSchema>(() => ({
-		...listingSchema,
+	const [formState, setFormState] = useState<Listing>(() => ({
+		...listingDefault,
 		endDate: new Date(tomorrow),
 	}));
 

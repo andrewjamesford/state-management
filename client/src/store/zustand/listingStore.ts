@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { create } from "zustand";
 import api from "~/api";
-import type { Category, Listing, ListingSchema } from "~/models";
+import type { Category, Listing, listingDefault } from "~/models";
 
 interface ListingStore {
 	listing: Listing;
@@ -11,12 +11,12 @@ interface ListingStore {
 	isLoading: boolean;
 	error: string | null;
 	setListing: (listing: Listing) => void;
-	fetchListing: (id: string) => Promise<void>;
+	fetchListing: (id: number) => Promise<void>;
 	fetchListings: () => Promise<void>;
 	fetchCategories: () => Promise<void>;
 	fetchSubCategories: (categoryId: number) => Promise<void>;
-	updateListing: (id: string, listing: Partial<ListingSchema>) => Promise<void>;
-	addListing: (listing: Partial<ListingSchema>) => Promise<void>;
+	updateListing: (id: number, listing: Partial<Listing>) => Promise<void>;
+	addListing: (listing: Partial<Listing>) => Promise<void>;
 }
 
 const initialListing: Listing = {
@@ -25,7 +25,7 @@ const initialListing: Listing = {
 	subTitle: "",
 	categoryId: 0,
 	subCategoryId: 0,
-	endDate: format(new Date(), "yyyy-MM-dd"),
+	endDate: new Date(),
 	condition: false,
 	description: "",
 	listingPrice: 0,
@@ -49,29 +49,14 @@ export const useListingStore = create<ListingStore>((set) => ({
 
 	setListing: (listing) => set({ listing }),
 
-	fetchListing: async (id) => {
+	fetchListing: async (id: number) => {
 		set({ isLoading: true, error: null });
 		try {
 			const response = await api.getListing(id);
-			if (!response.ok) throw new Error("Failed to fetch listing");
-			const rawData = await response.json();
-			const data: Listing = {
-				id: rawData.id,
-				title: rawData.title,
-				subTitle: rawData.subtitle,
-				categoryId: rawData.categoryid,
-				subCategoryId: rawData.subcategoryid,
-				endDate: rawData.enddate,
-				description: rawData.listingdescription,
-				condition: rawData.condition,
-				listingPrice: rawData.listingprice,
-				reservePrice: rawData.reserveprice,
-				creditCardPayment: rawData.creditcardpayment,
-				bankTransferPayment: rawData.banktransferpayment,
-				bitcoinPayment: rawData.bitcoinpayment,
-				pickUp: rawData.pickup,
-				shippingOption: rawData.shippingoption,
-			};
+			if (!response) throw new Error("Failed to fetch listing");
+			const data = response;
+			if (!data) throw new Error("No data found");
+
 			set({ listing: data, isLoading: false });
 		} catch (error) {
 			set({
@@ -85,25 +70,9 @@ export const useListingStore = create<ListingStore>((set) => ({
 		set({ isLoading: true, error: null });
 		try {
 			const response = await api.getListings();
-			if (!response.ok) throw new Error("Failed to fetch listings");
-			const rawData = await response.json();
-			const data: Listing[] = rawData.map((raw) => ({
-				id: raw.id,
-				title: raw.title,
-				subTitle: raw.subtitle,
-				categoryId: raw.categoryid,
-				subCategoryId: raw.subcategoryid,
-				endDate: raw.enddate,
-				description: raw.listingdescription,
-				condition: raw.condition,
-				listingPrice: raw.listingprice,
-				reservePrice: raw.reserveprice,
-				creditCardPayment: raw.creditcardpayment,
-				bankTransferPayment: raw.banktransferpayment,
-				bitcoinPayment: raw.bitcoinpayment,
-				pickUp: raw.pickup,
-				shippingOption: raw.shippingoption,
-			}));
+			if (!response) throw new Error("Failed to fetch listings");
+			const data = response;
+			if (!data) throw new Error("No data found");
 			set({ listings: data, isLoading: false });
 		} catch (error) {
 			set({
@@ -116,8 +85,9 @@ export const useListingStore = create<ListingStore>((set) => ({
 	fetchCategories: async () => {
 		try {
 			const response = await api.getCategories();
-			if (!response.ok) throw new Error("Failed to fetch categories");
-			const data = await response.json();
+			if (!response) throw new Error("Failed to fetch categories");
+			const data = response;
+			if (!data) throw new Error("No data found");
 			set({ categories: data });
 		} catch (error) {
 			set({
@@ -129,8 +99,9 @@ export const useListingStore = create<ListingStore>((set) => ({
 	fetchSubCategories: async (categoryId) => {
 		try {
 			const response = await api.getCategories(categoryId);
-			if (!response.ok) throw new Error("Failed to fetch subcategories");
-			const data: Category[] = await response.json();
+			if (!response) throw new Error("Failed to fetch subcategories");
+			const data: Category[] = response;
+			if (!data) throw new Error("No data found");
 			set({ subCategories: data });
 		} catch (error) {
 			set({
@@ -142,15 +113,10 @@ export const useListingStore = create<ListingStore>((set) => ({
 	updateListing: async (id, listing) => {
 		set({ isLoading: true, error: null });
 		try {
-			const listingToUpdate = {
-				...listing,
-				endDate: listing.endDate ? format(listing.endDate, "yyyy-MM-dd") : "",
-				listingPrice: String(listing.listingPrice),
-				reservePrice: String(listing.reservePrice),
-			};
-			const response = await api.updateListing(id, listingToUpdate as Listing);
-			if (!response.ok) throw new Error("Failed to update listing");
-			const data = await response.json();
+			const response = await api.updateListing(id, listing);
+			if (!response) throw new Error("Failed to update listing");
+			const data = response;
+			if (!data) throw new Error("No data found");
 			set({ listing: data, isLoading: false });
 		} catch (error) {
 			set({
@@ -164,15 +130,10 @@ export const useListingStore = create<ListingStore>((set) => ({
 	addListing: async (listing) => {
 		set({ isLoading: true, error: null });
 		try {
-			const listingToAdd = {
-				...listing,
-				endDate: listing.endDate ? format(listing.endDate, "yyyy-MM-dd") : "",
-				listingPrice: String(listing.listingPrice),
-				reservePrice: String(listing.reservePrice),
-			};
-			const response = await api.addListing(listingToAdd as Listing);
-			if (!response.ok) throw new Error("Failed to add listing");
-			const data = await response.json();
+			const response = await api.addListing(listing);
+			if (!response) throw new Error("Failed to add listing");
+			const data = response;
+			if (!data) throw new Error("No data found");
 			set({ listing: data, isLoading: false });
 		} catch (error) {
 			set({

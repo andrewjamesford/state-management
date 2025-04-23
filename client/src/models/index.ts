@@ -14,7 +14,7 @@ export interface Listing {
 	categoryId: number;
 	// Based on server queries, subCategoryId is the actual category ID stored in listings.category_id
 	subCategoryId: number;
-	endDate: string; // Server returns string (date format)
+	endDate: Date; // Server returns string (date format)
 	description: string; // Server column is listing_description
 	condition: boolean; // Server column is condition_new
 	listingPrice: number; // Server returns numeric, client expects number
@@ -27,26 +27,7 @@ export interface Listing {
 	category?: string; // This is the subcategory name based on server queries
 }
 
-// This interface is specifically for the form state, handling Date objects and numbers
-export interface ListingSchema {
-	id: number;
-	title: string;
-	subTitle: string;
-	categoryId: number; // Parent category ID
-	subCategoryId: number; // Sub category ID
-	endDate: Date; // Client form uses Date object
-	description: string;
-	condition: boolean;
-	listingPrice: number;
-	reservePrice: number;
-	creditCardPayment: boolean;
-	bankTransferPayment: boolean;
-	bitcoinPayment: boolean;
-	pickUp: boolean;
-	shippingOption: string;
-}
-
-export const listingSchema: ListingSchema = {
+export const listingDefault: Listing = {
 	id: 0,
 	title: "",
 	categoryId: 0, // Default to no parent category selected

@@ -6,7 +6,7 @@ import api from "~/api";
 import ErrorMessage from "~/components/errorMessage";
 import ListingForm from "~/forms/listingForm";
 import type { Listing } from "~/models";
-import { listingSchema } from "~/models";
+import { listingDefault } from "~/models";
 import { validatePrice } from "~/utils/formValidation";
 
 export const Route = createFileRoute("/tsquery/add")({
@@ -24,7 +24,7 @@ function RouteComponent() {
 		from: Route.fullPath,
 	});
 
-	const [formState, setFormState] = useState(listingSchema);
+	const [formState, setFormState] = useState(listingDefault);
 
 	const {
 		data: categoryData,

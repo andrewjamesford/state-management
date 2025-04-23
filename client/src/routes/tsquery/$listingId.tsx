@@ -10,7 +10,7 @@ import api from "~/api";
 import ErrorMessage from "~/components/errorMessage";
 import Loader from "~/components/loader";
 import ListingForm from "~/forms/listingForm";
-import { type Listing, type ListingSchema, listingSchema } from "~/models";
+import { type Listing, listingDefault } from "~/models";
 
 export const Route = createFileRoute("/tsquery/$listingId")({
 	component: RouteComponent,
@@ -68,7 +68,7 @@ function RouteComponent() {
 	});
 
 	// Local state for form
-	const [formState, setFormState] = useState(listingSchema);
+	const [formState, setFormState] = useState(listingDefault);
 
 	const { listingId } = useParams({ from: Route.id });
 
@@ -79,11 +79,15 @@ function RouteComponent() {
 	} = useQuery({
 		queryKey: ["listingData", listingId],
 		queryFn: async () => {
-			const response = await api.getListing(String(listingId)); // pass id as string
-			if (!response.ok) {
+			const response = await api.getListing(Number(listingId)); // pass id as number
+			if (!response) {
 				throw new Error(`Error retrieving listing ${listingId}`);
 			}
-			return await response.json();
+			const result = await response;
+			if (!result) {
+				throw new Error(`Error retrieving listing ${listingId}`);
+			}
+			return result;
 		},
 		enabled: !Number.isNaN(listingId),
 	});
@@ -96,8 +100,8 @@ function RouteComponent() {
 		queryKey: ["parentCategories"],
 		queryFn: async () => {
 			const response = await api.getCategories();
-			if (!response.ok) throw new Error("Error retrieving categories");
-			const result = await response.json();
+			if (!response) throw new Error("Error retrieving categories");
+			const result = await response;
 			return result ?? [];
 		},
 	});
@@ -111,14 +115,15 @@ function RouteComponent() {
 		queryFn: async () => {
 			if (!formState.categoryId) return [];
 			const response = await api.getCategories(formState.categoryId);
-			if (!response.ok) throw new Error("Error retrieving sub-categories");
-			return await response.json();
+			if (!response) throw new Error("Error retrieving sub-categories");
+			const result = await response;
+			return result ?? [];
 		},
 	});
 
 	useEffect(() => {
 		if (listingData) {
-			const newEndDate = new Date(listingData.enddate);
+			const newEndDate = new Date(listingData.endDate);
 			const isValidDate = isWithinInterval(newEndDate, {
 				start: new Date(tomorrow),
 				end: new Date(fortnight),
@@ -129,34 +134,39 @@ function RouteComponent() {
 			setFormState((prev) => ({
 				...prev,
 				title: listingData.title,
-				subTitle: listingData.subtitle,
+				subTitle: listingData.subTitle,
 				endDate,
-				categoryId: listingData?.categoryid,
-				subCategoryId: listingData?.subcategoryid,
-				description: listingData.listingdescription,
+				categoryId: listingData?.categoryId,
+				subCategoryId: listingData?.subCategoryId,
+				description: listingData.description,
 				condition: listingData.condition,
-				listingPrice: listingData.listingprice,
-				reservePrice: listingData.reserveprice || 0,
-				creditCardPayment: listingData.creditcardpayment,
-				bankTransferPayment: listingData.banktransferpayment,
-				bitcoinPayment: listingData.bitcoinpayment,
-				pickUp: listingData.pickup,
-				shippingOption: listingData.shippingoption,
+				listingPrice: listingData.listingPrice,
+				reservePrice: listingData.reservePrice || 0,
+				creditCardPayment: listingData.creditCardPayment,
+				bankTransferPayment: listingData.bankTransferPayment,
+				bitcoinPayment: listingData.bitcoinPayment,
+				pickUp: listingData.pickUp,
+				shippingOption: listingData.shippingOption,
 			}));
 		}
 	}, [listingData, tomorrow, fortnight]);
 
 	// Add mutation hook for updating the listing
 	const updateListingMutation = useMutation({
-		mutationFn: async (listing: ListingSchema) => {
+		mutationFn: async (listing: Listing) => {
 			const updatedListing: Listing = {
 				...listing,
-				endDate: listing.endDate.toISOString(),
+				endDate: listing.endDate,
 				listingPrice: listing.listingPrice,
 				reservePrice: listing.reservePrice,
 			};
-			const response = await api.updateListing(listingId, updatedListing);
-			const result = await response.json();
+			const response = await api.updateListing(
+				Number(listingId),
+				updatedListing,
+			);
+			if (!response) throw new Error("Error updating listing");
+			const result = await response;
+			if (!result) throw new Error("No result returned from update");
 			return result;
 		},
 	});
@@ -165,12 +175,14 @@ function RouteComponent() {
 		e.preventDefault();
 		updateListingMutation.mutate(formState, {
 			onSuccess: (result) => {
-				console.log(result);
-				if (result === 1) {
+				if (result) {
 					navListings();
 					return;
 				}
-				alert(`${JSON.stringify(result.message)}`);
+				alert("Update successful.");
+			},
+			onError: (error) => {
+				alert(`Error: ${error.message}`);
 			},
 		});
 	};

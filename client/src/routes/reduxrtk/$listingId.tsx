@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 import ErrorMessage from "~/components/errorMessage";
 import Loader from "~/components/loader";
 import ListingForm from "~/forms/listingForm";
-import { type Listing, type ListingSchema, listingSchema } from "~/models";
+import { type Listing, listingDefault } from "~/models";
 import type { RootState } from "~/store/reduxrtk";
 import {
 	useGetListingQuery,
@@ -71,11 +71,11 @@ function RouteComponent() {
 
 	// Get initial state from Redux
 	const reduxListing = useSelector((state: RootState) =>
-		state.listing ? state.listing : listingSchema,
+		state.listing ? state.listing : listingDefault,
 	);
 
 	// Local state for form
-	const [formState, setFormState] = useState<ListingSchema>(() => ({
+	const [formState, setFormState] = useState<Listing>(() => ({
 		...reduxListing,
 		endDate: new Date(reduxListing.endDate),
 		listingPrice: Number(reduxListing.listingPrice),
@@ -119,15 +119,13 @@ function RouteComponent() {
 		e.preventDefault();
 
 		try {
-			const updatedListing: Listing = {
-				...formState,
-				endDate: format(formState.endDate, "yyyy-MM-dd"),
-				listingPrice: String(formState.listingPrice),
-				reservePrice: String(formState.reservePrice),
-			};
+			if (!formState) {
+				alert("Form state is empty");
+				return;
+			}
 			await updateListing({
 				id: listingId,
-				listing: updatedListing,
+				listing: formState,
 			})
 				.then((res) => {
 					const result = res.data as number;
