@@ -1,4 +1,4 @@
-import type { ApiError, Listing, Category } from "~/models";
+import type { ApiError, Category, Listing } from "~/models";
 
 const headers = {
 	Accept: "application/json",
@@ -111,18 +111,10 @@ async function getDraftListing(userId: string): Promise<Listing | null> {
  * @throws {ApiError} If the API request fails.
  */
 async function addListing(listing: Listing): Promise<Listing> {
-	// Transform Listing (client form) to Listing (API/Server expected format)
-	// Note: Server expects subCategoryId in category_id column, and string date.
-	const apiListing = {
-		...listing,
-		categoryId: listing.subCategoryId, // Server expects subCategoryId here
-		endDate: listing.endDate, // Assuming endDate is already a string in the correct format
-	};
-
 	const response = await fetch(`${import.meta.env.VITE_API_URL}/listings`, {
 		method: "POST",
 		headers,
-		body: JSON.stringify(apiListing),
+		body: JSON.stringify(listing),
 	});
 	return handleApiResponse<Listing>(response);
 }
@@ -135,21 +127,12 @@ async function addListing(listing: Listing): Promise<Listing> {
  * @throws {ApiError} If the API request fails.
  */
 async function updateListing(id: number, listing: Listing): Promise<Listing> {
-	// Transform Listing (client form) to Listing (API/Server expected format)
-	// Note: Server expects subCategoryId in category_id column, and string date.
-	const apiListing = {
-		...listing,
-		categoryId: listing.subCategoryId, // Server expects subCategoryId here
-		// endDate: listing.endDate.toISOString(), // Convert Date object to ISO string
-		endDate: listing.endDate, // Assuming endDate is already a string in the correct format
-	};
-
 	const response = await fetch(
 		`${import.meta.env.VITE_API_URL}/listings/${id}`,
 		{
 			method: "PUT",
 			headers,
-			body: JSON.stringify(apiListing),
+			body: JSON.stringify(listing),
 		},
 	);
 	return handleApiResponse<Listing>(response);
@@ -167,20 +150,12 @@ async function saveDraftListing(
 	userId: string,
 	listing: Listing,
 ): Promise<Listing> {
-	// Transform Listing (client form) to Listing (API/Server expected format)
-	// Note: Server expects subCategoryId in category_id column, and string date.
-	const apiListing = {
-		...listing,
-		categoryId: listing.subCategoryId, // Server expects subCategoryId here
-		endDate: listing.endDate, // Assuming endDate is already a string in the correct format
-	};
-
 	const response = await fetch(
 		`${import.meta.env.VITE_API_URL}/users/${userId}/draft-listing`,
 		{
 			method: "POST",
 			headers,
-			body: JSON.stringify(apiListing),
+			body: JSON.stringify(listing),
 		},
 	);
 	return handleApiResponse<Listing>(response);
