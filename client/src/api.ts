@@ -1,4 +1,4 @@
-import type { Listing, ListingSchema, ApiError } from "~/models";
+import type { ApiError, Listing, Category } from "~/models";
 
 const headers = {
 	Accept: "application/json",
@@ -13,7 +13,7 @@ const headers = {
  */
 async function handleApiResponse<T>(response: Response): Promise<T> {
 	if (!response.ok) {
-		let errorDetails: any;
+		let errorDetails: { message?: string };
 		try {
 			// Attempt to parse error details from the response body
 			errorDetails = await response.json();
@@ -23,7 +23,9 @@ async function handleApiResponse<T>(response: Response): Promise<T> {
 		}
 
 		const apiError: ApiError = {
-			message: errorDetails.message || `API request failed with status ${response.status}`,
+			message:
+				errorDetails.message ||
+				`API request failed with status ${response.status}`,
 			status: response.status,
 			details: errorDetails,
 		};
@@ -68,9 +70,12 @@ async function getListings(): Promise<Listing[]> {
  * @throws {ApiError} If the API request fails or listing is not found.
  */
 async function getListing(id: number): Promise<Listing> {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/listings/${id}`, {
-		headers,
-	});
+	const response = await fetch(
+		`${import.meta.env.VITE_API_URL}/listings/${id}`,
+		{
+			headers,
+		},
+	);
 	return handleApiResponse<Listing>(response);
 }
 
@@ -82,9 +87,12 @@ async function getListing(id: number): Promise<Listing> {
  * @throws {ApiError} If the API request fails (excluding 404).
  */
 async function getDraftListing(userId: string): Promise<Listing | null> {
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/users/${userId}/draft-listing`, {
-		headers,
-	});
+	const response = await fetch(
+		`${import.meta.env.VITE_API_URL}/users/${userId}/draft-listing`,
+		{
+			headers,
+		},
+	);
 
 	if (response.status === 404) {
 		return null; // Return null for not found, not an error
@@ -102,14 +110,13 @@ async function getDraftListing(userId: string): Promise<Listing | null> {
  * @returns {Promise<Listing>} A promise resolving to the created listing data.
  * @throws {ApiError} If the API request fails.
  */
-async function addListing(listing: ListingSchema): Promise<Listing> {
-	// Transform ListingSchema (client form) to Listing (API/Server expected format)
+async function addListing(listing: Listing): Promise<Listing> {
+	// Transform Listing (client form) to Listing (API/Server expected format)
 	// Note: Server expects subCategoryId in category_id column, and string date.
 	const apiListing = {
 		...listing,
 		categoryId: listing.subCategoryId, // Server expects subCategoryId here
-		endDate: listing.endDate.toISOString(), // Convert Date object to ISO string
-		// Ensure prices are numbers, which ListingSchema already enforces
+		endDate: listing.endDate, // Assuming endDate is already a string in the correct format
 	};
 
 	const response = await fetch(`${import.meta.env.VITE_API_URL}/listings`, {
@@ -127,21 +134,24 @@ async function addListing(listing: ListingSchema): Promise<Listing> {
  * @returns {Promise<Listing>} A promise resolving to the updated listing data.
  * @throws {ApiError} If the API request fails.
  */
-async function updateListing(id: number, listing: ListingSchema): Promise<Listing> {
-	// Transform ListingSchema (client form) to Listing (API/Server expected format)
+async function updateListing(id: number, listing: Listing): Promise<Listing> {
+	// Transform Listing (client form) to Listing (API/Server expected format)
 	// Note: Server expects subCategoryId in category_id column, and string date.
 	const apiListing = {
 		...listing,
 		categoryId: listing.subCategoryId, // Server expects subCategoryId here
-		endDate: listing.endDate.toISOString(), // Convert Date object to ISO string
-		// Ensure prices are numbers, which ListingSchema already enforces
+		// endDate: listing.endDate.toISOString(), // Convert Date object to ISO string
+		endDate: listing.endDate, // Assuming endDate is already a string in the correct format
 	};
 
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/listings/${id}`, {
-		method: "PUT",
-		headers,
-		body: JSON.stringify(apiListing),
-	});
+	const response = await fetch(
+		`${import.meta.env.VITE_API_URL}/listings/${id}`,
+		{
+			method: "PUT",
+			headers,
+			body: JSON.stringify(apiListing),
+		},
+	);
 	return handleApiResponse<Listing>(response);
 }
 
@@ -155,22 +165,24 @@ async function updateListing(id: number, listing: ListingSchema): Promise<Listin
  */
 async function saveDraftListing(
 	userId: string,
-	listing: ListingSchema,
+	listing: Listing,
 ): Promise<Listing> {
-	// Transform ListingSchema (client form) to Listing (API/Server expected format)
+	// Transform Listing (client form) to Listing (API/Server expected format)
 	// Note: Server expects subCategoryId in category_id column, and string date.
 	const apiListing = {
 		...listing,
 		categoryId: listing.subCategoryId, // Server expects subCategoryId here
-		endDate: listing.endDate.toISOString(), // Convert Date object to ISO string
-		// Ensure prices are numbers, which ListingSchema already enforces
+		endDate: listing.endDate, // Assuming endDate is already a string in the correct format
 	};
 
-	const response = await fetch(`${import.meta.env.VITE_API_URL}/users/${userId}/draft-listing`, {
-		method: "POST", // Or PUT if updating an existing draft
-		headers,
-		body: JSON.stringify(apiListing),
-	});
+	const response = await fetch(
+		`${import.meta.env.VITE_API_URL}/users/${userId}/draft-listing`,
+		{
+			method: "POST",
+			headers,
+			body: JSON.stringify(apiListing),
+		},
+	);
 	return handleApiResponse<Listing>(response);
 }
 

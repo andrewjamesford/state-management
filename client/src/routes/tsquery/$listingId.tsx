@@ -4,8 +4,8 @@ import {
 	useNavigate,
 	useParams,
 } from "@tanstack/react-router";
-import { addDays, format, isWithinInterval } from "date-fns";
-import { useEffect, useState } from "react";
+import { addDays } from "date-fns";
+import { useState } from "react";
 import api from "~/api";
 import ErrorMessage from "~/components/errorMessage";
 import Loader from "~/components/loader";
@@ -16,33 +16,9 @@ export const Route = createFileRoute("/tsquery/$listingId")({
 	component: RouteComponent,
 });
 
-/**
- * @fileoverview
- * A React component for editing listing details.
- * Uses TanStack Router for routing and TanStack Query for data management.
- *
- * Features:
- * - Loads and displays existing listing data for editing
- * - Manages form state for title/category, item details, price/payment, and shipping
- * - Handles category/subcategory selection with dynamic loading
- * - Validates dates within allowed range
- * - Supports multiple payment methods
- * - Handles shipping and pickup options
- *
- * @remarks
- * The component uses several custom form components:
- * - TextInput for text fields
- * - Select for category dropdowns
- * - DateInput for date selection
- * - Textarea for description
- * - MoneyTextInput for prices
- * - RadioButton for binary choices
- * - Checkbox for multiple selections
- *
- * Form data is validated and submitted via mutation to update the formState.
- * On successful update, user is redirected to listings page.
- * @module RouteComponent
- */
+const today = new Date();
+const tomorrow = new Date(addDays(today, 1));
+const fortnight = new Date(addDays(today, 14));
 
 /**
  * React component that renders a form to update listing details.
@@ -59,16 +35,9 @@ export const Route = createFileRoute("/tsquery/$listingId")({
  * - On submission, the updateListing mutation is invoked and the user is navigated on successful update.
  */
 function RouteComponent() {
-	const today = new Date();
-	const tomorrow = new Date(addDays(today, 1));
-	const fortnight = new Date(addDays(today, 14));
-
 	const navigate = useNavigate({
 		from: Route.fullPath,
 	});
-
-	// Local state for form
-	const [formState, setFormState] = useState(listingDefault);
 
 	const { listingId } = useParams({ from: Route.id });
 
@@ -91,6 +60,11 @@ function RouteComponent() {
 		},
 		enabled: !Number.isNaN(listingId),
 	});
+
+	// Local state for form
+	const [formState, setFormState] = useState<Listing>(
+		loadingListing || !listingData ? listingDefault : listingData,
+	);
 
 	const {
 		data: categoryData,
@@ -121,36 +95,6 @@ function RouteComponent() {
 			return result ?? [];
 		},
 	});
-
-	useEffect(() => {
-		if (listingData) {
-			const newEndDate = new Date(listingData.endDate);
-			const isValidDate = isWithinInterval(newEndDate, {
-				start: new Date(tomorrow),
-				end: new Date(fortnight),
-			});
-
-			const endDate = isValidDate ? newEndDate : new Date(tomorrow);
-
-			setFormState((prev) => ({
-				...prev,
-				title: listingData.title,
-				subTitle: listingData.subTitle,
-				endDate,
-				categoryId: listingData?.categoryId,
-				subCategoryId: listingData?.subCategoryId,
-				description: listingData.description,
-				condition: listingData.condition,
-				listingPrice: listingData.listingPrice,
-				reservePrice: listingData.reservePrice || 0,
-				creditCardPayment: listingData.creditCardPayment,
-				bankTransferPayment: listingData.bankTransferPayment,
-				bitcoinPayment: listingData.bitcoinPayment,
-				pickUp: listingData.pickUp,
-				shippingOption: listingData.shippingOption,
-			}));
-		}
-	}, [listingData, tomorrow, fortnight]);
 
 	// Add mutation hook for updating the listing
 	const updateListingMutation = useMutation({

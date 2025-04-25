@@ -1,4 +1,4 @@
-import { isWithinInterval, parseISO, isValid as isDate } from "date-fns";
+import { isValid as isDate, isWithinInterval, parseISO } from "date-fns";
 
 const MAX_TITLE_LENGTH = 80;
 const MIN_TITLE_LENGTH = 3;
@@ -76,21 +76,21 @@ function validatePaymentMethods(
  * @returns {boolean} - True if the price is a valid positive number, false otherwise.
  */
 function validatePrice(price: number | string): boolean {
-    if (price === null || price === undefined) {
-        console.error("Price cannot be null or undefined");
-        return false;
-    }
-    
-    const numPrice = typeof price === "string" ? Number.parseFloat(price) : price;
-    
-    // Check if the parsed number is valid
-    if (Number.isNaN(numPrice)) {
-        console.error("Invalid price value provided");
-        return false;
-    }
-    
-    // Check if the price is finite and positive
-    return Number.isFinite(numPrice) && numPrice > 0;
+	if (price === null || price === undefined) {
+		console.error("Price cannot be null or undefined");
+		return false;
+	}
+
+	const numPrice = typeof price === "string" ? Number.parseFloat(price) : price;
+
+	// Check if the parsed number is valid
+	if (Number.isNaN(numPrice)) {
+		console.error("Invalid price value provided");
+		return false;
+	}
+
+	// Check if the price is finite and positive
+	return Number.isFinite(numPrice) && numPrice > 0;
 }
 
 export {

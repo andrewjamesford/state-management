@@ -20,8 +20,8 @@ describe("generateUUID", () => {
 	it("should generate unique UUIDs on multiple calls", () => {
 		// Mock implementation to return different values on subsequent calls
 		const mockUUIDs = [
-			["123e4567","e89b","42d3","a456","556642440001"],
-			["123e4567","e89b","42d3","a456","556642440002"],
+			["123e4567", "e89b", "42d3", "a456", "556642440001"],
+			["123e4567", "e89b", "42d3", "a456", "556642440002"],
 		];
 
 		let callCount = 0;

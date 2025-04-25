@@ -1,3 +1,5 @@
+import { addDays } from "date-fns";
+
 export interface ApiError {
 	message: string;
 	status?: number;
@@ -33,7 +35,7 @@ export const listingDefault: Listing = {
 	categoryId: 0, // Default to no parent category selected
 	subCategoryId: 0, // Default to no subcategory selected
 	subTitle: "",
-	endDate: new Date(), // Default to current date, will be updated by form logic
+	endDate: new Date(addDays(new Date(), 1)), // Default to current date + 1 (tomorrow), will be updated by form logic
 	description: "",
 	condition: false, // Default to used
 	listingPrice: 0,

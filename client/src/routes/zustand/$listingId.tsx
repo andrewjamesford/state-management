@@ -36,10 +36,7 @@ function RouteComponent() {
 	} = useListingStore();
 
 	// Local state for form
-	const [formState, setFormState] = useState<Listing>(() => ({
-		...listingDefault,
-		endDate: new Date(tomorrow),
-	}));
+	const [formState, setFormState] = useState<Listing>(() => listingDefault);
 
 	useEffect(() => {
 		if (listingId !== "new") {
@@ -58,9 +55,7 @@ function RouteComponent() {
 		if (listing && listingId !== "new") {
 			setFormState({
 				...listing,
-				endDate: listing.endDate
-					? new Date(listing.endDate)
-					: new Date(tomorrow),
+				endDate: new Date(listing.endDate),
 				listingPrice: Number(listing.listingPrice),
 				reservePrice: Number(listing.reservePrice),
 				categoryId: listing.categoryId,
@@ -71,7 +66,7 @@ function RouteComponent() {
 				fetchSubCategories(listing.categoryId);
 			}
 		}
-	}, [listing, listingId, tomorrow, fetchSubCategories]);
+	}, [listing, listingId, fetchSubCategories]);
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();

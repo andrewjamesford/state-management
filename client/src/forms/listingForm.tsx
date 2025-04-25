@@ -1,4 +1,4 @@
-import { isDate } from "date-fns";
+import { addDays, format } from "date-fns";
 import Checkbox from "~/components/checkbox";
 import DateInput from "~/components/dateInput";
 import Loader from "~/components/loader";
@@ -32,8 +32,8 @@ interface BasicInfoSectionProps extends SectionProps {
 	loadingSubCategory: boolean;
 	categoryData: Category[] | null;
 	subCategoryData: Category[] | null;
-	minDate: Date;
-	maxDate: Date;
+	minDate: string;
+	maxDate: string;
 }
 
 const handleTextChange =
@@ -92,7 +92,6 @@ const BasicInfoSection = ({
 					onChange={handleTextChange("subTitle", setFormState)}
 					maxLength={50}
 					className="block w-full px-3 py-2 mt-1 border rounded-md placeholder:italic peer"
-					// Note: Added basic validation classes/messages for subtitle too
 					errorMessage="Please enter a subtitle of up to 50 characters"
 					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
 					requirementsLabel="50 characters max"
@@ -193,18 +192,17 @@ const BasicInfoSection = ({
 					label="End date"
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="end-date"
-					value={formState.endDate.toDateString()}
+					value={format(formState.endDate, "yyyy-MM-dd")}
 					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 						const dateValue = e.target.value;
 						setFormState((prev) => ({
 							...prev,
-							endDate: isDate(dateValue) ? new Date(dateValue) : prev.endDate,
+							endDate: new Date(dateValue),
 						}));
 					}}
+					min={minDate}
+					max={maxDate}
 					required
-					// pattern="\d{4}-\d{2}-\d{2}" // Basic pattern validation
-					min={minDate.toDateString()}
-					max={maxDate.toDateString()}
 					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:default):invalid]:block"
 					error="Please select a future date between tomorrow and two weeks from now"
 				/>
@@ -287,15 +285,13 @@ const PriceAndPaymentSection = ({ formState, setFormState }: SectionProps) => (
 					placeholder="10.00"
 					value={formState.listingPrice}
 					onChange={(e) => {
-						// MoneyTextInput likely returns a number or string that needs parsing
 						const value = Number(e.target.value) || 0; // Ensure it's a number
 						setFormState((prev) => ({
 							...prev,
 							listingPrice: value,
 						}));
 					}}
-					required // Start price should likely be required and positive
-					// Add validation classes/messages for price
+					required // Start price required and positive
 					className="peer mt-1 block w-full rounded-md border px-3 py-2 placeholder:italic invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-600"
 					errorMessage="Please enter a valid price greater than 0"
 					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
@@ -316,7 +312,6 @@ const PriceAndPaymentSection = ({ formState, setFormState }: SectionProps) => (
 						}));
 					}}
 					// Reserve price is optional, so no 'required' prop
-					// Add validation classes/messages for reserve price (optional but must be valid if entered)
 					className="peer mt-1 block w-full rounded-md border px-3 py-2 placeholder:italic invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-600"
 					errorMessage="Please enter a valid reserve price (or leave blank)" // Adjust message
 					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
@@ -327,7 +322,6 @@ const PriceAndPaymentSection = ({ formState, setFormState }: SectionProps) => (
 				<legend className="block text-sm font-medium text-gray-700">
 					Payment options
 				</legend>
-				{/* Add a required attribute or handle validation manually for payment options */}
 				<div className="flex mt-3">
 					<Checkbox
 						id="payment-credit"
@@ -367,7 +361,6 @@ const PriceAndPaymentSection = ({ formState, setFormState }: SectionProps) => (
 						}}
 					/>
 				</div>
-				{/* Manual validation feedback for payment options would go here */}
 			</div>
 		</fieldset>
 	</>
@@ -459,8 +452,7 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 		listingId = 0, // Default to 0 for new listings
 		formState,
 		setFormState,
-		minDate: tomorrow,
-		maxDate: fortnight,
+
 		loadingCategory,
 		loadingSubCategory,
 		categoryData,
@@ -471,6 +463,9 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 	if (loadingCategory || loadingSubCategory) {
 		return <Loader aria-label="Loading form data" />;
 	}
+	const today = new Date();
+	const tomorrow = format(new Date(addDays(today, 1)), "yyyy-MM-dd");
+	const fortnight = format(new Date(addDays(today, 14)), "yyyy-MM-dd");
 
 	return (
 		<>
