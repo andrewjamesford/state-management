@@ -14,8 +14,8 @@ export const Route = createFileRoute("/zustand/add")({
 
 function RouteComponent() {
 	const today = new Date();
-	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
-	const fortnight = format(addDays(today, 14), "yyyy-MM-dd");
+	const tomorrow = new Date(addDays(today, 1));
+	const fortnight = new Date(addDays(today, 14));
 
 	const navigate = useNavigate({
 		from: Route.fullPath,
@@ -72,8 +72,8 @@ function RouteComponent() {
 				listingId={0}
 				formState={formState}
 				setFormState={setFormState}
-				tomorrow={tomorrow}
-				fortnight={fortnight}
+				minDate={tomorrow}
+				maxDate={fortnight}
 				loadingCategory={isLoading}
 				loadingSubCategory={isLoading}
 				categoryData={categories}

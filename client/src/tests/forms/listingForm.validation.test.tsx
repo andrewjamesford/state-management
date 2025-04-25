@@ -3,14 +3,14 @@ import userEvent from "@testing-library/user-event";
 import { addDays, format } from "date-fns";
 import { describe, expect, it, vi } from "vitest";
 import ListingForm from "~/forms/listingForm";
-import type { Category, ListingSchema } from "~/models";
+import type { Category, Listing } from "~/models";
 
 describe("ListingForm validation", () => {
 	// Helper function to render the form with necessary props
-	const renderForm = (initialFormState: Partial<ListingSchema> = {}) => {
+	const renderForm = (initialFormState: Partial<Listing> = {}) => {
 		const today = new Date();
-		const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
-		const fortnight = format(addDays(today, 14), "yyyy-MM-dd");
+		const tomorrow = new Date(addDays(today, 1));
+		const fortnight = new Date(addDays(today, 14));
 
 		const mockCategories: Category[] = [
 			{ id: 1, category_name: "Electronics", parent_id: 0, active: true },
@@ -22,7 +22,7 @@ describe("ListingForm validation", () => {
 			{ id: 4, category_name: "Phones", parent_id: 1, active: true },
 		];
 
-		const defaultFormState: ListingSchema = {
+		const defaultFormState: Listing = {
 			id: 0,
 			title: "",
 			subTitle: "",
@@ -50,8 +50,8 @@ describe("ListingForm validation", () => {
 				<ListingForm
 					formState={{ ...defaultFormState, ...initialFormState }}
 					setFormState={setFormState}
-					tomorrow={tomorrow}
-					fortnight={fortnight}
+					minDate={tomorrow}
+					maxDate={fortnight}
 					loadingCategory={false}
 					loadingSubCategory={false}
 					categoryData={mockCategories}
@@ -178,8 +178,8 @@ describe("ListingForm validation", () => {
 	describe("Conditional rendering", () => {
 		it("renders loading indicator when categories are loading", () => {
 			const today = new Date();
-			const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
-			const fortnight = format(addDays(today, 14), "yyyy-MM-dd");
+			const tomorrow = new Date(addDays(today, 1));
+			const fortnight = new Date(addDays(today, 14));
 
 			render(
 				<ListingForm
@@ -201,8 +201,8 @@ describe("ListingForm validation", () => {
 						shippingOption: "post",
 					}}
 					setFormState={vi.fn()}
-					tomorrow={tomorrow}
-					fortnight={fortnight}
+					minDate={tomorrow}
+					maxDate={fortnight}
 					loadingCategory={true}
 					loadingSubCategory={false}
 					categoryData={null}

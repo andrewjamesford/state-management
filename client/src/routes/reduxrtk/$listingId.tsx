@@ -181,8 +181,8 @@ function RouteComponent() {
 				listingId={Number(listingId)}
 				formState={formState}
 				setFormState={setFormState}
-				tomorrow={tomorrow}
-				fortnight={fortnight}
+				minDate={tomorrow}
+				maxDate={fortnight}
 				loadingCategory={loadingCategory}
 				loadingSubCategory={loadingSubCategory}
 				categoryData={categoryData ?? null}

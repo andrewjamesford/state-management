@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { addDays, format } from "date-fns";
+import { addDays } from "date-fns";
 import { useState } from "react";
 import api from "~/api";
 import ErrorMessage from "~/components/errorMessage";
@@ -17,8 +17,8 @@ function RouteComponent() {
 	// Hardcode listingId as "add"
 	const listingId = "add";
 	const today = new Date();
-	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
-	const fortnight = format(addDays(today, 14), "yyyy-MM-dd");
+	const tomorrow = new Date(addDays(today, 1));
+	const fortnight = new Date(addDays(today, 14));
 
 	const navigate = useNavigate({
 		from: Route.fullPath,
@@ -34,8 +34,8 @@ function RouteComponent() {
 		queryKey: ["parentCategories"],
 		queryFn: async () => {
 			const response = await api.getCategories();
-			if (!response.ok) throw new Error("Error retrieving categories");
-			const result = await response.json();
+			if (!response) throw new Error("Error retrieving categories");
+			const result = response;
 			return result ?? [];
 		},
 	});
@@ -49,8 +49,9 @@ function RouteComponent() {
 		queryFn: async () => {
 			if (!formState.categoryId) return [];
 			const response = await api.getCategories(formState.categoryId);
-			if (!response.ok) throw new Error("Error retrieving sub-categories");
-			return await response.json();
+			if (!response) throw new Error("Error retrieving sub-categories");
+			const result = response;
+			return result ?? [];
 		},
 	});
 
@@ -67,8 +68,16 @@ function RouteComponent() {
 		mutationFn: async ({ listing }) => {
 			// Always add a new listing
 			const response = await api.addListing(listing);
-			if (!response.ok) throw new Error("Error adding listing");
-			return await response.json();
+			if (!response) throw new Error("Error adding listing");
+			const result = await response;
+			if (!result) throw new Error("No result returned from the API");
+			if (
+				typeof result === "number" ||
+				(typeof result === "object" && "message" in result)
+			) {
+				return 1;
+			}
+			return 0;
 		},
 		onSuccess: (data) => {
 			if (data === 1) return navListings();
@@ -120,8 +129,8 @@ function RouteComponent() {
 				listingId={0}
 				formState={formState}
 				setFormState={setFormState}
-				tomorrow={tomorrow}
-				fortnight={fortnight}
+				minDate={tomorrow}
+				maxDate={fortnight}
 				loadingCategory={loadingCategory}
 				loadingSubCategory={loadingSubCategory}
 				categoryData={categoryData}

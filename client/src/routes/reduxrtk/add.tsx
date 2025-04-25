@@ -48,12 +48,12 @@ function RouteComponent() {
 	const navigate = useNavigate({ from: Route.fullPath });
 
 	const today = new Date();
-	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
-	const fortnight = format(addDays(today, 14), "yyyy-MM-dd");
+	const tomorrow = new Date(addDays(today, 1));
+	const fortnight = new Date(addDays(today, 14));
 
 	const [formState, setFormState] = useState<ListingSchema>({
 		...initialState,
-		endDate: new Date(tomorrow),
+		endDate: tomorrow,
 	});
 
 	const [addListing] = useAddListingMutation();
@@ -121,8 +121,8 @@ function RouteComponent() {
 				listingId={0}
 				formState={formState}
 				setFormState={setFormState}
-				tomorrow={tomorrow}
-				fortnight={fortnight}
+				minDate={tomorrow}
+				maxDate={fortnight}
 				loadingCategory={loadingCategory}
 				loadingSubCategory={loadingSubCategory}
 				categoryData={categoryData}

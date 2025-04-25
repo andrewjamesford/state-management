@@ -18,7 +18,6 @@ export default function DateInput({
 		"block w-full px-3 py-2 mt-1 border rounded-md text-black focus:ring-primary focus:border-primary focus:bg-transparent placeholder:italic peer";
 	const defaultLabelClass = "block text-sm font-medium text-gray-700";
 	const defaultErrorClass = "mt-1 text-sm text-red-600";
-
 	return (
 		<div>
 			{label && (

@@ -3,7 +3,7 @@ import {
 	useNavigate,
 	useParams,
 } from "@tanstack/react-router";
-import { addDays, format } from "date-fns";
+import { addDays } from "date-fns";
 import { useEffect, useState } from "react";
 import ErrorMessage from "~/components/errorMessage";
 import Loader from "~/components/loader";
@@ -17,11 +17,11 @@ export const Route = createFileRoute("/zustand/$listingId")({
 
 function RouteComponent() {
 	const today = new Date();
-	const tomorrow = format(addDays(today, 1), "yyyy-MM-dd");
-	const fortnight = format(addDays(today, 14), "yyyy-MM-dd");
+	const tomorrow = new Date(addDays(today, 1));
+	const fortnight = new Date(addDays(today, 14));
 
 	const navigate = useNavigate({ from: Route.fullPath });
-	const { listingId } = useParams({ from: Route.id });
+	const { listingId = 0 } = useParams({ from: Route.id });
 
 	const {
 		listing,
@@ -43,7 +43,7 @@ function RouteComponent() {
 
 	useEffect(() => {
 		if (listingId !== "new") {
-			fetchListing(listingId);
+			fetchListing(listingId as number);
 		}
 		fetchCategories();
 	}, [listingId, fetchListing, fetchCategories]);
@@ -76,11 +76,16 @@ function RouteComponent() {
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		try {
-			await updateListing(listingId, {
+			await updateListing(listingId as number, {
 				...formState,
 				endDate: formState.endDate,
 				listingPrice: formState.listingPrice,
 				reservePrice: formState.reservePrice,
+				creditCardPayment: formState.creditCardPayment,
+				bankTransferPayment: formState.bankTransferPayment,
+				bitcoinPayment: formState.bitcoinPayment,
+				pickUp: formState.pickUp,
+				shippingOption: formState.shippingOption,
 			});
 			navigate({ to: "/zustand" });
 		} catch (error) {
@@ -103,11 +108,11 @@ function RouteComponent() {
 	return (
 		<form onSubmit={handleSubmit} className="group max-w-4xl mx-auto px-4 py-5">
 			<ListingForm
-				listingId={Number(listingId)}
+				listingId={listingId as number}
 				formState={formState}
 				setFormState={setFormState}
-				tomorrow={tomorrow}
-				fortnight={fortnight}
+				minDate={tomorrow}
+				maxDate={fortnight}
 				loadingCategory={isLoading}
 				loadingSubCategory={isLoading}
 				categoryData={categories}

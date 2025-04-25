@@ -14,8 +14,8 @@ interface ListingFormProps {
 	listingId?: number;
 	formState: Listing;
 	setFormState: React.Dispatch<React.SetStateAction<Listing>>;
-	tomorrow: Date;
-	fortnight: Date;
+	minDate: Date;
+	maxDate: Date;
 	loadingCategory: boolean;
 	loadingSubCategory: boolean;
 	categoryData: Category[] | null;
@@ -32,8 +32,8 @@ interface BasicInfoSectionProps extends SectionProps {
 	loadingSubCategory: boolean;
 	categoryData: Category[] | null;
 	subCategoryData: Category[] | null;
-	tomorrow: Date;
-	fortnight: Date;
+	minDate: Date;
+	maxDate: Date;
 }
 
 const handleTextChange =
@@ -56,8 +56,8 @@ const BasicInfoSection = ({
 	loadingSubCategory,
 	categoryData,
 	subCategoryData,
-	tomorrow,
-	fortnight,
+	minDate,
+	maxDate,
 }: BasicInfoSectionProps) => (
 	<>
 		<h1 className="mt-4 text-2xl font-bold">What are you listing?</h1>
@@ -193,30 +193,18 @@ const BasicInfoSection = ({
 					label="End date"
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="end-date"
-					// Format the Date object to 'yyyy-MM-dd' for the input value
-					value={
-						isDate(formState.endDate)
-							? formState.endDate.toString()
-							: tomorrow.toString() // Default to tomorrow if date is invalid
-					}
+					value={formState.endDate.toDateString()}
 					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 						const dateValue = e.target.value;
-						// Parse the input string value into a Date object
-						const endDate = dateValue
-							? new Date(dateValue)
-							: new Date(tomorrow);
 						setFormState((prev) => ({
 							...prev,
-							// Check if the parsed date is valid before setting state
-							endDate: Number.isFinite(endDate.getTime())
-								? endDate
-								: new Date(tomorrow), // Fallback to tomorrow if invalid
+							endDate: isDate(dateValue) ? new Date(dateValue) : prev.endDate,
 						}));
 					}}
 					required
-					pattern="\d{4}-\d{2}-\d{2}" // Basic pattern validation
-					min={tomorrow.toString()}
-					max={fortnight.toString()}
+					// pattern="\d{4}-\d{2}-\d{2}" // Basic pattern validation
+					min={minDate.toDateString()}
+					max={maxDate.toDateString()}
 					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:default):invalid]:block"
 					error="Please select a future date between tomorrow and two weeks from now"
 				/>
@@ -471,8 +459,8 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 		listingId = 0, // Default to 0 for new listings
 		formState,
 		setFormState,
-		tomorrow,
-		fortnight,
+		minDate: tomorrow,
+		maxDate: fortnight,
 		loadingCategory,
 		loadingSubCategory,
 		categoryData,
@@ -493,8 +481,8 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 				loadingSubCategory={loadingSubCategory}
 				categoryData={categoryData}
 				subCategoryData={subCategoryData}
-				tomorrow={tomorrow}
-				fortnight={fortnight}
+				minDate={tomorrow}
+				maxDate={fortnight}
 			/>
 
 			<ItemDetailsSection formState={formState} setFormState={setFormState} />
