@@ -61,10 +61,17 @@ function RouteComponent() {
 		enabled: !Number.isNaN(listingId),
 	});
 
-	// Local state for form
-	const [formState, setFormState] = useState<Listing>(
-		loadingListing || !listingData ? listingDefault : listingData,
-	);
+	const [formState, setFormState] = useState<Listing>(listingDefault);
+
+	// Update formState when listingData changes
+	if (listingData && formState.id !== listingData.id) {
+		setFormState({
+			...listingData,
+			endDate: new Date(listingData.endDate),
+			listingPrice: Number(listingData.listingPrice),
+			reservePrice: Number(listingData.reservePrice),
+		});
+	}
 
 	const {
 		data: categoryData,
@@ -94,6 +101,7 @@ function RouteComponent() {
 			const result = await response;
 			return result ?? [];
 		},
+		enabled: !!formState.categoryId,
 	});
 
 	// Add mutation hook for updating the listing
