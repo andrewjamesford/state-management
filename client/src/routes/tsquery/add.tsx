@@ -107,9 +107,9 @@ function RouteComponent() {
 		mutation.mutate({
 			listing: {
 				...formState,
-				endDate: formState.endDate.toISOString(),
-				listingPrice: formState.listingPrice.toPrecision(2),
-				reservePrice: formState.reservePrice.toPrecision(2),
+				endDate: formState.endDate,
+				listingPrice: formState.listingPrice,
+				reservePrice: formState.reservePrice,
 			},
 		});
 	};
@@ -133,8 +133,8 @@ function RouteComponent() {
 				maxDate={fortnight}
 				loadingCategory={loadingCategory}
 				loadingSubCategory={loadingSubCategory}
-				categoryData={categoryData}
-				subCategoryData={subCategoryData}
+				categoryData={categoryData ?? []}
+				subCategoryData={subCategoryData ?? []}
 			/>
 		</form>
 	);

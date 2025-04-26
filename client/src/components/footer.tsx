@@ -16,7 +16,7 @@ export default function Footer() {
 				</div>
 				<p className="text-gray-600">
 					This application is a demonstration for using multiple ways to handle
-					forms data persistence in React.js
+					State Management in React.js
 				</p>
 			</div>
 		</footer>

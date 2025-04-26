@@ -46,7 +46,7 @@ const getUserID = () => {
 
 getUserID();
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 export const Route = createRootRoute({
 	loader: () => <Skeleton />,

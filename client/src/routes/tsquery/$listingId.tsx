@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryClient } from "~/routes/__root";
 import {
 	createFileRoute,
 	useNavigate,
@@ -46,17 +47,16 @@ function RouteComponent() {
 		isLoading: loadingListing,
 		error: listingError,
 	} = useQuery({
-		queryKey: ["listingData", listingId],
+		queryKey: ["listings", listingId],
 		queryFn: async () => {
-			const response = await api.getListing(Number(listingId)); // pass id as number
-			if (!response) {
-				throw new Error(`Error retrieving listing ${listingId}`);
-			}
-			const result = await response;
+			const result = await api.getListings();
 			if (!result) {
 				throw new Error(`Error retrieving listing ${listingId}`);
 			}
-			return result;
+			const listing = result.find((listing: Listing) => {
+				return listing.id === Number(listingId);
+			});
+			return listing ?? null;
 		},
 		enabled: !Number.isNaN(listingId),
 	});
@@ -65,12 +65,7 @@ function RouteComponent() {
 
 	// Update formState when listingData changes
 	if (listingData && formState.id !== listingData.id) {
-		setFormState({
-			...listingData,
-			endDate: new Date(listingData.endDate),
-			listingPrice: Number(listingData.listingPrice),
-			reservePrice: Number(listingData.reservePrice),
-		});
+		setFormState(listingData);
 	}
 
 	const {
@@ -80,9 +75,7 @@ function RouteComponent() {
 	} = useQuery({
 		queryKey: ["parentCategories"],
 		queryFn: async () => {
-			const response = await api.getCategories();
-			if (!response) throw new Error("Error retrieving categories");
-			const result = response;
+			const result = await api.getCategories();
 			if (!result) throw new Error("Error retrieving categories");
 			return result ?? [];
 		},
@@ -96,9 +89,7 @@ function RouteComponent() {
 		queryKey: ["subCategories", formState.categoryId],
 		queryFn: async () => {
 			if (!formState.categoryId) return [];
-			const response = await api.getCategories(formState.categoryId);
-			if (!response) throw new Error("Error retrieving sub-categories");
-			const result = await response;
+			const result = await api.getCategories(formState.categoryId);
 			return result ?? [];
 		},
 		enabled: !!formState.categoryId,
@@ -107,32 +98,23 @@ function RouteComponent() {
 	// Add mutation hook for updating the listing
 	const updateListingMutation = useMutation({
 		mutationFn: async (listing: Listing) => {
-			const updatedListing: Listing = {
-				...listing,
-				endDate: listing.endDate,
-				listingPrice: listing.listingPrice,
-				reservePrice: listing.reservePrice,
-			};
-			const response = await api.updateListing(
-				Number(listingId),
-				updatedListing,
-			);
-			if (!response) throw new Error("Error updating listing");
-			const result = await response;
-			if (!result) throw new Error("No result returned from update");
+			const result = await api.updateListing(Number(listingId), listing);
+			if (!result) throw new Error("Error updating listing");
 			return result;
+		},
+		onSuccess: (listing) => {
+			return queryClient.invalidateQueries({
+				queryKey: ["listings", listing.id],
+			});
 		},
 	});
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		updateListingMutation.mutate(formState, {
-			onSuccess: (result) => {
-				if (result) {
-					navListings();
-					return;
-				}
-				alert("Update successful.");
+			onSuccess: () => {
+				queryClient.setQueryData(["listings", listingId], formState);
+				navListings();
 			},
 			onError: (error) => {
 				alert(`Error: ${error.message}`);
@@ -171,8 +153,8 @@ function RouteComponent() {
 				maxDate={fortnight}
 				loadingCategory={loadingCategory}
 				loadingSubCategory={loadingSubCategory}
-				categoryData={categoryData ?? null}
-				subCategoryData={subCategoryData ?? null}
+				categoryData={categoryData ?? []}
+				subCategoryData={subCategoryData ?? []}
 			/>
 		</form>
 	);
