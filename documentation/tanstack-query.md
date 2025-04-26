@@ -261,8 +261,8 @@ const mutation = useMutation({
     return { id: variables.id };
   },
   onError: (error, variables, context) => {
-    // An error happened!
-    console.log(`Rolling back optimistic update with id: ${context.id}`);
+    // An error!
+    console.error(`Rolling back optimistic update with id: ${context.id}`);
   },
   onSuccess: (data, variables, context) => {
     // Boom baby!

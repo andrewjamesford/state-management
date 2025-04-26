@@ -195,9 +195,15 @@ const BasicInfoSection = ({
 					value={format(formState.endDate, "yyyy-MM-dd")}
 					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 						const dateValue = e.target.value;
+						// Create a date object without time component by using the date string
+						// Set to noon UTC to avoid timezone issues when converting back to string
+						const normalizedDate = dateValue
+							? new Date(`${dateValue}T00:00:00Z`)
+							: new Date();
+
 						setFormState((prev) => ({
 							...prev,
-							endDate: new Date(dateValue),
+							endDate: normalizedDate,
 						}));
 					}}
 					min={minDate}
