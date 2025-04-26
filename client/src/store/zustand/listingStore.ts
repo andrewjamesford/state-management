@@ -1,7 +1,7 @@
-import { format } from "date-fns";
 import { create } from "zustand";
 import api from "~/api";
-import type { Category, Listing, listingDefault } from "~/models";
+import type { Category, Listing } from "~/models";
+import { listingDefault } from "~/models";
 
 interface ListingStore {
 	listing: Listing;
@@ -15,30 +15,12 @@ interface ListingStore {
 	fetchListings: () => Promise<void>;
 	fetchCategories: () => Promise<void>;
 	fetchSubCategories: (categoryId: number) => Promise<void>;
-	updateListing: (id: number, listing: Partial<Listing>) => Promise<void>;
-	addListing: (listing: Partial<Listing>) => Promise<void>;
+	updateListing: (id: number, listing: Listing) => Promise<void>;
+	addListing: (listing: Listing) => Promise<void>;
 }
 
-const initialListing: Listing = {
-	id: 0,
-	title: "",
-	subTitle: "",
-	categoryId: 0,
-	subCategoryId: 0,
-	endDate: new Date(),
-	condition: false,
-	description: "",
-	listingPrice: 0,
-	reservePrice: 0,
-	creditCardPayment: false,
-	bankTransferPayment: false,
-	bitcoinPayment: false,
-	pickUp: false,
-	shippingOption: "",
-};
-
 export const useListingStore = create<ListingStore>((set) => ({
-	listing: initialListing,
+	listing: listingDefault,
 	listings: [],
 	categories: [],
 	subCategories: [],
@@ -52,12 +34,9 @@ export const useListingStore = create<ListingStore>((set) => ({
 	fetchListing: async (id: number) => {
 		set({ isLoading: true, error: null });
 		try {
-			const response = await api.getListing(id);
-			if (!response) throw new Error("Failed to fetch listing");
-			const data = response;
-			if (!data) throw new Error("No data found");
-
-			set({ listing: data, isLoading: false });
+			const result = await api.getListing(id);
+			if (!result) throw new Error("Failed to fetch listing");
+			set({ listing: result, isLoading: false });
 		} catch (error) {
 			set({
 				error: error instanceof Error ? error.message : "An error occurred",
@@ -69,11 +48,9 @@ export const useListingStore = create<ListingStore>((set) => ({
 	fetchListings: async () => {
 		set({ isLoading: true, error: null });
 		try {
-			const response = await api.getListings();
-			if (!response) throw new Error("Failed to fetch listings");
-			const data = response;
-			if (!data) throw new Error("No data found");
-			set({ listings: data, isLoading: false });
+			const result = await api.getListings();
+			if (!result) throw new Error("Failed to fetch listings");
+			set({ listings: result, isLoading: false });
 		} catch (error) {
 			set({
 				error: error instanceof Error ? error.message : "An error occurred",
@@ -84,11 +61,9 @@ export const useListingStore = create<ListingStore>((set) => ({
 
 	fetchCategories: async () => {
 		try {
-			const response = await api.getCategories();
-			if (!response) throw new Error("Failed to fetch categories");
-			const data = response;
-			if (!data) throw new Error("No data found");
-			set({ categories: data });
+			const result = await api.getCategories();
+			if (!result) throw new Error("Failed to fetch categories");
+			set({ categories: result });
 		} catch (error) {
 			set({
 				error: error instanceof Error ? error.message : "An error occurred",
@@ -98,11 +73,9 @@ export const useListingStore = create<ListingStore>((set) => ({
 
 	fetchSubCategories: async (categoryId) => {
 		try {
-			const response = await api.getCategories(categoryId);
-			if (!response) throw new Error("Failed to fetch subcategories");
-			const data: Category[] = response;
-			if (!data) throw new Error("No data found");
-			set({ subCategories: data });
+			const result = await api.getCategories(categoryId);
+			if (!result) throw new Error("Failed to fetch subcategories");
+			set({ subCategories: result });
 		} catch (error) {
 			set({
 				error: error instanceof Error ? error.message : "An error occurred",
@@ -113,11 +86,9 @@ export const useListingStore = create<ListingStore>((set) => ({
 	updateListing: async (id, listing) => {
 		set({ isLoading: true, error: null });
 		try {
-			const response = await api.updateListing(id, listing);
-			if (!response) throw new Error("Failed to update listing");
-			const data = response;
-			if (!data) throw new Error("No data found");
-			set({ listing: data, isLoading: false });
+			const result = await api.updateListing(id, listing);
+			if (!result) throw new Error("Failed to update listing");
+			set({ listing: result, isLoading: false });
 		} catch (error) {
 			set({
 				error: error instanceof Error ? error.message : "An error occurred",

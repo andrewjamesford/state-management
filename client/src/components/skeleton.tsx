@@ -59,7 +59,7 @@ export default function Skeleton({ layoutType, repeat = 1 }: SkeletonProps) {
 		}
 
 		return (
-			// biome-ignore lint/a11y/useSemanticElements: <explanation>
+			// biome-ignore lint/a11y/useSemanticElements: React.Fragment is not a semantic element
 			<div role="status" aria-live="polite" className="animate-pulse block">
 				<div className="mb-4 h-10 w-48 rounded-md bg-gray-200 dark:bg-gray-700" />
 				<span className="sr-only">Loading...</span>

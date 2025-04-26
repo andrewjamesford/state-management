@@ -33,9 +33,8 @@ function RouteComponent() {
 	} = useQuery({
 		queryKey: ["parentCategories"],
 		queryFn: async () => {
-			const response = await api.getCategories();
-			if (!response) throw new Error("Error retrieving categories");
-			const result = response;
+			const result = await api.getCategories();
+			if (!result) throw new Error("Error retrieving categories");
 			return result ?? [];
 		},
 	});
@@ -67,10 +66,8 @@ function RouteComponent() {
 	>({
 		mutationFn: async ({ listing }) => {
 			// Always add a new listing
-			const response = await api.addListing(listing);
-			if (!response) throw new Error("Error adding listing");
-			const result = await response;
-			if (!result) throw new Error("No result returned from the API");
+			const result = await api.addListing(listing);
+			if (!result) throw new Error("Error adding listing");
 			if (
 				typeof result === "number" ||
 				(typeof result === "object" && "message" in result)
