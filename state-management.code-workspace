@@ -34,10 +34,10 @@
 				"server": "localhost",
 				"port": 5432,
 				"driver": "PostgreSQL",
-				"name": "localdb",
-				"database": "postgres",
+				"name": "db",
+				"database": "statemanagement",
 				"username": "postgres",
-				"password": "password"
+				"password": "postgres"
 			}
 		],
 		"[dockerfile]": {
