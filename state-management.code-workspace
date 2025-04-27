@@ -74,7 +74,8 @@
 			"biomejs.biome",
 			"bradlc.vscode-tailwindcss",
 			"anweber.vscode-httpyac",
-			"dbcode.dbcode"
+			"mtxr.sqltools-driver-pg",
+			"vitest.explorer"
 		]
 	},
 }
