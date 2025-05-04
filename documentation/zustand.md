@@ -22,13 +22,6 @@ Key characteristics of Zustand include:
 # NPM
 npm install zustand
 
-# Yarn
-yarn add zustand
-
-# PNPM
-pnpm add zustand
-```
-
 ## Basic Usage
 
 ### Creating a Store

@@ -58,164 +58,187 @@ const BasicInfoSection = ({
 	subCategoryData,
 	minDate,
 	maxDate,
-}: BasicInfoSectionProps) => (
-	<>
-		<h1 className="mt-4 text-2xl font-bold">What are you listing?</h1>
-		<fieldset>
-			<legend className="sr-only">Basic Information</legend>
-			<div className="mt-6">
-				<TextInput
-					labelClassName="block text-sm font-medium text-gray-700"
-					label="Listing title"
-					id="listing-title"
-					placeholder="e.g. iPhone 5c, Red t-shirt"
-					value={formState.title}
-					onChange={handleTextChange("title", setFormState)}
-					required={true}
-					maxLength={80}
-					minLength={3}
-					className="peer mt-1 block w-full rounded-md border px-3 py-2 placeholder:italic invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-600"
-					errorMessage="Please enter a listing title of 3-80 characters"
-					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
-					requirementsLabel="80 characters max"
-					requirementsClassName="mt-1 text-sm text-gray-500"
-				/>
-			</div>
+}: BasicInfoSectionProps) => {
+	// Helper function to safely format date or return fallback
+	const safeFormatDate = (
+		date: Date | string | undefined | null,
+		fallbackDate: string,
+	): string => {
+		try {
+			const dateObj = new Date(date ?? "");
+			// Check if date is valid
+			if (Number.isNaN(dateObj.getTime())) {
+				return fallbackDate;
+			}
+			return format(dateObj, "yyyy-MM-dd");
+		} catch {
+			return fallbackDate;
+		}
+	};
 
-			<div className="mt-6">
-				<TextInput
-					labelClassName="block text-sm font-medium text-gray-700"
-					label="Subtitle (optional)"
-					id="sub-title"
-					placeholder="e.g. iPhone 5c, Red t-shirt"
-					value={formState.subTitle}
-					onChange={handleTextChange("subTitle", setFormState)}
-					maxLength={50}
-					className="block w-full px-3 py-2 mt-1 border rounded-md placeholder:italic peer"
-					errorMessage="Please enter a subtitle of up to 50 characters"
-					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
-					requirementsLabel="50 characters max"
-					requirementsClassName="mt-1 text-sm text-gray-500"
-				/>
-			</div>
+	return (
+		<>
+			<h1 className="mt-4 text-2xl font-bold">What are you listing?</h1>
+			<fieldset>
+				<legend className="sr-only">Basic Information</legend>
+				<div className="mt-6">
+					<TextInput
+						labelClassName="block text-sm font-medium text-gray-700"
+						label="Listing title"
+						id="listing-title"
+						placeholder="e.g. iPhone 5c, Red t-shirt"
+						value={formState.title}
+						onChange={handleTextChange("title", setFormState)}
+						required={true}
+						maxLength={80}
+						minLength={3}
+						className="peer mt-1 block w-full rounded-md border px-3 py-2 placeholder:italic invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-600"
+						errorMessage="Please enter a listing title of 3-80 characters"
+						errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
+						requirementsLabel="80 characters max"
+						requirementsClassName="mt-1 text-sm text-gray-500"
+					/>
+				</div>
 
-			<div className="mt-6">
-				{loadingCategory ? (
-					<Loader width={20} height={20} aria-label="Loading categories" />
-				) : (
-					categoryData && (
-						<Select
-							label="Category"
-							labelClassName="block text-sm font-medium text-gray-700"
-							id="category"
-							selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${
-								formState.categoryId === 0 ? " italic text-gray-400" : ""
-							}`}
-							onChange={(e) => {
-								const value = Number.parseInt(e.target.value) || 0;
-								setFormState((prev) => ({
-									...prev,
-									categoryId: value,
-									subCategoryId: 0, // Reset subcategory when category changes
-								}));
-							}}
-							value={formState.categoryId}
-							required={true}
-							disabled={loadingCategory}
-							aria-busy={loadingCategory}
-							options={[
-								{
-									value: 0,
-									label: "Select a category...",
-									className: "text-muted-foreground italic",
-									disabled: loadingCategory,
-								},
-								...(categoryData ?? []).map((category: Category) => ({
-									value: category.id,
-									label: category.category_name,
-								})),
-							]}
+				<div className="mt-6">
+					<TextInput
+						labelClassName="block text-sm font-medium text-gray-700"
+						label="Subtitle (optional)"
+						id="sub-title"
+						placeholder="e.g. iPhone 5c, Red t-shirt"
+						value={formState.subTitle}
+						onChange={handleTextChange("subTitle", setFormState)}
+						maxLength={50}
+						className="block w-full px-3 py-2 mt-1 border rounded-md placeholder:italic peer"
+						errorMessage="Please enter a subtitle of up to 50 characters"
+						errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
+						requirementsLabel="50 characters max"
+						requirementsClassName="mt-1 text-sm text-gray-500"
+					/>
+				</div>
+
+				<div className="mt-6">
+					{loadingCategory ? (
+						<Loader width={20} height={20} aria-label="Loading categories" />
+					) : (
+						categoryData && (
+							<Select
+								label="Category"
+								labelClassName="block text-sm font-medium text-gray-700"
+								id="category"
+								selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${
+									formState.categoryId === 0 ? " italic text-gray-400" : ""
+								}`}
+								onChange={(e) => {
+									const value = Number.parseInt(e.target.value) || 0;
+									setFormState((prev) => ({
+										...prev,
+										categoryId: value,
+										subCategoryId: 0, // Reset subcategory when category changes
+									}));
+								}}
+								value={formState.categoryId}
+								required={true}
+								disabled={loadingCategory}
+								aria-busy={loadingCategory}
+								options={[
+									{
+										value: 0,
+										label: "Select a category...",
+										className: "text-muted-foreground italic",
+										disabled: loadingCategory,
+									},
+									...(categoryData ?? []).map((category: Category) => ({
+										value: category.id,
+										label: category.category_name,
+									})),
+								]}
+							/>
+						)
+					)}
+				</div>
+
+				<div className="mt-6">
+					{loadingSubCategory ? (
+						<Loader
+							width={20}
+							height={20}
+							aria-label="Loading sub categories"
 						/>
-					)
-				)}
-			</div>
+					) : (
+						subCategoryData && (
+							<Select
+								label="Sub Category"
+								labelClassName="block text-sm font-medium text-gray-700"
+								id="category-sub"
+								selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${
+									formState.subCategoryId === 0 ? " italic text-gray-400" : ""
+								}`}
+								onChange={(e) => {
+									const value = Number.parseInt(e.target.value) || 0;
+									setFormState((prev) => ({
+										...prev,
+										subCategoryId: value,
+									}));
+								}}
+								value={formState.subCategoryId}
+								required={true} // Subcategory is required
+								disabled={
+									!subCategoryData ||
+									loadingSubCategory ||
+									formState.categoryId === 0 // Disable if no parent category selected
+								}
+								aria-busy={loadingSubCategory}
+								options={[
+									{
+										value: 0,
+										label:
+											formState.categoryId === 0
+												? "Select a category first"
+												: "Select a sub category...",
+										className: "text-muted-foreground italic",
+										disabled: loadingSubCategory || formState.categoryId === 0,
+									},
+									...(subCategoryData ?? []).map((category: Category) => ({
+										value: category.id,
+										label: category.category_name,
+									})),
+								]}
+							/>
+						)
+					)}
+				</div>
 
-			<div className="mt-6">
-				{loadingSubCategory ? (
-					<Loader width={20} height={20} aria-label="Loading sub categories" />
-				) : (
-					subCategoryData && (
-						<Select
-							label="Sub Category"
-							labelClassName="block text-sm font-medium text-gray-700"
-							id="category-sub"
-							selectClassName={`block w-full h-10 px-3 py-2 items-center justify-between rounded-md border border-input bg-background ring-offset-background peer ${
-								formState.subCategoryId === 0 ? " italic text-gray-400" : ""
-							}`}
-							onChange={(e) => {
-								const value = Number.parseInt(e.target.value) || 0;
-								setFormState((prev) => ({
-									...prev,
-									subCategoryId: value,
-								}));
-							}}
-							value={formState.subCategoryId}
-							required={true} // Subcategory is required
-							disabled={
-								!subCategoryData ||
-								loadingSubCategory ||
-								formState.categoryId === 0 // Disable if no parent category selected
-							}
-							aria-busy={loadingSubCategory}
-							options={[
-								{
-									value: 0,
-									label:
-										formState.categoryId === 0
-											? "Select a category first"
-											: "Select a sub category...",
-									className: "text-muted-foreground italic",
-									disabled: loadingSubCategory || formState.categoryId === 0,
-								},
-								...(subCategoryData ?? []).map((category: Category) => ({
-									value: category.id,
-									label: category.category_name,
-								})),
-							]}
-						/>
-					)
-				)}
-			</div>
+				<div className="mt-6">
+					<DateInput
+						label="End date"
+						labelClassName="block text-sm font-medium text-gray-700"
+						id="end-date"
+						value={safeFormatDate(formState.endDate, minDate)}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+							const dateValue = e.target.value;
+							// Create a date object without time component by using the date string
+							// Set to noon UTC to avoid timezone issues when converting back to string
+							const normalizedDate = dateValue
+								? new Date(`${dateValue}T00:00:00Z`)
+								: new Date();
 
-			<div className="mt-6">
-				<DateInput
-					label="End date"
-					labelClassName="block text-sm font-medium text-gray-700"
-					id="end-date"
-					value={format(formState.endDate, "yyyy-MM-dd")}
-					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-						const dateValue = e.target.value;
-						// Create a date object without time component by using the date string
-						// Set to noon UTC to avoid timezone issues when converting back to string
-						const normalizedDate = dateValue
-							? new Date(`${dateValue}T00:00:00Z`)
-							: new Date();
-
-						setFormState((prev) => ({
-							...prev,
-							endDate: normalizedDate,
-						}));
-					}}
-					min={minDate}
-					max={maxDate}
-					required
-					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:default):invalid]:block"
-					error="Please select a future date between tomorrow and two weeks from now"
-				/>
-			</div>
-		</fieldset>
-	</>
-);
+							setFormState((prev) => ({
+								...prev,
+								endDate: normalizedDate,
+							}));
+						}}
+						min={minDate}
+						max={maxDate}
+						required
+						errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:default):invalid]:block"
+						error="Please select a future date between tomorrow and two weeks from now"
+					/>
+				</div>
+			</fieldset>
+		</>
+	);
+};
 
 const ItemDetailsSection = ({ formState, setFormState }: SectionProps) => (
 	<>
@@ -289,15 +312,17 @@ const PriceAndPaymentSection = ({ formState, setFormState }: SectionProps) => (
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="listing-price"
 					placeholder="10.00"
-					value={formState.listingPrice}
+					value={
+						Number.isNaN(formState.listingPrice) ? "" : formState.listingPrice
+					}
 					onChange={(e) => {
-						const value = Number(e.target.value) || 0; // Ensure it's a number
+						const value = Number(e.target.value) || 0;
 						setFormState((prev) => ({
 							...prev,
 							listingPrice: value,
 						}));
 					}}
-					required // Start price required and positive
+					required
 					className="peer mt-1 block w-full rounded-md border px-3 py-2 placeholder:italic invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-600"
 					errorMessage="Please enter a valid price greater than 0"
 					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
@@ -309,21 +334,21 @@ const PriceAndPaymentSection = ({ formState, setFormState }: SectionProps) => (
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="listing-reserve"
 					placeholder="$20.00"
-					value={formState.reservePrice}
+					value={
+						Number.isNaN(formState.reservePrice) ? "" : formState.reservePrice
+					}
 					onChange={(e) => {
-						const value = Number(e.target.value) || 0; // Ensure it's a number
+						const value = Number(e.target.value) || 0;
 						setFormState((prev) => ({
 							...prev,
 							reservePrice: value,
 						}));
 					}}
-					// Reserve price is optional, so no 'required' prop
 					className="peer mt-1 block w-full rounded-md border px-3 py-2 placeholder:italic invalid:[&:not(:placeholder-shown):not(:focus)]:border-red-600"
-					errorMessage="Please enter a valid reserve price (or leave blank)" // Adjust message
+					errorMessage="Please enter a valid reserve price (or leave blank)"
 					errorClassName="mt-1 hidden text-sm text-red-600 peer-[&:not(:placeholder-shown):not(:focus):invalid]:block"
 				/>
 			</div>
-
 			<div className="mt-6">
 				<legend className="block text-sm font-medium text-gray-700">
 					Payment options
@@ -458,7 +483,6 @@ export default function ListingForm(listingFormProps: ListingFormProps) {
 		listingId = 0, // Default to 0 for new listings
 		formState,
 		setFormState,
-
 		loadingCategory,
 		loadingSubCategory,
 		categoryData,
