@@ -26,8 +26,6 @@ export const useListingStore = create<ListingStore>((set) => ({
 	subCategories: [],
 	isLoading: false,
 	error: null,
-	// Will replace the store object rather than a shallow merge when updating/adding
-	replace: true,
 
 	setListing: (listing) => set({ listing }),
 

@@ -106,7 +106,7 @@ const BasicInfoSection = ({
 						label="Subtitle (optional)"
 						id="sub-title"
 						placeholder="e.g. iPhone 5c, Red t-shirt"
-						value={formState.subTitle}
+						value={formState.subTitle ?? ""}
 						onChange={handleTextChange("subTitle", setFormState)}
 						maxLength={50}
 						className="block w-full px-3 py-2 mt-1 border rounded-md placeholder:italic peer"
@@ -250,7 +250,7 @@ const ItemDetailsSection = ({ formState, setFormState }: SectionProps) => (
 					label="Description"
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="listing-description"
-					value={formState.description}
+					value={formState.description ?? ""}
 					onChange={handleTextChange("description", setFormState)}
 					required={true}
 					maxLength={500}
