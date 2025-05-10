@@ -99,11 +99,9 @@ export const useListingStore = create<ListingStore>((set) => ({
 	addListing: async (listing) => {
 		set({ isLoading: true, error: null });
 		try {
-			const response = await api.addListing(listing);
-			if (!response) throw new Error("Failed to add listing");
-			const data = response;
-			if (!data) throw new Error("No data found");
-			set({ listing: data, isLoading: false });
+			const result = await api.addListing(listing);
+			if (!result) throw new Error("Failed to add listing");
+			set({ listing: result, isLoading: false });
 		} catch (error) {
 			set({
 				error: error instanceof Error ? error.message : "An error occurred",
