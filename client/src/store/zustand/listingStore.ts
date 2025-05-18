@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import api from "~/api";
-import type { Category, Listing } from "~/models";
+import type { ApiListing, Category, Listing } from "~/models";
 import { listingDefault } from "~/models";
 import { format } from "date-fns";
 
@@ -102,7 +102,10 @@ export const useListingStore = create<ListingStore>((set) => ({
 						: listing.reservePrice,
 			};
 
-			const result = await api.updateListing(id, formattedListing);
+			const result = await api.updateListing(
+				id,
+				formattedListing as unknown as Listing,
+			);
 			if (!result) throw new Error("Failed to update listing");
 			set({ listing: result, isLoading: false });
 		} catch (error) {
@@ -134,7 +137,9 @@ export const useListingStore = create<ListingStore>((set) => ({
 						: listing.reservePrice,
 			};
 
-			const result = await api.addListing(formattedListing);
+			const result = await api.addListing(
+				formattedListing as unknown as Listing,
+			);
 			if (!result) throw new Error("Failed to add listing");
 			set({ listing: result, isLoading: false });
 		} catch (error) {
