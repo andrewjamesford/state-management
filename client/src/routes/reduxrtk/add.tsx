@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import ErrorMessage from "~/components/errorMessage";
 import Loader from "~/components/loader";
 import ListingForm from "~/forms/listingForm";
-import type { ApiListing, Category, Listing } from "~/models";
+import type { Category, Listing } from "~/models";
 import {
 	useAddListingMutation,
 	useGetParentCategoriesQuery,
@@ -85,7 +85,10 @@ function RouteComponent() {
 				listingPrice: String(formState.listingPrice),
 				reservePrice: String(formState.reservePrice),
 			};
-			const response = await addListing({ listing: listingToAdd as any }).unwrap();
+			const response = await addListing({
+				// biome-ignore lint/suspicious/noExplicitAny: simplified for demo
+				listing: listingToAdd as any,
+			}).unwrap();
 			if (response === 1) {
 				dispatch(resetState());
 				navigate({ to: "/reduxrtk" });
