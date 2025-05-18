@@ -2,6 +2,7 @@ import { create } from "zustand";
 import api from "~/api";
 import type { Category, Listing } from "~/models";
 import { listingDefault } from "~/models";
+import { format } from "date-fns";
 
 interface ListingStore {
 	listing: Listing;
@@ -84,7 +85,24 @@ export const useListingStore = create<ListingStore>((set) => ({
 	updateListing: async (id, listing) => {
 		set({ isLoading: true, error: null });
 		try {
-			const result = await api.updateListing(id, listing);
+			// Format dates and numbers as strings for API
+			const formattedListing = {
+				...listing,
+				endDate:
+					listing.endDate instanceof Date
+						? format(listing.endDate, "yyyy-MM-dd")
+						: listing.endDate,
+				listingPrice:
+					typeof listing.listingPrice === "number"
+						? listing.listingPrice.toString()
+						: listing.listingPrice,
+				reservePrice:
+					typeof listing.reservePrice === "number"
+						? listing.reservePrice.toString()
+						: listing.reservePrice,
+			};
+
+			const result = await api.updateListing(id, formattedListing);
 			if (!result) throw new Error("Failed to update listing");
 			set({ listing: result, isLoading: false });
 		} catch (error) {
@@ -99,7 +117,24 @@ export const useListingStore = create<ListingStore>((set) => ({
 	addListing: async (listing) => {
 		set({ isLoading: true, error: null });
 		try {
-			const result = await api.addListing(listing);
+			// Format dates and numbers as strings for API
+			const formattedListing = {
+				...listing,
+				endDate:
+					listing.endDate instanceof Date
+						? format(listing.endDate, "yyyy-MM-dd")
+						: listing.endDate,
+				listingPrice:
+					typeof listing.listingPrice === "number"
+						? listing.listingPrice.toString()
+						: listing.listingPrice,
+				reservePrice:
+					typeof listing.reservePrice === "number"
+						? listing.reservePrice.toString()
+						: listing.reservePrice,
+			};
+
+			const result = await api.addListing(formattedListing);
 			if (!result) throw new Error("Failed to add listing");
 			set({ listing: result, isLoading: false });
 		} catch (error) {

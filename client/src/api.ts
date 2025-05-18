@@ -1,4 +1,25 @@
-import type { ApiError, Category, Listing } from "~/models";
+import type { ApiError, ApiListing, Category, Listing } from "~/models";
+import { format, parseISO } from "date-fns";
+
+// Convert API listing to internal listing format
+function convertFromApiListing(apiListing: ApiListing): Listing {
+	return {
+		...apiListing,
+		endDate: parseISO(apiListing.endDate),
+		listingPrice: Number(apiListing.listingPrice),
+		reservePrice: Number(apiListing.reservePrice),
+	};
+}
+
+// Convert internal listing to API format
+function convertToApiListing(listing: Listing): ApiListing {
+	return {
+		...listing,
+		endDate: format(listing.endDate, "yyyy-MM-dd"),
+		listingPrice: listing.listingPrice.toString(),
+		reservePrice: listing.reservePrice.toString(),
+	};
+}
 
 const headers = {
 	Accept: "application/json",
@@ -60,7 +81,8 @@ async function getListings(): Promise<Listing[]> {
 	const response = await fetch(`${import.meta.env.VITE_API_URL}/listings`, {
 		headers,
 	});
-	return handleApiResponse<Listing[]>(response);
+	const apiListings = await handleApiResponse<ApiListing[]>(response);
+	return apiListings.map(convertFromApiListing);
 }
 
 /**
@@ -76,7 +98,8 @@ async function getListing(id: number): Promise<Listing> {
 			headers,
 		},
 	);
-	return handleApiResponse<Listing>(response);
+	const apiListing = await handleApiResponse<ApiListing>(response);
+	return convertFromApiListing(apiListing);
 }
 
 /**
@@ -111,12 +134,14 @@ async function getDraftListing(userId: string): Promise<Listing | null> {
  * @throws {ApiError} If the API request fails.
  */
 async function addListing(listing: Listing): Promise<Listing> {
+	const apiListing = convertToApiListing(listing);
 	const response = await fetch(`${import.meta.env.VITE_API_URL}/listings`, {
 		method: "POST",
 		headers,
-		body: JSON.stringify(listing),
+		body: JSON.stringify(apiListing),
 	});
-	return handleApiResponse<Listing>(response);
+	const result = await handleApiResponse<ApiListing>(response);
+	return convertFromApiListing(result);
 }
 
 /**
@@ -127,15 +152,17 @@ async function addListing(listing: Listing): Promise<Listing> {
  * @throws {ApiError} If the API request fails.
  */
 async function updateListing(id: number, listing: Listing): Promise<Listing> {
+	const apiListing = convertToApiListing(listing);
 	const response = await fetch(
 		`${import.meta.env.VITE_API_URL}/listings/${id}`,
 		{
 			method: "PUT",
 			headers,
-			body: JSON.stringify(listing),
+			body: JSON.stringify(apiListing),
 		},
 	);
-	return handleApiResponse<Listing>(response);
+	const result = await handleApiResponse<ApiListing>(response);
+	return convertFromApiListing(result);
 }
 
 /**

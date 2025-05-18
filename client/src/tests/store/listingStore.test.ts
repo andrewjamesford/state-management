@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import api from "~/api";
-import type { Listing, RawListing } from "~/models";
+import type { ApiListing, Category, Listing } from "~/models";
 import { useListingStore } from "~/store/zustand/listingStore";
 
 // Mock the API module
@@ -28,11 +28,11 @@ describe("listingStore (Zustand)", () => {
 				subTitle: "",
 				categoryId: 0,
 				subCategoryId: 0,
-				endDate: format(new Date(), "yyyy-MM-dd"),
+				endDate: new Date(),
 				condition: false,
 				description: "",
-				listingPrice: "0",
-				reservePrice: "0",
+				listingPrice: 0,
+				reservePrice: 0,
 				creditCardPayment: false,
 				bankTransferPayment: false,
 				bitcoinPayment: false,
@@ -55,11 +55,11 @@ describe("listingStore (Zustand)", () => {
 				subTitle: "Test Subtitle",
 				categoryId: 2,
 				subCategoryId: 3,
-				endDate: "2023-12-31",
+				endDate: new Date("2023-12-31"),
 				condition: true,
 				description: "Test description",
-				listingPrice: "100.00",
-				reservePrice: "50.00",
+				listingPrice: 100,
+				reservePrice: 50,
 				creditCardPayment: true,
 				bankTransferPayment: false,
 				bitcoinPayment: false,
@@ -78,32 +78,45 @@ describe("listingStore (Zustand)", () => {
 	describe("fetchListing", () => {
 		it("should fetch and update listing data", async () => {
 			// Mock API response
-			const mockRawListing: RawListing = {
+			const mockApiListing: ApiListing = {
 				id: 5,
 				title: "API Listing",
-				subtitle: "From API",
-				categoryid: 2,
-				subcategoryid: 4,
-				enddate: "2023-10-15",
+				subTitle: "From API",
+				categoryId: 2,
+				subCategoryId: 4,
+				endDate: "2023-10-15",
 				condition: true,
-				listingdescription: "Description from API",
-				listingprice: "75.00",
-				reserveprice: "25.00",
-				creditcardpayment: true,
-				banktransferpayment: true,
-				bitcoinpayment: false,
-				pickup: false,
-				shippingoption: "courier",
+				description: "Description from API",
+				listingPrice: "75.00",
+				reservePrice: "25.00",
+				creditCardPayment: true,
+				bankTransferPayment: true,
+				bitcoinPayment: false,
+				pickUp: false,
+				shippingOption: "courier",
 				category: "API Category",
 			};
 
 			vi.mocked(api.getListing).mockResolvedValue({
-				ok: true,
-				json: async () => mockRawListing,
-			} as Response);
+				id: mockApiListing.id,
+				title: mockApiListing.title,
+				subTitle: mockApiListing.subTitle,
+				categoryId: mockApiListing.categoryId,
+				subCategoryId: mockApiListing.subCategoryId,
+				endDate: new Date("2023-10-15"),
+				condition: mockApiListing.condition,
+				description: mockApiListing.description,
+				listingPrice: 75,
+				reservePrice: 25,
+				creditCardPayment: mockApiListing.creditCardPayment,
+				bankTransferPayment: mockApiListing.bankTransferPayment,
+				bitcoinPayment: mockApiListing.bitcoinPayment,
+				pickUp: mockApiListing.pickUp,
+				shippingOption: mockApiListing.shippingOption,
+			});
 
 			const { fetchListing } = useListingStore.getState();
-			await fetchListing("5");
+			await fetchListing(5);
 
 			const state = useListingStore.getState();
 
@@ -113,34 +126,32 @@ describe("listingStore (Zustand)", () => {
 
 			// Verify the data was transformed and stored correctly
 			expect(state.listing).toEqual({
-				id: mockRawListing.id,
-				title: mockRawListing.title,
-				subTitle: mockRawListing.subtitle,
-				categoryId: mockRawListing.categoryid,
-				subCategoryId: mockRawListing.subcategoryid,
-				endDate: mockRawListing.enddate,
-				condition: mockRawListing.condition,
-				description: mockRawListing.listingdescription,
-				listingPrice: mockRawListing.listingprice,
-				reservePrice: mockRawListing.reserveprice,
-				creditCardPayment: mockRawListing.creditcardpayment,
-				bankTransferPayment: mockRawListing.banktransferpayment,
-				bitcoinPayment: mockRawListing.bitcoinpayment,
-				pickUp: mockRawListing.pickup,
-				shippingOption: mockRawListing.shippingoption,
+				id: mockApiListing.id,
+				title: mockApiListing.title,
+				subTitle: mockApiListing.subTitle,
+				categoryId: mockApiListing.categoryId,
+				subCategoryId: mockApiListing.subCategoryId,
+				endDate: new Date("2023-10-15"),
+				condition: mockApiListing.condition,
+				description: mockApiListing.description,
+				listingPrice: 75,
+				reservePrice: 25,
+				creditCardPayment: mockApiListing.creditCardPayment,
+				bankTransferPayment: mockApiListing.bankTransferPayment,
+				bitcoinPayment: mockApiListing.bitcoinPayment,
+				pickUp: mockApiListing.pickUp,
+				shippingOption: mockApiListing.shippingOption,
 			});
 		});
 
 		it("should handle API errors", async () => {
 			// Mock API error response
-			vi.mocked(api.getListing).mockResolvedValue({
-				ok: false,
-				status: 404,
-				statusText: "Not Found",
-			} as Response);
+			vi.mocked(api.getListing).mockRejectedValue(
+				new Error("Failed to fetch listing"),
+			);
 
 			const { fetchListing } = useListingStore.getState();
-			await fetchListing("999");
+			await fetchListing(999);
 
 			const state = useListingStore.getState();
 
@@ -151,49 +162,53 @@ describe("listingStore (Zustand)", () => {
 
 	describe("fetchListings", () => {
 		it("should fetch and update multiple listings", async () => {
-			const mockRawListings: RawListing[] = [
+			const mockApiListings: ApiListing[] = [
 				{
 					id: 1,
 					title: "First Listing",
-					subtitle: "First subtitle",
-					categoryid: 1,
-					subcategoryid: 2,
-					enddate: "2023-11-30",
+					subTitle: "First subtitle",
+					categoryId: 1,
+					subCategoryId: 2,
+					endDate: "2023-11-30",
 					condition: false,
-					listingdescription: "First description",
-					listingprice: "10.00",
-					reserveprice: "5.00",
-					creditcardpayment: true,
-					banktransferpayment: false,
-					bitcoinpayment: false,
-					pickup: true,
-					shippingoption: "post",
+					description: "First description",
+					listingPrice: "10.00",
+					reservePrice: "5.00",
+					creditCardPayment: true,
+					bankTransferPayment: false,
+					bitcoinPayment: false,
+					pickUp: true,
+					shippingOption: "post",
 					category: "Category One",
 				},
 				{
 					id: 2,
 					title: "Second Listing",
-					subtitle: "Second subtitle",
-					categoryid: 3,
-					subcategoryid: 4,
-					enddate: "2023-12-15",
+					subTitle: "Second subtitle",
+					categoryId: 3,
+					subCategoryId: 4,
+					endDate: "2023-12-15",
 					condition: true,
-					listingdescription: "Second description",
-					listingprice: "20.00",
-					reserveprice: "15.00",
-					creditcardpayment: false,
-					banktransferpayment: true,
-					bitcoinpayment: false,
-					pickup: false,
-					shippingoption: "courier",
+					description: "Second description",
+					listingPrice: "20.00",
+					reservePrice: "15.00",
+					creditCardPayment: false,
+					bankTransferPayment: true,
+					bitcoinPayment: false,
+					pickUp: false,
+					shippingOption: "courier",
 					category: "Category Two",
 				},
 			];
 
-			vi.mocked(api.getListings).mockResolvedValue({
-				ok: true,
-				json: async () => mockRawListings,
-			} as Response);
+			vi.mocked(api.getListings).mockResolvedValue(
+				mockApiListings.map((api) => ({
+					...api,
+					endDate: new Date(api.endDate),
+					listingPrice: Number(api.listingPrice),
+					reservePrice: Number(api.reservePrice),
+				})),
+			);
 
 			const { fetchListings } = useListingStore.getState();
 			await fetchListings();
@@ -202,27 +217,26 @@ describe("listingStore (Zustand)", () => {
 
 			expect(state.isLoading).toBe(false);
 			expect(state.error).toBeNull();
-			expect(state.listings.length).toBe(2);
+			expect(state.listings).toHaveLength(2);
 
 			// Check if the data is transformed correctly
-			expect(state.listings[0].id).toBe(mockRawListings[0].id);
-			expect(state.listings[0].title).toBe(mockRawListings[0].title);
-			expect(state.listings[1].id).toBe(mockRawListings[1].id);
-			expect(state.listings[1].title).toBe(mockRawListings[1].title);
+			expect(state.listings[0].id).toBe(mockApiListings[0].id);
+			expect(state.listings[0].title).toBe(mockApiListings[0].title);
+			expect(state.listings[0].listingPrice).toBe(10);
+			expect(state.listings[1].id).toBe(mockApiListings[1].id);
+			expect(state.listings[1].title).toBe(mockApiListings[1].title);
+			expect(state.listings[1].listingPrice).toBe(20);
 		});
 	});
 
 	describe("fetchCategories and fetchSubCategories", () => {
 		it("should fetch and store categories", async () => {
-			const mockCategories = [
+			const mockCategories: Category[] = [
 				{ id: 1, category_name: "Electronics", parent_id: 0, active: true },
 				{ id: 2, category_name: "Clothing", parent_id: 0, active: true },
 			];
 
-			vi.mocked(api.getCategories).mockResolvedValue({
-				ok: true,
-				json: async () => mockCategories,
-			} as Response);
+			vi.mocked(api.getCategories).mockResolvedValue(mockCategories);
 
 			const { fetchCategories } = useListingStore.getState();
 			await fetchCategories();
@@ -232,15 +246,12 @@ describe("listingStore (Zustand)", () => {
 		});
 
 		it("should fetch and store subcategories", async () => {
-			const mockSubCategories = [
+			const mockSubCategories: Category[] = [
 				{ id: 3, category_name: "Laptops", parent_id: 1, active: true },
 				{ id: 4, category_name: "Phones", parent_id: 1, active: true },
 			];
 
-			vi.mocked(api.getCategories).mockResolvedValue({
-				ok: true,
-				json: async () => mockSubCategories,
-			} as Response);
+			vi.mocked(api.getCategories).mockResolvedValue(mockSubCategories);
 
 			const { fetchSubCategories } = useListingStore.getState();
 			await fetchSubCategories(1);
@@ -253,29 +264,38 @@ describe("listingStore (Zustand)", () => {
 
 	describe("updateListing", () => {
 		it("should format and send update data correctly", async () => {
-			vi.mocked(api.updateListing).mockResolvedValue({
-				ok: true,
-				json: async () => ({ id: 1, title: "Updated Listing" }),
-			} as Response);
-
-			const updateData = {
+			const updateListing = {
 				title: "Updated Listing",
 				description: "New description",
 				endDate: new Date("2024-12-31"),
 				listingPrice: 199.99,
 				reservePrice: 150,
-			};
+			} as Listing;
 
-			const { updateListing } = useListingStore.getState();
-			await updateListing("1", updateData);
+			vi.mocked(api.updateListing).mockResolvedValue({
+				...updateListing,
+				id: 1,
+				subTitle: "",
+				categoryId: 1,
+				subCategoryId: 1,
+				condition: true,
+				creditCardPayment: true,
+				bankTransferPayment: false,
+				bitcoinPayment: false,
+				pickUp: true,
+				shippingOption: "post",
+			});
+
+			const { updateListing: update } = useListingStore.getState();
+			await update(1, updateListing);
 
 			// Check if api was called with correctly formatted data
 			expect(api.updateListing).toHaveBeenCalledWith(
-				"1",
+				1,
 				expect.objectContaining({
 					title: "Updated Listing",
 					description: "New description",
-					endDate: "2024-12-31",
+					endDate: format(new Date("2024-12-31"), "yyyy-MM-dd"),
 					listingPrice: "199.99",
 					reservePrice: "150",
 				}),
@@ -288,12 +308,7 @@ describe("listingStore (Zustand)", () => {
 
 	describe("addListing", () => {
 		it("should format and send new listing data correctly", async () => {
-			vi.mocked(api.addListing).mockResolvedValue({
-				ok: true,
-				json: async () => ({ id: 10, title: "New Listing" }),
-			} as Response);
-
-			const newListingData = {
+			const newListing = {
 				title: "New Listing",
 				description: "Brand new item",
 				endDate: new Date("2023-11-30"),
@@ -303,17 +318,27 @@ describe("listingStore (Zustand)", () => {
 				subCategoryId: 3,
 				condition: true,
 				creditCardPayment: true,
-			};
+			} as Listing;
 
-			const { addListing } = useListingStore.getState();
-			await addListing(newListingData);
+			vi.mocked(api.addListing).mockResolvedValue({
+				...newListing,
+				id: 10,
+				subTitle: "",
+				bankTransferPayment: false,
+				bitcoinPayment: false,
+				pickUp: false,
+				shippingOption: "",
+			});
+
+			const { addListing: add } = useListingStore.getState();
+			await add(newListing);
 
 			// Check if api was called with correctly formatted data
 			expect(api.addListing).toHaveBeenCalledWith(
 				expect.objectContaining({
 					title: "New Listing",
 					description: "Brand new item",
-					endDate: "2023-11-30",
+					endDate: format(new Date("2023-11-30"), "yyyy-MM-dd"),
 					listingPrice: "50",
 					reservePrice: "25",
 				}),
@@ -326,14 +351,13 @@ describe("listingStore (Zustand)", () => {
 		it("should handle errors when adding a listing", async () => {
 			vi.mocked(api.addListing).mockRejectedValue(new Error("Network error"));
 
-			const newListingData = {
+			const newListing = {
 				title: "Error Listing",
 				endDate: new Date(),
-			};
+			} as Listing;
 
-			const { addListing } = useListingStore.getState();
-
-			await expect(addListing(newListingData)).rejects.toThrow();
+			const { addListing: add } = useListingStore.getState();
+			await expect(add(newListing)).rejects.toThrow();
 
 			const state = useListingStore.getState();
 			expect(state.error).toBe("Network error");

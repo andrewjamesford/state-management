@@ -7,6 +7,26 @@ export interface ApiError {
 	details?: unknown;
 }
 
+// This interface reflects the API payload structure
+export interface ApiListing {
+	id: number;
+	title: string;
+	subTitle: string;
+	categoryId: number;
+	subCategoryId: number;
+	endDate: string; // API expects string in yyyy-MM-dd format
+	description: string;
+	condition: boolean;
+	listingPrice: string; // API expects string
+	reservePrice: string; // API expects string
+	creditCardPayment: boolean;
+	bankTransferPayment: boolean;
+	bitcoinPayment: boolean;
+	pickUp: boolean;
+	shippingOption: string;
+	category?: string;
+}
+
 // This interface reflects the camelCase structure returned by the server repository
 export interface Listing {
 	id: number;

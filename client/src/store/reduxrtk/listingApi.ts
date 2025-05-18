@@ -1,24 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { Category, Listing } from "~/models";
 
-interface RawListing {
-	id: number;
-	title: string;
-	subtitle: string;
-	categoryid: number;
-	subcategoryid: number;
-	enddate: string;
-	condition: boolean;
-	listingdescription: string;
-	listingprice: string;
-	reserveprice: string;
-	creditcardpayment: boolean;
-	banktransferpayment: boolean;
-	bitcoinpayment: boolean;
-	pickup: boolean;
-	shippingoption: string;
-}
-
 export const listingApi = createApi({
 	reducerPath: "listingApi",
 	baseQuery: fetchBaseQuery({ baseUrl: `${import.meta.env.VITE_API_URL}/` }),
