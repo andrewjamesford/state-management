@@ -79,13 +79,13 @@ function RouteComponent() {
 		}
 
 		try {
-			const listingToAdd: ApiListing = {
+			const listingToAdd = {
 				...formState,
 				endDate: format(formState.endDate, "yyyy-MM-dd"),
 				listingPrice: String(formState.listingPrice),
 				reservePrice: String(formState.reservePrice),
 			};
-			const response = await addListing({ listing: listingToAdd }).unwrap();
+			const response = await addListing({ listing: listingToAdd as any }).unwrap();
 			if (response === 1) {
 				dispatch(resetState());
 				navigate({ to: "/reduxrtk" });

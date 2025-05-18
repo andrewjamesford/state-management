@@ -3,7 +3,7 @@ import {
 	useNavigate,
 	useParams,
 } from "@tanstack/react-router";
-import { addDays, format } from "date-fns";
+import { addDays } from "date-fns";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import ErrorMessage from "~/components/errorMessage";
