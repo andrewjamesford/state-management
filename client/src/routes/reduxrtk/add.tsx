@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import ErrorMessage from "~/components/errorMessage";
 import Loader from "~/components/loader";
 import ListingForm from "~/forms/listingForm";
-import type { Category, Listing, ListingSchema } from "~/models";
+import type { ApiListing, Category, Listing } from "~/models";
 import {
 	useAddListingMutation,
 	useGetParentCategoriesQuery,
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/reduxrtk/add")({
 });
 
 // Add initial state types and values
-const initialState: ListingSchema = {
+const initialState: Listing = {
 	id: 0,
 	title: "",
 	subTitle: "",
@@ -51,7 +51,7 @@ function RouteComponent() {
 	const tomorrow = new Date(addDays(today, 1));
 	const fortnight = new Date(addDays(today, 14));
 
-	const [formState, setFormState] = useState<ListingSchema>({
+	const [formState, setFormState] = useState<Listing>({
 		...initialState,
 		endDate: tomorrow,
 	});
@@ -79,7 +79,7 @@ function RouteComponent() {
 		}
 
 		try {
-			const listingToAdd: Listing = {
+			const listingToAdd: ApiListing = {
 				...formState,
 				endDate: format(formState.endDate, "yyyy-MM-dd"),
 				listingPrice: String(formState.listingPrice),
