@@ -65,11 +65,10 @@
 	},
 	"extensions": {
 		"recommendations": [
-			"ms-azuretools.vscode-docker",
+			"ms-azuretools.vscode-containers",
 			"ms-playwright.playwright",
 			"ms-edgedevtools.vscode-edge-devtools",
 			"orta.vscode-jest",
-			"ms-azuretools.vscode-docker",
 			"mtxr.sqltools",
 			"biomejs.biome",
 			"bradlc.vscode-tailwindcss",
