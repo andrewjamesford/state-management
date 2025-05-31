@@ -1,3 +1,15 @@
-.aider*
+public/**/*
+dist/**/*
+node_modules/**/*
+build/**/*
 .env
-package-lock.json
+*.swp
+*.swo
+.vscode/settings.json
+.vscode/extensions
+.idea
+.DS_Store
+Thumbs.db
+CLAUDE.md
+.aider*
+client/1/

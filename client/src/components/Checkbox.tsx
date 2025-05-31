@@ -3,6 +3,7 @@ import type React from "react";
 interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
 	label?: string;
 	labelClassName?: string;
+	id: string;
 }
 
 const Checkbox: React.FC<CheckboxProps> = ({

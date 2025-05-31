@@ -1,3 +1,4 @@
+import { useLocation } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
 /**
@@ -37,11 +38,16 @@ function NavItem({ href, isActive, children }: NavItemProps) {
  * @param {number} props.currentStep - The current step in the breadcrumb navigation.
  * @returns {JSX.Element} The rendered breadcrumb navigation.
  */
-export default function BreadCrumbs({ currentStep }) {
-	const path = usePath();
-	const stepArray = path[0].split("/");
-	const step = stepArray[2];
-	const page = stepArray[1];
+interface BreadCrumbsProps {
+	currentStep: number;
+}
+
+export default function BreadCrumbs({ currentStep }: BreadCrumbsProps) {
+	const location = useLocation();
+	const pathname = location.pathname || "";
+	const pathParts = pathname.split("/").filter(Boolean);
+	const page = pathParts[0] || "redux";
+	const step = currentStep.toString();
 
 	const steps = [
 		{ href: `/${page}/1`, label: "Title & Category" },

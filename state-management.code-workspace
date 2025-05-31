@@ -23,39 +23,43 @@
 			"node_modules/": true,
 			"packages/": true
 		},
-		"jest.autoEnable": false,
 		"jest.disabledWorkspaceFolders": [
 			"DB",
 			"ROOT"
-		],
-		"sqltools.connections": [
-			{
-				"previewLimit": 50,
-				"server": "localhost",
-				"port": 5432,
-				"driver": "PostgreSQL",
-				"name": "localdb",
-				"database": "postgres",
-				"username": "postgres",
-				"password": "password"
-			}
 		],
 		"[dockerfile]": {
 			"editor.defaultFormatter": "ms-azuretools.vscode-docker"
 		},
 		"[dockercompose]": {
 			"editor.defaultFormatter": "ms-azuretools.vscode-docker"
-		}
+		},
+		"cSpell.words": [
+			"banktransferpayment",
+			"bitcoinpayment",
+			"categoryid",
+			"creditcardpayment",
+			"enddate",
+			"listingdescription",
+			"listingprice",
+			"reserveprice",
+			"shippingoption",
+			"subcategoryid"
+		],
+		"[jsonc]": {
+			"editor.defaultFormatter": "vscode.json-language-features"
+		},
+		"postman.settings.dotenv-detection-notification-visibility": false
 	},
 	"extensions": {
 		"recommendations": [
-			"ms-azuretools.vscode-docker",
+			"ms-azuretools.vscode-containers",
+			"ms-playwright.playwright",
+			"ms-edgedevtools.vscode-edge-devtools",
 			"orta.vscode-jest",
-			"ms-azuretools.vscode-docker",
-			"mtxr.sqltools",
 			"biomejs.biome",
 			"bradlc.vscode-tailwindcss",
-			"anweber.vscode-httpyac"
+			"anweber.vscode-httpyac",
+			"vitest.explorer"
 		]
-	}
+	},
 }

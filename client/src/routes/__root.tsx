@@ -1,11 +1,11 @@
-import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { lazy, Suspense } from "react";
+import { Outlet, createRootRoute } from "@tanstack/react-router";
+import { Suspense, lazy } from "react";
 
 import Footer from "~/components/footer";
 import Header from "~/components/header";
-import Skeleton from "~/components/skeleton";
 import NotFoundPage from "~/components/notFoundPage";
+import Skeleton from "~/components/skeleton";
 
 import { generateUUID } from "~/utils/generateUUID";
 import { getLocalStorageItem, setLocalStorageItem } from "~/utils/localStorage";
@@ -15,7 +15,7 @@ const TanStackRouterDevtools =
 		? () => null // Render nothing in production
 		: lazy(() =>
 				// Lazy load in development
-				import("@tanstack/router-devtools").then((res) => ({
+				import("@tanstack/react-router-devtools").then((res) => ({
 					default: res.TanStackRouterDevtools,
 					// For Embedded Mode
 					// default: res.TanStackRouterDevtoolsPanel
@@ -46,7 +46,7 @@ const getUserID = () => {
 
 getUserID();
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 export const Route = createRootRoute({
 	loader: () => <Skeleton />,

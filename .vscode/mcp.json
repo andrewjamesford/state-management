@@ -1,0 +1,14 @@
+{
+    "servers": {
+        "postgres": {
+            "command": "docker",
+            "args": [
+                "run",
+                "-i",
+                "--rm",
+                "mcp/postgres",
+                "postgresql://host.docker.internal:5432/statemanagement"
+            ]
+        }
+    }
+}

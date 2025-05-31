@@ -1,7 +1,8 @@
-import { StrictMode } from "react";
-import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
-// biome-ignore lint: import-styles
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { Provider } from "react-redux";
+import { store } from "./store/reduxrtk/store";
 import "~/index.css";
 
 // Import the generated route tree
@@ -19,11 +20,12 @@ declare module "@tanstack/react-router" {
 
 // Render the app
 const rootElement = document.getElementById("root");
-if (rootElement && !rootElement.innerHTML) {
-	const root = ReactDOM.createRoot(rootElement);
-	root.render(
-		<StrictMode>
+if (!rootElement) throw new Error("Failed to find the root element");
+
+ReactDOM.createRoot(rootElement).render(
+	<React.StrictMode>
+		<Provider store={store}>
 			<RouterProvider router={router} />
-		</StrictMode>,
-	);
-}
+		</Provider>
+	</React.StrictMode>,
+);

@@ -6,7 +6,7 @@
  * @param {function} props.onChange - The function to call when the button is clicked.
  * @returns {JSX.Element} The rendered component.
  */
-export default function MenuLoggedOut({ onChange }) {
+export default function MenuLoggedOut({ onChange }: { onChange: () => void }) {
 	return (
 		<ul className="flex list-none flex-col items-center gap-2 md:flex-row md:gap-4">
 			<li>

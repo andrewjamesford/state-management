@@ -1,5 +1,6 @@
-import { Pool } from "pg";
-import { config } from "dotenv";
+import pg from "pg";
+
+const { Pool } = pg;
 
 // Database connection pool
 export const pool = new Pool({

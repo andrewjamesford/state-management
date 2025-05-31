@@ -4,8 +4,7 @@ import express, {
 	type NextFunction,
 } from "express";
 const router = express.Router();
-import { getCategories } from "./categories.repository";
-import type { QueryResult } from "pg";
+import { getCategories } from "./categories.repository.js";
 
 // Get all categories
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {

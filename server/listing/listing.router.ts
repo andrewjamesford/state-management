@@ -1,16 +1,16 @@
 import express from "express";
 import type { Request, Response, NextFunction } from "express";
 const router = express.Router();
-import Joi from "joi";
-import bodyValidationMiddleware from "../middleware/bodyValidationMiddleware";
+import bodyValidationMiddleware from "../middleware/bodyValidationMiddleware.js";
 import {
 	addListing,
 	getListings,
 	getListing,
 	updateListing,
-} from "./listing.repository";
+} from "./listing.repository.js";
 
-import type { ListingDetails } from "./listing.repository";
+import { listingSchema } from "./listing.schema.js";
+import type { Listing } from "./listing.model.js";
 
 router.use(express.json());
 
@@ -27,8 +27,10 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		// Call getListings() to retrieve all listings from the database
 		const getListingsResponse = await getListings();
+		if (!getListingsResponse.length)
+			return res.status(404).json({ message: "No listings found" });
 
-		return res.json(getListingsResponse);
+		return res.status(200).json(getListingsResponse);
 	} catch (err) {
 		next(err);
 	}
@@ -47,60 +49,24 @@ router.get(
 	"/:listingId",
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const listingId = req.params.listingId;
-			if (listingId) {
-				const listing = await getListing(Number(listingId));
-				return res.json(listing);
+			const listingId = Number(req.params.listingId);
+			if (Number.isNaN(listingId)) {
+				return res.status(404).json({ message: "Listing not found" });
 			}
-			return res.json({ message: "Listing ID is required" });
+
+			const listing = await getListing(Number(listingId));
+			if (!listing) {
+				return res.status(404).json({ message: "Listing not found" });
+			}
+			return res.json(listing);
 		} catch (err) {
 			next(err);
 		}
 	},
 );
 
-// Schema for adding a new listing
-const listingSchema = Joi.object().keys({
-	listing: Joi.object({
-		titleCategory: Joi.object({
-			id: Joi.number().optional(),
-			title: Joi.string().required(),
-			subTitle: Joi.string(),
-			categoryId: Joi.number().greater(0).required(),
-			subCategoryId: Joi.number(),
-			endDate: Joi.date().greater("now").required(),
-		}).required(),
-		itemDetails: Joi.object({
-			description: Joi.string().required(),
-			condition: Joi.boolean().required(),
-		}).required(),
-		pricePayment: Joi.object({
-			listingPrice: Joi.string().required(),
-			reservePrice: Joi.string(),
-			creditCardPayment: Joi.boolean().required(),
-			bankTransferPayment: Joi.boolean().required(),
-			bitcoinPayment: Joi.boolean().required(),
-		}).required(),
-		shipping: Joi.object({
-			pickUp: Joi.boolean().required(),
-			shippingOption: Joi.string().required(),
-		}).required(),
-	})
-		.required()
-		.custom((value) => {
-			if (
-				value.pricePayment.creditCardPayment === false &&
-				value.pricePayment.bankTransferPayment === false &&
-				value.pricePayment.bitcoinPayment === false
-			) {
-				throw new Error("At least one of the payment methods must be selected");
-			}
-		}),
-});
-
 /**
  * Add a new Listing
- *
  * @name POST /listings
  * @function
  * @param {Object} req - The request object
@@ -112,11 +78,16 @@ router.post(
 	bodyValidationMiddleware(listingSchema),
 	async (req, res, next) => {
 		try {
-			const listing = req.body.listing;
-
+			const listing: Listing = req.body;
 			const addListingResponse = await addListing(listing);
+			if (!addListingResponse) {
+				return res.status(400).json({ message: "Error adding listing" });
+			}
 
-			return res.json(addListingResponse);
+			// If addListingResponse is a number, it indicates the ID of the newly created listing
+			if (typeof addListingResponse === "number" && addListingResponse > 0) {
+				return res.status(201).json({ id: addListingResponse });
+			}
 		} catch (err) {
 			console.error(err);
 			next(err);
@@ -139,9 +110,19 @@ router.put(
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const listingId = Number(req.params.listingId);
-			const listing: ListingDetails = req.body;
+			const listing: Listing = req.body;
 			const updateListingResponse = await updateListing(listingId, listing);
-			return res.json(updateListingResponse);
+			if (!updateListingResponse) {
+				return res.status(404).json({ message: "Listing not found" });
+			}
+
+			// Fetch and return the updated listing
+			const updatedListing = await getListing(listingId);
+			if (!updatedListing) {
+				return res.status(404).json({ message: "Listing not found" });
+			}
+
+			return res.json(updatedListing);
 		} catch (err) {
 			console.error(err);
 			next(err);

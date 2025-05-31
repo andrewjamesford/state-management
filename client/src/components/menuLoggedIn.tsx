@@ -18,7 +18,7 @@ export default function MenuLoggedIn({
 				<LinkComponent to="/tsquery" title="Tanstack Query" />
 			</li>
 			<li>
-				<LinkComponent to="/redux" title="Redux" />
+				<LinkComponent to="/reduxrtk" title="Redux" />
 			</li>
 			<li>
 				<LinkComponent to="/zustand" title="Zustand" />

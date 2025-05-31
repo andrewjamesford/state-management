@@ -1,17 +1,19 @@
 {
 	"name": "state-management-server",
 	"version": "1.0.0",
-	"description": "",
+	"description": "Server for the state management application",
 	"main": "index.ts",
+	"type": "module",
 	"scripts": {
-		"dev": "tsx watch --inspect=0.0.0.0:9229 ./index.ts",
+		"dev": "tsx watch --inspect=0.0.0.0:9230 ./index.ts",
 		"start": "npm run build && node dist/index.js",
 		"build": "tsc",
 		"test": "vitest",
 		"check": "biome check --write ./**/*.ts",
 		"format": "biome format --write ./**/*.ts",
 		"report": "biome check --reporter=summary --log-level=warn ./",
-		"httptest": "httpyac send -a ./http/*.http"
+		"httptest": "httpyac send -a ./http/*.http",
+		"clean": "rm -rf ./dist ./coverage ./node_modules"
 	},
 	"author": "Andrew Ford",
 	"license": "GPL-3.0-only",
@@ -20,8 +22,8 @@
 		"dotenv": "^16.4.5",
 		"express": "^4.21.2",
 		"helmet": "^8.0.0",
-		"joi": "^17.13.3",
-		"pg": "^8.12.0"
+		"pg": "^8.12.0",
+		"zod": "^3.24.1"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
@@ -36,8 +38,7 @@
 		"supertest": "^7.0.0",
 		"tsx": "^4.19.2",
 		"typescript": "~5.6.2",
-		"vitest": "^2.0.5",
-		"zod": "^3.24.1"
+		"vitest": "^3.1.1"
 	},
 	"engines": {
 		"node": ">=22.0.0"
