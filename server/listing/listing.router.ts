@@ -115,7 +115,14 @@ router.put(
 			if (!updateListingResponse) {
 				return res.status(404).json({ message: "Listing not found" });
 			}
-			return res.json(updateListingResponse);
+
+			// Fetch and return the updated listing
+			const updatedListing = await getListing(listingId);
+			if (!updatedListing) {
+				return res.status(404).json({ message: "Listing not found" });
+			}
+
+			return res.json(updatedListing);
 		} catch (err) {
 			console.error(err);
 			next(err);

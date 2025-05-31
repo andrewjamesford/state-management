@@ -313,7 +313,7 @@ const PriceAndPaymentSection = ({ formState, setFormState }: SectionProps) => (
 					id="listing-price"
 					placeholder="10.00"
 					value={
-						Number.isNaN(formState.listingPrice) ? "" : formState.listingPrice
+						Number.isNaN(formState.listingPrice) ? 0 : formState.listingPrice
 					}
 					onChange={(e) => {
 						const value = Number(e.target.value) || 0;
@@ -333,9 +333,9 @@ const PriceAndPaymentSection = ({ formState, setFormState }: SectionProps) => (
 					label="Reserve price (optional)"
 					labelClassName="block text-sm font-medium text-gray-700"
 					id="listing-reserve"
-					placeholder="$20.00"
+					placeholder="20.00"
 					value={
-						Number.isNaN(formState.reservePrice) ? "" : formState.reservePrice
+						Number.isNaN(formState.reservePrice) ? 0 : formState.reservePrice
 					}
 					onChange={(e) => {
 						const value = Number(e.target.value) || 0;

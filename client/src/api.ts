@@ -3,6 +3,11 @@ import { format, parseISO } from "date-fns";
 
 // Convert API listing to internal listing format
 function convertFromApiListing(apiListing: ApiListing): Listing {
+	// Safety check to ensure apiListing has the expected structure
+	if (!apiListing || typeof apiListing !== "object" || !apiListing.endDate) {
+		throw new Error("Invalid API listing data received");
+	}
+
 	return {
 		...apiListing,
 		endDate: parseISO(apiListing.endDate),
