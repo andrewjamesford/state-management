@@ -161,11 +161,8 @@ async function updateListing(id: number, listing: Listing): Promise<Listing> {
 			body: JSON.stringify(apiListing),
 		},
 	);
-	await handleApiResponse<number>(response);
-
-	// Server returns just the number of affected rows, not the full listing
-	// Return the original listing data since the update was successful
-	return listing;
+	const result = await handleApiResponse<ApiListing>(response);
+	return convertFromApiListing(result);
 }
 
 /**
