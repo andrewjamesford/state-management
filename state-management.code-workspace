@@ -23,22 +23,9 @@
 			"node_modules/": true,
 			"packages/": true
 		},
-		"jest.autoEnable": false,
 		"jest.disabledWorkspaceFolders": [
 			"DB",
 			"ROOT"
-		],
-		"sqltools.connections": [
-			{
-				"previewLimit": 50,
-				"server": "localhost",
-				"port": 5432,
-				"driver": "PostgreSQL",
-				"name": "db",
-				"database": "statemanagement",
-				"username": "postgres",
-				"password": "postgres"
-			}
 		],
 		"[dockerfile]": {
 			"editor.defaultFormatter": "ms-azuretools.vscode-docker"
@@ -69,11 +56,9 @@
 			"ms-playwright.playwright",
 			"ms-edgedevtools.vscode-edge-devtools",
 			"orta.vscode-jest",
-			"mtxr.sqltools",
 			"biomejs.biome",
 			"bradlc.vscode-tailwindcss",
 			"anweber.vscode-httpyac",
-			"mtxr.sqltools-driver-pg",
 			"vitest.explorer"
 		]
 	},
