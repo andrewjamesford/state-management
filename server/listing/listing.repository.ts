@@ -118,11 +118,12 @@ export const addListing = async (listingDetails: Listing): Promise<number> => {
 			bitcoin_payment,
 			pick_up,
 			shipping_option)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13);
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+			RETURNING id;
 		`,
 			[
 				title,
-				subCategoryId, // Corrected: Insert subCategoryId into category_id column
+				subCategoryId,
 				subTitle,
 				endDate,
 				description,
@@ -136,7 +137,7 @@ export const addListing = async (listingDetails: Listing): Promise<number> => {
 				shippingOption,
 			],
 		);
-		return result.rowCount ?? 0;
+		return result.rows[0]?.id ?? 0;
 	} catch (error) {
 		if (error instanceof Error) {
 			console.error(`Error adding listing: ${error.message}`, error);

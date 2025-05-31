@@ -69,7 +69,7 @@ function RouteComponent() {
 			const result = await api.addListing(listing);
 			if (!result) throw new Error("Error adding listing");
 			if (
-				typeof result === "number" ||
+				typeof result.id === "number" ||
 				(typeof result === "object" && "message" in result)
 			) {
 				return 1;

@@ -141,7 +141,16 @@ async function addListing(listing: Listing): Promise<Listing> {
 		body: JSON.stringify(apiListing),
 	});
 	const result = await handleApiResponse<ApiListing>(response);
-	return convertFromApiListing(result);
+
+	if (!result) {
+		throw new Error("Failed to add listing");
+	}
+	const listingWithId: ApiListing = {
+		...apiListing,
+		id: result.id || 0, // Ensure id is present
+	};
+
+	return convertFromApiListing(listingWithId);
 }
 
 /**
@@ -162,6 +171,10 @@ async function updateListing(id: number, listing: Listing): Promise<Listing> {
 		},
 	);
 	const result = await handleApiResponse<ApiListing>(response);
+
+	if (!result) {
+		throw new Error("Failed to update listing");
+	}
 	return convertFromApiListing(result);
 }
 

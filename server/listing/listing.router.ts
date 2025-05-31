@@ -78,10 +78,16 @@ router.post(
 	bodyValidationMiddleware(listingSchema),
 	async (req, res, next) => {
 		try {
-			// Changed: use req.body directly
-			const listing = req.body;
+			const listing: Listing = req.body;
 			const addListingResponse = await addListing(listing);
-			return res.json(addListingResponse);
+			if (!addListingResponse) {
+				return res.status(400).json({ message: "Error adding listing" });
+			}
+
+			// If addListingResponse is a number, it indicates the ID of the newly created listing
+			if (typeof addListingResponse === "number" && addListingResponse > 0) {
+				return res.status(201).json({ id: addListingResponse });
+			}
 		} catch (err) {
 			console.error(err);
 			next(err);
